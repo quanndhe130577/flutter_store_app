@@ -3,6 +3,8 @@ import 'package:flutter_food_app/HomeScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'SignUpScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'ForgotScreen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -13,16 +15,76 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreen extends State<LogInScreen> {
+  bool signInState = false;
   var _formKey = GlobalKey<FormState>();
   String email = "", password = "";
 
+  String error = "";
+  bool _isVisible = false;
+
+  void showError(String msg) {
+    setState(() {
+      _isVisible = true;
+      error = msg;
+    });
+  }
+
+  void hideError() {
+    setState(() {
+      _isVisible = false;
+      error = "";
+    });
+  }
+
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<String> logIn() async {
-    String user = (await auth.signInWithEmailAndPassword(
-        email: email.trim(), password: password)) as String;
+  Future<void> logIn() async {
+    try {
+      var userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) => {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => HomeScreen()))
+              });
+    } catch (e) {
+      switch (e.code) {
+        case "ERROR_INVALID_EMAIL":
+          showError("Your email address appears to be malformed.");
+          break;
+        case "ERROR_WRONG_PASSWORD":
+          showError("Your password is wrong.");
+          break;
+        case "ERROR_USER_NOT_FOUND":
+          showError("User with this email doesn't exist.");
+          break;
+        case "ERROR_USER_DISABLED":
+          showError("User with this email has been disabled.");
+          break;
+        case "ERROR_TOO_MANY_REQUESTS":
+          showError("Too many requests. Try again later.");
+          break;
+        case "ERROR_OPERATION_NOT_ALLOWED":
+          showError("Signing in with Email and Password is not enabled.");
+          break;
+        default:
+          showError("An undefined Error happened.");
+      }
+    }
+  }
 
-    return user;
+  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  Future<void> googleSignInApp() async {
+    GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
+    GoogleSignInAuthentication signInAuthentication = await signInAccount.authentication;
+    AuthCredential credential = GoogleAuthProvider.getCredential(idToken: signInAuthentication.idToken, accessToken: signInAuthentication.accessToken);
+    FirebaseUser user= (await auth.signInWithCredential(credential)).user;
+
+    print(user);
+    setState(() {
+      signInState = true;
+    });
   }
 
   @override
@@ -30,7 +92,7 @@ class _LogInScreen extends State<LogInScreen> {
     // TODO: implement initState
     super.initState();
     Future(() async {
-      if (await auth != null) {
+      if (await auth.currentUser() != null) {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
       }
@@ -67,7 +129,7 @@ class _LogInScreen extends State<LogInScreen> {
                             fontSize: 35),
                       ),
                       Text(
-                        "Welcom to our store",
+                        "Welcome to our store",
                         style: TextStyle(
                           color: Colors.white,
                         ),
@@ -155,13 +217,30 @@ class _LogInScreen extends State<LogInScreen> {
                   ),
                 ),
               ),
+              Visibility(
+                visible: _isVisible,
+                child: Container(
+                  padding: EdgeInsets.only(top: 5, right: 20),
+                  width: double.infinity,
+                  child: Text(
+                    error,
+                    style: TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
               Container(
                 padding: EdgeInsets.only(top: 5, right: 20),
                 width: double.infinity,
-                child: Text(
-                  "Forgot password",
-                  style: TextStyle(color: Color(0xffff2fc3)),
-                  textAlign: TextAlign.right,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => ForgotScreen()) );
+                  },
+                  child: Text(
+                    "Forgot password",
+                    style: TextStyle(color: Color(0xffff2fc3)),
+                    textAlign: TextAlign.right,
+                  ),
                 ),
               ),
               SizedBox(
@@ -172,14 +251,8 @@ class _LogInScreen extends State<LogInScreen> {
                 child: RaisedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      Future<String> check = logIn();
-                      if (check != null) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    HomeScreen()));
-                      }
+                      hideError();
+                      logIn();
                     }
                   },
                   shape: RoundedRectangleBorder(
@@ -206,7 +279,12 @@ class _LogInScreen extends State<LogInScreen> {
               Padding(
                 padding: EdgeInsets.only(top: 20, left: 20, right: 20),
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    googleSignInApp();
+                    if(signInState){
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
+                    }
+                  },
                   color: Colors.white,
                   padding: EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
