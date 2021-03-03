@@ -13,14 +13,49 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreen extends State<SignUpScreen> {
-
   String email = "", password = "";
   var _formKey = GlobalKey<FormState>();
 
+  String error = "";
+  bool _isVisible = false;
+
+  void showError(String msg) {
+    setState(() {
+      _isVisible = true;
+      error = msg;
+    });
+  }
+
+  void hideError() {
+    setState(() {
+      _isVisible = false;
+      error = "";
+    });
+  }
+
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<void> register() async{
-    FirebaseUser user = (await auth.createUserWithEmailAndPassword(email: email.trim(), password: password)) as FirebaseUser;
+  Future<void> register() async {
+    try {
+      await auth
+          .createUserWithEmailAndPassword(
+              email: email.trim(), password: password)
+          .then((value) => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            HomeScreen(value.user.email)))
+              });
+    } catch (e) {
+      switch (e.code) {
+        case "ERROR_EMAIL_ALREADY_IN_USE":
+          showError("Your email has existed");
+          break;
+        default:
+          showError("An undefined Error happened.");
+      }
+    }
   }
 
   @override
@@ -72,8 +107,8 @@ class _SignUpScreen extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.only(top: 40, right: 20, left: 20),
                 child: TextFormField(
-                  validator: (value){
-                    if(value.isEmpty){
+                  validator: (value) {
+                    if (value.isEmpty) {
                       return "Please enter username";
                     }
                     return null;
@@ -107,10 +142,10 @@ class _SignUpScreen extends State<SignUpScreen> {
                 padding: EdgeInsets.only(top: 10, right: 20, left: 20),
                 child: TextFormField(
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value){
-                    if(value.isEmpty){
+                  validator: (value) {
+                    if (value.isEmpty) {
                       return "Please enter email";
-                    }else{
+                    } else {
                       email = value;
                     }
                     return null;
@@ -145,12 +180,12 @@ class _SignUpScreen extends State<SignUpScreen> {
                 child: TextFormField(
                   obscureText: true,
                   autocorrect: false,
-                  validator: (value){
-                    if(value.isEmpty){
+                  validator: (value) {
+                    if (value.isEmpty) {
                       return "Please enter password";
-                    }else if(value.length < 8){
+                    } else if (value.length < 8) {
                       return "Your password shouldn't be less than 8 character";
-                    }else{
+                    } else {
                       password = value;
                     }
                     return null;
@@ -181,13 +216,25 @@ class _SignUpScreen extends State<SignUpScreen> {
             SizedBox(
               height: 10,
             ),
+            Visibility(
+              visible: _isVisible,
+              child: Container(
+                //padding: EdgeInsets.only(top: 5, right: 20),
+                width: double.infinity,
+                child: Text(
+                  error,
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
             Padding(
               padding: EdgeInsets.only(right: 20, left: 20),
               child: RaisedButton(
                 onPressed: () {
-                  if(_formKey.currentState.validate()){
+                  if (_formKey.currentState.validate()) {
+                    hideError();
                     register();
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
                   }
                 },
                 shape: RoundedRectangleBorder(

@@ -5,6 +5,8 @@ import 'SignUpScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'ForgotScreen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -15,7 +17,6 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreen extends State<LogInScreen> {
-  bool signInState = false;
   var _formKey = GlobalKey<FormState>();
   String email = "", password = "";
 
@@ -46,7 +47,8 @@ class _LogInScreen extends State<LogInScreen> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) => HomeScreen()))
+                        builder: (BuildContext context) =>
+                            HomeScreen(value.user.email)))
               });
     } catch (e) {
       switch (e.code) {
@@ -77,14 +79,60 @@ class _LogInScreen extends State<LogInScreen> {
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   Future<void> googleSignInApp() async {
     GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
-    GoogleSignInAuthentication signInAuthentication = await signInAccount.authentication;
-    AuthCredential credential = GoogleAuthProvider.getCredential(idToken: signInAuthentication.idToken, accessToken: signInAuthentication.accessToken);
-    FirebaseUser user= (await auth.signInWithCredential(credential)).user;
+    GoogleSignInAuthentication signInAuthentication =
+        await signInAccount.authentication;
+    AuthCredential credential = GoogleAuthProvider.getCredential(
+        idToken: signInAuthentication.idToken,
+        accessToken: signInAuthentication.accessToken);
+    await auth.signInWithCredential(credential).then((value) => {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      HomeScreen(value.user.email)))
+        });
+  }
 
-    print(user);
-    setState(() {
-      signInState = true;
-    });
+  Future<void> signInWithFacebook() async {
+    // // Trigger the sign-in flow
+    // AccessToken result = await FacebookAuth.instance.login();
+    //
+    // // Create a credential from the access token
+    // AuthCredential facebookAuthCredential =
+    //     FacebookAuthProvider.getCredential(accessToken: result.token);
+    //
+    // // Once signed in, return the UserCredential
+    // await auth.signInWithCredential(facebookAuthCredential).then((value) => {
+    //       Navigator.pushReplacement(
+    //           context,
+    //           MaterialPageRoute(
+    //               builder: (BuildContext context) =>
+    //                   HomeScreen(value.user.email)))
+    //     });
+    FacebookLogin facebookSignIn = new FacebookLogin();
+    FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        final FacebookAccessToken accessToken = result.accessToken;
+        print('''
+         Logged in!
+
+         Token: ${accessToken.token}
+         User id: ${accessToken.userId}
+         Expires: ${accessToken.expires}
+         Permissions: ${accessToken.permissions}
+         Declined permissions: ${accessToken.declinedPermissions}
+         ''');
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        print('Login cancelled by the user.');
+        break;
+      case FacebookLoginStatus.error:
+        print('Something went wrong with the login process.\n'
+            'Here\'s the error Facebook gave us: ${result.errorMessage}');
+        break;
+    }
   }
 
   @override
@@ -92,10 +140,20 @@ class _LogInScreen extends State<LogInScreen> {
     // TODO: implement initState
     super.initState();
     Future(() async {
-      if (await auth.currentUser() != null) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
-      }
+      auth.currentUser().then((value) => {
+            if (value != null)
+              {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            HomeScreen(value.email)))
+              }
+          });
+      // if (await auth.currentUser() != null) {
+      //   Navigator.pushReplacement(context,
+      //       MaterialPageRoute(builder: (BuildContext context) => HomeScreen(auth.currentUser().then((value) => value.email))));
+      // }
     });
   }
 
@@ -234,7 +292,10 @@ class _LogInScreen extends State<LogInScreen> {
                 width: double.infinity,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => ForgotScreen()) );
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => ForgotScreen()));
                   },
                   child: Text(
                     "Forgot password",
@@ -281,9 +342,6 @@ class _LogInScreen extends State<LogInScreen> {
                 child: RaisedButton(
                   onPressed: () {
                     googleSignInApp();
-                    if(signInState){
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
-                    }
                   },
                   color: Colors.white,
                   padding: EdgeInsets.all(10),
@@ -308,14 +366,16 @@ class _LogInScreen extends State<LogInScreen> {
               Padding(
                 padding: EdgeInsets.only(top: 20, left: 20, right: 20),
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    signInWithFacebook();
+                  },
                   color: Colors.white,
                   padding: EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   child: Row(
                     children: [
-                      //we meed to import font awasome
+                      //we meed to import font awesome
                       Icon(FontAwesomeIcons.facebook, color: Colors.blue),
                       SizedBox(width: 10),
                       Text(
