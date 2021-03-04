@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toast/toast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 
 class UploadData extends StatefulWidget {
   @override
@@ -186,11 +186,17 @@ class _UploadDataState extends State<UploadData> {
               RaisedButton(
                 onPressed: () {
                   if (imageFile == null) {
-                    Fluttertoast.showToast(
-                        msg: "Please select an image",
-                        gravity: ToastGravity.CENTER,
-                        toastLength: Toast.LENGTH_LONG,
-                        timeInSecForIosWeb: 2);
+                    Toast.show(
+                      "Please select an image",
+                      context,
+                      duration: 2,
+                      gravity: Toast.CENTER,
+                    );
+                    // Fluttertoast.showToast(
+                    //     msg: "Please select an image",
+                    //     gravity: ToastGravity.CENTER,
+                    //     toastLength: Toast.LENGTH_LONG,
+                    //     timeInSecForIosWeb: 2);
                   } else {
                     upload();
                   }

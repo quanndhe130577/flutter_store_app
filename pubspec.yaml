@@ -37,7 +37,8 @@ dev_dependencies:
   firebase_auth: ^0.14.0+5
   google_sign_in: ^4.5.1
   image_picker: ^0.6.7+22
-  fluttertoast: ^7.1.6
+#  fluttertoast: ^7.1.6
+  toast: ^0.1.5
   firebase_storage: ^3.1.5
   firebase_database: ^3.1.5
 #  flutter_facebook_auth: ^2.0.2+1
