@@ -210,7 +210,7 @@ class _LogInScreen extends State<LogInScreen> {
                       if (value.isEmpty) {
                         return "Please enter email";
                       } else {
-                        email = value;
+                        email = value.trim();
                       }
                       return null;
                     },
@@ -292,7 +292,7 @@ class _LogInScreen extends State<LogInScreen> {
                 width: double.infinity,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) => ForgotScreen()));

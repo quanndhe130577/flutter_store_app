@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Data.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class MyFavorite extends StatefulWidget {
   @override
   _MyFavoriteState createState() => _MyFavoriteState();
 }
 
-class _MyFavoriteState extends State<MyFavorite> {
+class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   FirebaseUser currentUser;
   List<Data> dataList = [];
+  bool isLoading = true;
   FirebaseAuth auth = FirebaseAuth.instance;
+  String test = "";
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      isLoading = true;
+    });
     auth.currentUser().then((value) => {this.currentUser = value});
     loadData();
   }
@@ -55,6 +61,7 @@ class _MyFavoriteState extends State<MyFavorite> {
 
     if (this.mounted) {
       setState(() {
+        isLoading = false;
         //dataList = dataList;
       });
     }
@@ -68,22 +75,32 @@ class _MyFavoriteState extends State<MyFavorite> {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color(0xffff2f3c),
       ),
-      body: dataList.length == 0
+      body: isLoading
           ? Center(
-              child: Text("No data available", style: TextStyle(fontSize: 30)),
+              //child: Text("No data available", style: TextStyle(fontSize: 30)),
+              child: SpinKitSquareCircle(
+                color: Colors.red,
+                size: 50.0,
+                duration: Duration(milliseconds: 1200),
+              ),
             )
-          : ListView.builder(
-              itemCount: dataList.length,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (buildContext, index) {
-                return cardUI(
-                    dataList[index].imgUrl,
-                    dataList[index].name,
-                    dataList[index].material,
-                    dataList[index].price,
-                    dataList[index].uploadId,
-                    dataList[index].fav);
-              }),
+          : dataList.length == 0
+              ? Center(
+                  child:
+                      Text("No data available", style: TextStyle(fontSize: 30)),
+                )
+              : ListView.builder(
+                  itemCount: dataList.length,
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (buildContext, index) {
+                    return cardUI(
+                        dataList[index].imgUrl,
+                        dataList[index].name,
+                        dataList[index].material,
+                        dataList[index].price,
+                        dataList[index].uploadId,
+                        dataList[index].fav);
+                  }),
     );
   }
 

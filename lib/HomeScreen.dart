@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Data.dart';
@@ -6,11 +8,10 @@ import 'UploadData.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'MyFavorite.dart';
 import 'package:toast/toast.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class HomeScreen extends StatefulWidget {
   String currentEmail = "";
-
   HomeScreen(this.currentEmail);
 
   @override
@@ -20,8 +21,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreen extends State<HomeScreen> {
   String currentEmail = "";
   List<Data> dataList = [];
+  List<Data> searchList = [];
   FirebaseUser currentUser;
   bool searchState = false;
+  bool isLoading = true;
   _HomeScreen(this.currentEmail);
 
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -37,16 +40,7 @@ class _HomeScreen extends State<HomeScreen> {
   ScrollController _controller;
 
   void reloadData() {
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
-      Toast.show(
-        "Reloading . . .",
-        context,
-        duration: 2,
-        gravity: Toast.CENTER,
-      );
-    }
-    // if (_controller.offset <= _controller.position.minScrollExtent &&
+    // if (_controller.offset >= _controller.position.maxScrollExtent &&
     //     !_controller.position.outOfRange) {
     //   Toast.show(
     //     "Reloading . . .",
@@ -55,6 +49,17 @@ class _HomeScreen extends State<HomeScreen> {
     //     gravity: Toast.CENTER,
     //   );
     // }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        isLoading = true;
+      });
+      Timer(Duration(milliseconds: 2000), () {
+        setState(() {
+          isLoading = false;
+        });
+      });
+    }
   }
 
   @override
@@ -67,6 +72,12 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void loadData() async {
+    if (this.mounted) {
+      setState(() {
+        isLoading = true;
+        //dataList = dataList;
+      });
+    }
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child("Data");
     await reference.once().then((DataSnapshot dataSnapShot) async {
@@ -93,13 +104,16 @@ class _HomeScreen extends State<HomeScreen> {
       }
 
       dataList.sort((a, b) => a.name.compareTo(b.name));
-    });
-
-    if (this.mounted) {
-      setState(() {
-        //dataList = dataList;
-      });
-    }
+      searchList = dataList;
+    }).whenComplete(() => {
+          if (this.mounted)
+            {
+              setState(() {
+                isLoading = false;
+                //dataList = dataList;
+              })
+            }
+        });
   }
 
   @override
@@ -141,16 +155,6 @@ class _HomeScreen extends State<HomeScreen> {
                     });
                   },
                 ),
-          Visibility(
-            visible: !searchState,
-            child: FlatButton.icon(
-              onPressed: () {
-                logOut();
-              },
-              icon: Icon(Icons.person),
-              label: Text("Log out"),
-            ),
-          )
         ],
       ),
       drawer: Drawer(
@@ -194,7 +198,6 @@ class _HomeScreen extends State<HomeScreen> {
                         MaterialPageRoute(
                             builder: (BuildContext context) => MyFavorite()))
                     .then((value) => loadData());
-                //loadData();
               },
             ),
             ListTile(
@@ -207,26 +210,57 @@ class _HomeScreen extends State<HomeScreen> {
               title: Text("Contact Us"),
               leading: Icon(Icons.email),
             ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: ListTile(
+                  title: Text("Log out"),
+                  leading: Icon(Icons.logout),
+                  onTap: () {
+                    logOut();
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
-      body: dataList.length == 0
-          ? Center(
-              child: Text("No data available", style: TextStyle(fontSize: 30)),
-            )
-          : ListView.builder(
-              controller: _controller,
-              itemCount: dataList.length,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (buildContext, index) {
-                return cardUI(
-                    dataList[index].imgUrl,
-                    dataList[index].name,
-                    dataList[index].material,
-                    dataList[index].price,
-                    dataList[index].uploadId,
-                    dataList[index].fav);
-              }),
+      body: Column(
+        children: [
+          Visibility(
+            visible: isLoading,
+            child: Padding(
+              padding: EdgeInsets.only(top: 15),
+              child: SpinKitWave(
+                color: Colors.red,
+                size: 35.0,
+              ),
+            ),
+          ),
+          Expanded(
+            child: searchList.length == 0
+                ? Center(
+                    child: Text("No data available",
+                        style: TextStyle(fontSize: 30)),
+                  )
+                : ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    controller: _controller,
+                    itemCount: searchList.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (buildContext, index) {
+                      return cardUI(
+                          searchList[index].imgUrl,
+                          searchList[index].name,
+                          searchList[index].material,
+                          searchList[index].price,
+                          searchList[index].uploadId,
+                          searchList[index].fav);
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -306,6 +340,12 @@ class _HomeScreen extends State<HomeScreen> {
           item.fav = fav;
         }
       }
+      for (var item in searchList) {
+        if (item.uploadId == uploadId) {
+          item.fav = fav;
+        }
+      }
+
       if (this.mounted) {
         setState(() {
           //dataList = dataList;
@@ -315,7 +355,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void searchMethod(String text) {
-    List<Data> searchList = [];
     for (var item in dataList) {
       if (item.name.contains(text) || item.material.contains(text)) {
         searchList.add(item);
@@ -323,7 +362,7 @@ class _HomeScreen extends State<HomeScreen> {
     }
     if (this.mounted) {
       setState(() {
-        dataList = searchList;
+        //
       });
     }
   }
