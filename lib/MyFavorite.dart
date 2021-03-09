@@ -48,6 +48,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
               values[key]["name"],
               values[key]["material"],
               values[key]["price"],
+              values[key]["description"],
               key,
               true,
             );
@@ -98,6 +99,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         dataList[index].name,
                         dataList[index].material,
                         dataList[index].price,
+                        dataList[index].description,
                         dataList[index].uploadId,
                         dataList[index].fav);
                   }),
@@ -105,69 +107,115 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   }
 
   Widget cardUI(String imgUrl, String name, String material, String price,
-      String uploadId, bool fav) {
+      String description, String uploadId, bool fav) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
       color: Color(0xffff2fc3),
       child: Container(
-        color: Colors.white,
-        margin: EdgeInsets.all(1.5),
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Image.network(imgUrl, fit: BoxFit.cover, height: 100),
-            SizedBox(height: 5),
-            Text(
-              name,
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 1),
-            Text("Material : $material"),
-            Container(
-              width: double.infinity,
-              child: Text(
-                '$price ${new String.fromCharCodes(new Runes('\u0024'))}',
-                style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.right,
+          color: Colors.white,
+          margin: EdgeInsets.all(1.5),
+          padding: EdgeInsets.only(right: 10, left: 10, bottom: 10),
+          child: Column(
+            children: [
+              FlatButton(
+                onPressed: () {
+                  auth.currentUser().then((value) {
+                    DatabaseReference favRef = FirebaseDatabase.instance
+                        .reference()
+                        .child("Data")
+                        .child(uploadId)
+                        .child("Fav")
+                        .child(value.uid)
+                        .child("state");
+                    favRef.set(false);
+                    removeFav(uploadId);
+                  });
+                },
+                child: Icon(Icons.remove, color: Colors.red),
+                minWidth: double.infinity,
+                color: Colors.black12,
               ),
-            ),
-            SizedBox(height: 1),
-            RaisedButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: Column(
+                        children: [
+                          Image.network(imgUrl, fit: BoxFit.cover, height: 100),
+                          SizedBox(height: 5),
+                          Text(
+                            name,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          child: Text(
+                            'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
+                            style: TextStyle(
+                              //color: Colors.red,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          width: double.infinity,
+                          child: Text(
+                            'Material : $material',
+                            style: TextStyle(
+                              //color: Colors.red,
+                              fontSize: 18,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Container(
+                            child: Text(
+                              'Descriptions: ${description != null ? description : ""}',
+                              style: TextStyle(
+                                  //color: Colors.red,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.left,
+                            ),
+                            width: double.infinity,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              child: Text(
-                "Remove",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
+              SizedBox(height: 5),
+              Container(
+                child: FlatButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.add_shopping_cart),
+                  label: Text("Add to cart"),
                 ),
+                width: double.infinity,
+                color: Colors.red,
               ),
-              onPressed: () {
-                auth.currentUser().then((value) {
-                  DatabaseReference favRef = FirebaseDatabase.instance
-                      .reference()
-                      .child("Data")
-                      .child(uploadId)
-                      .child("Fav")
-                      .child(value.uid)
-                      .child("state");
-                  favRef.set(false);
-                  removeFav(uploadId);
-                });
-              },
-            ),
-          ],
-        ),
-      ),
+            ],
+          )),
     );
   }
 

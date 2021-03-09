@@ -9,6 +9,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'MyFavorite.dart';
 import 'package:toast/toast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'MyCart.dart';
 
 class HomeScreen extends StatefulWidget {
   String currentEmail = "";
@@ -51,14 +52,15 @@ class _HomeScreen extends State<HomeScreen> {
     // }
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
-      setState(() {
-        isLoading = true;
-      });
-      Timer(Duration(milliseconds: 2000), () {
-        setState(() {
-          isLoading = false;
-        });
-      });
+      // setState(() {
+      //   isLoading = true;
+      // });
+      // Timer(Duration(milliseconds: 2000), () {
+      //   setState(() {
+      //     isLoading = false;
+      //   });
+      // });
+      loadData();
     }
   }
 
@@ -98,13 +100,14 @@ class _HomeScreen extends State<HomeScreen> {
             fav = true;
           }
           Data data = new Data(values[key]["imgUrl"], values[key]["name"],
-              values[key]["material"], values[key]["price"], key, fav);
+              values[key]["material"], values[key]["price"], values[key]["description"],key, fav);
           dataList.add(data);
         });
       }
 
       dataList.sort((a, b) => a.name.compareTo(b.name));
-      searchList = dataList;
+      //searchList = new List<Data>.from(dataList);
+      searchList = [...dataList]; //clone dataList
     }).whenComplete(() => {
           if (this.mounted)
             {
@@ -133,6 +136,7 @@ class _HomeScreen extends State<HomeScreen> {
                 onChanged: (text) {
                   searchMethod(text);
                 },
+                autofocus: true,
               ),
         actions: [
           searchState
@@ -155,6 +159,14 @@ class _HomeScreen extends State<HomeScreen> {
                     });
                   },
                 ),
+          Visibility(
+              visible: !searchState,
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart()));
+                },
+                child: Icon(Icons.shopping_cart),
+              ))
         ],
       ),
       drawer: Drawer(
@@ -254,6 +266,7 @@ class _HomeScreen extends State<HomeScreen> {
                           searchList[index].name,
                           searchList[index].material,
                           searchList[index].price,
+                          searchList[index].description,
                           searchList[index].uploadId,
                           searchList[index].fav);
                     },
@@ -264,7 +277,7 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, String price,
+  Widget cardUI(String imgUrl, String name, String material, String price, String description,
       String uploadId, bool fav) {
     return Card(
       elevation: 7,
@@ -303,21 +316,39 @@ class _HomeScreen extends State<HomeScreen> {
                 ),
               ),
               SizedBox(height: 1),
-              fav
-                  ? IconButton(
-                      icon: Icon(Icons.favorite),
-                      color: Colors.red,
-                      onPressed: () {
-                        favoriteFunc(uploadId, !fav);
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.favorite),
-                      color: Colors.grey,
-                      onPressed: () {
-                        favoriteFunc(uploadId, !fav);
-                      },
-                    )
+              Row(
+                children: [
+                  fav
+                      ? Tooltip(
+                          message: 'High quality',
+                          child: IconButton(
+                            icon: Icon(Icons.favorite),
+                            color: Colors.red,
+                            onPressed: () {
+                              favoriteFunc(uploadId, !fav);
+                            },
+                          ),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.favorite),
+                          color: Colors.grey,
+                          onPressed: () {
+                            favoriteFunc(uploadId, !fav);
+                          },
+                          tooltip: "Love",
+                        ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FlatButton.icon(
+                        onPressed: () {},
+                        icon: Icon(Icons.add_shopping_cart),
+                        label: Text("Add to cart"),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
         ),
@@ -355,6 +386,8 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void searchMethod(String text) {
+    searchList.clear();
+    int count = dataList.length;
     for (var item in dataList) {
       if (item.name.contains(text) || item.material.contains(text)) {
         searchList.add(item);

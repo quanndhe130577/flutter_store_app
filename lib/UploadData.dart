@@ -15,7 +15,7 @@ class UploadData extends StatefulWidget {
 }
 
 class _UploadDataState extends State<UploadData> {
-  String name = "", material = "", price = "";
+  String name = "", material = "", price = "", description = "";
   File imageFile;
   var _formKey = GlobalKey<FormState>();
   @override
@@ -183,30 +183,73 @@ class _UploadDataState extends State<UploadData> {
                 ],
               ),
               SizedBox(height: 10),
-              RaisedButton(
-                onPressed: () {
-                  if (imageFile == null) {
-                    Toast.show(
-                      "Please select an image",
-                      context,
-                      duration: 2,
-                      gravity: Toast.CENTER,
-                    );
-                    // Fluttertoast.showToast(
-                    //     msg: "Please select an image",
-                    //     gravity: ToastGravity.CENTER,
-                    //     toastLength: Toast.LENGTH_LONG,
-                    //     timeInSecForIosWeb: 2);
-                  } else {
-                    upload();
-                  }
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                color: Color(0xffff2fc3),
-                child: Text("Upload",
-                    style: TextStyle(fontSize: 19, color: Colors.blue)),
-              )
+              Expanded(
+                child: Column(
+                  children: [
+                    Theme(
+                      data: ThemeData(
+                        hintColor: Colors.blue,
+                      ),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "PLease write the description of production";
+                          } else {
+                            description = value;
+                            return null;
+                          }
+                        },
+                        style: TextStyle(color: Colors.white),
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    RaisedButton(
+                      onPressed: () {
+                        if (imageFile == null) {
+                          Toast.show(
+                            "Please select an image",
+                            context,
+                            duration: 2,
+                            gravity: Toast.CENTER,
+                          );
+                        } else {
+                          upload();
+                        }
+                      },
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Color(0xffff2fc3),
+                      child: Text("Upload",
+                          style: TextStyle(fontSize: 19, color: Colors.blue)),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -290,6 +333,7 @@ class _UploadDataState extends State<UploadData> {
       map["material"] = material;
       map["price"] = price;
       map["imgUrl"] = url;
+      map["description"] = description;
 
       await databaseReference
           .child(uploadId)
