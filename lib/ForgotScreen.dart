@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:toast/toast.dart';
 
 class ForgotScreen extends StatefulWidget {
   @override
@@ -73,24 +74,35 @@ class _ForgotScreenState extends State<ForgotScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 20),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         FirebaseAuth.instance
                             .sendPasswordResetEmail(email: email)
-                            .then((value) => {print("Check your mails")});
+                            .then((value) => {
+                                  Toast.show(
+                                    "Please select an image",
+                                    context,
+                                    duration: 2,
+                                    gravity: Toast.CENTER,
+                                  )
+                                });
                       }
                     },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      primary: Color(0xffff2fc3),
+                      padding: EdgeInsets.all(10),
                     ),
-                    color: Color(0xffff2fc3),
                     child: Text(
                       "Send",
                       style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),

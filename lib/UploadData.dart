@@ -1,10 +1,10 @@
 import 'dart:collection';
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
 import 'package:toast/toast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -33,18 +33,20 @@ class _UploadDataState extends State<UploadData> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(padding: EdgeInsets.only(top: 15)),
-              Container(
-                child: imageFile == null
-                    ? FlatButton(
-                        onPressed: () {
-                          _showDialog();
-                        },
-                        child: Icon(
-                          Icons.add_a_photo,
-                          size: 80,
-                          color: Color(0xffff2fc3),
-                        ))
-                    : Image.file(imageFile, width: 400, height: 400),
+              Expanded(
+                child: Container(
+                  child: imageFile == null
+                      ? TextButton(
+                          onPressed: () {
+                            _showDialog();
+                          },
+                          child: Icon(
+                            Icons.add_a_photo,
+                            size: 80,
+                            color: Color(0xffff2fc3),
+                          ))
+                      : Image.file(imageFile, width: 400, height: 400),
+                ),
               ),
               SizedBox(height: 10),
               Row(
@@ -58,7 +60,7 @@ class _UploadDataState extends State<UploadData> {
                       child: TextFormField(
                         validator: (value) {
                           if (value.isEmpty) {
-                            return "PLease write the name of production";
+                            return "Please write the name of production";
                           } else {
                             name = value;
                             return null;
@@ -100,7 +102,7 @@ class _UploadDataState extends State<UploadData> {
                       child: TextFormField(
                         validator: (value) {
                           if (value.isEmpty) {
-                            return "PLease write the material of production";
+                            return "Please write the material of production";
                           } else {
                             material = value;
                             return null;
@@ -146,7 +148,7 @@ class _UploadDataState extends State<UploadData> {
                         ],
                         validator: (value) {
                           if (value.isEmpty) {
-                            return "PLease write the price of production";
+                            return "Please write the price of production";
                           } else {
                             price = value;
                             return null;
@@ -193,7 +195,7 @@ class _UploadDataState extends State<UploadData> {
                       child: TextFormField(
                         validator: (value) {
                           if (value.isEmpty) {
-                            return "PLease write the description of production";
+                            return "Please write the description of production";
                           } else {
                             description = value;
                             return null;
@@ -228,7 +230,7 @@ class _UploadDataState extends State<UploadData> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    RaisedButton(
+                    ElevatedButton(
                       onPressed: () {
                         if (imageFile == null) {
                           Toast.show(
@@ -241,9 +243,11 @@ class _UploadDataState extends State<UploadData> {
                           upload();
                         }
                       },
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Color(0xffff2fc3),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        primary: Color(0xffff2fc3),
+                      ),
                       child: Text("Upload",
                           style: TextStyle(fontSize: 19, color: Colors.blue)),
                     ),
@@ -335,10 +339,10 @@ class _UploadDataState extends State<UploadData> {
       map["imgUrl"] = url;
       map["description"] = description;
 
-      await databaseReference
-          .child(uploadId)
-          .set(map)
-          .then((value) => Navigator.pop(context));
+      await databaseReference.child(uploadId).set(map).then(
+            (value) => Toast.show("Upload successfully", context,
+                duration: 2, gravity: Toast.CENTER),
+          );
 
       // String email = "";
       // FirebaseAuth auth = FirebaseAuth.instance;

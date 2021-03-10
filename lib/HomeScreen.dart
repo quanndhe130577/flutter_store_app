@@ -7,7 +7,6 @@ import 'package:flutter_food_app/LogInScreen.dart';
 import 'UploadData.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'MyFavorite.dart';
-import 'package:toast/toast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'MyCart.dart';
 
@@ -99,8 +98,14 @@ class _HomeScreen extends State<HomeScreen> {
           if (value.value != null && value.value["state"] == true) {
             fav = true;
           }
-          Data data = new Data(values[key]["imgUrl"], values[key]["name"],
-              values[key]["material"], values[key]["price"], values[key]["description"],key, fav);
+          Data data = new Data(
+              values[key]["imgUrl"],
+              values[key]["name"],
+              values[key]["material"],
+              values[key]["price"],
+              values[key]["description"],
+              key,
+              fav);
           dataList.add(data);
         });
       }
@@ -129,12 +134,15 @@ class _HomeScreen extends State<HomeScreen> {
             ? Text("Home")
             : TextField(
                 decoration: InputDecoration(
-                  icon: Icon(Icons.search),
+                  icon: Icon(Icons.search, color: Colors.white),
                   hintText: "Search . . . ",
                   hintStyle: TextStyle(color: Colors.white),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
                 ),
                 onChanged: (text) {
-                  searchMethod(text);
+                  searchMethod(text.toLowerCase());
                 },
                 autofocus: true,
               ),
@@ -161,11 +169,15 @@ class _HomeScreen extends State<HomeScreen> {
                 ),
           Visibility(
               visible: !searchState,
-              child: FlatButton(
+              child: TextButton.icon(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => MyCart()));
                 },
-                child: Icon(Icons.shopping_cart),
+                icon: Icon(Icons.shopping_cart, color: Colors.black),
+                label: Text(""),
               ))
         ],
       ),
@@ -277,8 +289,8 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, String price, String description,
-      String uploadId, bool fav) {
+  Widget cardUI(String imgUrl, String name, String material, String price,
+      String description, String uploadId, bool fav) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
@@ -340,7 +352,7 @@ class _HomeScreen extends State<HomeScreen> {
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: FlatButton.icon(
+                      child: TextButton.icon(
                         onPressed: () {},
                         icon: Icon(Icons.add_shopping_cart),
                         label: Text("Add to cart"),
@@ -387,9 +399,8 @@ class _HomeScreen extends State<HomeScreen> {
 
   void searchMethod(String text) {
     searchList.clear();
-    int count = dataList.length;
     for (var item in dataList) {
-      if (item.name.contains(text) || item.material.contains(text)) {
+      if (item.name.toLowerCase().contains(text.toLowerCase()) || item.material.toLowerCase().contains(text.toLowerCase())) {
         searchList.add(item);
       }
     }

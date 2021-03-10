@@ -113,12 +113,15 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
       margin: EdgeInsets.all(15),
       color: Color(0xffff2fc3),
       child: Container(
-          color: Colors.white,
-          margin: EdgeInsets.all(1.5),
-          padding: EdgeInsets.only(right: 10, left: 10, bottom: 10),
-          child: Column(
-            children: [
-              FlatButton(
+        color: Colors.white,
+        margin: EdgeInsets.all(1.5),
+        padding: EdgeInsets.only(right: 10, left: 10, bottom: 10),
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              // height: double.infinity,
+              child: TextButton(
                 onPressed: () {
                   auth.currentUser().then((value) {
                     DatabaseReference favRef = FirebaseDatabase.instance
@@ -133,89 +136,94 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                   });
                 },
                 child: Icon(Icons.remove, color: Colors.red),
-                minWidth: double.infinity,
-                color: Colors.black12,
+                style: TextButton.styleFrom(
+                  //minimumSize: Size(double.infinity, double.infinity),
+                  backgroundColor: Colors.black12,
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Container(
-                      child: Column(
-                        children: [
-                          Image.network(imgUrl, fit: BoxFit.cover, height: 100),
-                          SizedBox(height: 5),
-                          Text(
-                            name,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Container(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          child: Text(
-                            'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
-                            style: TextStyle(
-                              //color: Colors.red,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
+                        Image.network(imgUrl, fit: BoxFit.cover, height: 100),
                         SizedBox(height: 5),
-                        Container(
-                          width: double.infinity,
-                          child: Text(
-                            'Material : $material',
-                            style: TextStyle(
-                              //color: Colors.red,
-                              fontSize: 18,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            child: Text(
-                              'Descriptions: ${description != null ? description : ""}',
-                              style: TextStyle(
-                                  //color: Colors.red,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.left,
-                            ),
-                            width: double.infinity,
-                          ),
+                        Text(
+                          name,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 5),
-              Container(
-                child: FlatButton.icon(
-                  onPressed: () {},
-                  icon: Icon(Icons.add_shopping_cart),
-                  label: Text("Add to cart"),
                 ),
-                width: double.infinity,
-                color: Colors.red,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
+                          style: TextStyle(
+                            //color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          'Material : $material',
+                          style: TextStyle(
+                            //color: Colors.red,
+                            fontSize: 18,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          child: Text(
+                            'Descriptions: ${description != null ? description : ""}',
+                            style: TextStyle(
+                                //color: Colors.red,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.left,
+                          ),
+                          width: double.infinity,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Container(
+              child: TextButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.add_shopping_cart, color: Colors.black),
+                label:
+                    Text("Add to cart", style: TextStyle(color: Colors.black)),
               ),
-            ],
-          )),
+              width: double.infinity,
+              color: Colors.red,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/HomeScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -5,8 +7,11 @@ import 'SignUpScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'ForgotScreen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+
+// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -41,7 +46,7 @@ class _LogInScreen extends State<LogInScreen> {
 
   Future<void> logIn() async {
     try {
-      var userCredential = await FirebaseAuth.instance
+      await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) => {
                 Navigator.pushReplacement(
@@ -94,45 +99,46 @@ class _LogInScreen extends State<LogInScreen> {
   }
 
   Future<void> signInWithFacebook() async {
-    // // Trigger the sign-in flow
-    // AccessToken result = await FacebookAuth.instance.login();
-    //
-    // // Create a credential from the access token
-    // AuthCredential facebookAuthCredential =
-    //     FacebookAuthProvider.getCredential(accessToken: result.token);
-    //
-    // // Once signed in, return the UserCredential
-    // await auth.signInWithCredential(facebookAuthCredential).then((value) => {
-    //       Navigator.pushReplacement(
-    //           context,
-    //           MaterialPageRoute(
-    //               builder: (BuildContext context) =>
-    //                   HomeScreen(value.user.email)))
-    //     });
-    FacebookLogin facebookSignIn = new FacebookLogin();
-    FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+    // Trigger the sign-in flow
+    AccessToken result = await FacebookAuth.instance.login();
 
-    switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        final FacebookAccessToken accessToken = result.accessToken;
-        print('''
-         Logged in!
+    // Create a credential from the access token
+    AuthCredential facebookAuthCredential =
+        FacebookAuthProvider.getCredential(accessToken: result.token);
 
-         Token: ${accessToken.token}
-         User id: ${accessToken.userId}
-         Expires: ${accessToken.expires}
-         Permissions: ${accessToken.permissions}
-         Declined permissions: ${accessToken.declinedPermissions}
-         ''');
-        break;
-      case FacebookLoginStatus.cancelledByUser:
-        print('Login cancelled by the user.');
-        break;
-      case FacebookLoginStatus.error:
-        print('Something went wrong with the login process.\n'
-            'Here\'s the error Facebook gave us: ${result.errorMessage}');
-        break;
-    }
+    // Once signed in, return the UserCredential
+    await auth.signInWithCredential(facebookAuthCredential).then((value) => {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      HomeScreen(value.user.email)))
+        });
+
+    // FacebookLogin facebookSignIn = new FacebookLogin();
+    // FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+    //
+    // switch (result.status) {
+    //   case FacebookLoginStatus.loggedIn:
+    //     final FacebookAccessToken accessToken = result.accessToken;
+    //     print('''
+    //      Logged in!
+    //
+    //      Token: ${accessToken.token}
+    //      User id: ${accessToken.userId}
+    //      Expires: ${accessToken.expires}
+    //      Permissions: ${accessToken.permissions}
+    //      Declined permissions: ${accessToken.declinedPermissions}
+    //      ''');
+    //     break;
+    //   case FacebookLoginStatus.cancelledByUser:
+    //     print('Login cancelled by the user.');
+    //     break;
+    //   case FacebookLoginStatus.error:
+    //     print('Something went wrong with the login process.\n'
+    //         'Here\'s the error Facebook gave us: ${result.errorMessage}');
+    //     break;
+    // }
   }
 
   @override
@@ -309,17 +315,19 @@ class _LogInScreen extends State<LogInScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 20, left: 20),
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       hideError();
                       logIn();
                     }
                   },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    primary: Color(0xffff2fc3),
                   ),
-                  color: Color(0xffff2fc3),
                   child: Text(
                     "Log In",
                     style: TextStyle(
@@ -339,17 +347,20 @@ class _LogInScreen extends State<LogInScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     googleSignInApp();
                   },
-                  color: Colors.white,
-                  padding: EdgeInsets.all(10),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    primary: Colors.white,
+                    padding: EdgeInsets.all(10),
+                  ),
                   child: Row(
                     children: [
-                      //we meed to import font awasome
+                      //we meed to import font awesome
                       Icon(FontAwesomeIcons.google, color: Color(0xffff2fc3)),
                       SizedBox(width: 10),
                       Text(
@@ -365,14 +376,17 @@ class _LogInScreen extends State<LogInScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     signInWithFacebook();
                   },
-                  color: Colors.white,
-                  padding: EdgeInsets.all(10),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    primary: Colors.white,
+                    padding: EdgeInsets.all(10),
+                  ),
                   child: Row(
                     children: [
                       //we meed to import font awesome
@@ -396,20 +410,18 @@ class _LogInScreen extends State<LogInScreen> {
                     Text("Don't have an account ? ",
                         style: TextStyle(color: Colors.white)),
                     SizedBox(height: 5),
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      SignUpScreen()));
-                        },
-                        child: Column(
-                          children: [
-                            Text("Sign Up",
-                                style: TextStyle(color: Colors.blue)),
-                            Container(width: 45, height: 1, color: Colors.blue)
-                          ],
-                        )),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (BuildContext context) => SignUpScreen()));
+                      },
+                      child: Column(
+                        children: [
+                          Text("Sign Up", style: TextStyle(color: Colors.blue)),
+                          Container(width: 45, height: 1, color: Colors.blue)
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

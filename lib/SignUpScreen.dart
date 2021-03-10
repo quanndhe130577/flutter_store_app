@@ -230,17 +230,19 @@ class _SignUpScreen extends State<SignUpScreen> {
             ),
             Padding(
               padding: EdgeInsets.only(right: 20, left: 20),
-              child: RaisedButton(
+              child: ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     hideError();
                     register();
                   }
                 },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  primary: Color(0xffff2fc3),
                 ),
-                color: Color(0xffff2fc3),
                 child: Text(
                   "Sign Up",
                   style: TextStyle(
@@ -260,15 +262,17 @@ class _SignUpScreen extends State<SignUpScreen> {
             ),
             Padding(
               padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: RaisedButton(
+              child: ElevatedButton(
                 onPressed: () {},
-                color: Colors.white,
-                padding: EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                ),
                 child: Row(
                   children: [
-                    //we meed to import font awasome
+                    //we meed to import font awesome
                     Icon(FontAwesomeIcons.google, color: Color(0xffff2fc3)),
                     SizedBox(width: 10),
                     Text(
@@ -284,12 +288,14 @@ class _SignUpScreen extends State<SignUpScreen> {
             ),
             Padding(
               padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: RaisedButton(
+              child: ElevatedButton(
                 onPressed: () {},
-                color: Colors.white,
-                padding: EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                ),
                 child: Row(
                   children: [
                     //we meed to import font awasome
@@ -313,17 +319,18 @@ class _SignUpScreen extends State<SignUpScreen> {
                   Text("You already have an account ? ",
                       style: TextStyle(color: Colors.white)),
                   SizedBox(height: 5),
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (BuildContext context) => LogInScreen()));
-                      },
-                      child: Column(
-                        children: [
-                          Text("Log In", style: TextStyle(color: Colors.blue)),
-                          Container(width: 45, height: 1, color: Colors.blue)
-                        ],
-                      )),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (BuildContext context) => LogInScreen()));
+                    },
+                    child: Column(
+                      children: [
+                        Text("Log In", style: TextStyle(color: Colors.blue)),
+                        Container(width: 45, height: 1, color: Colors.blue)
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
