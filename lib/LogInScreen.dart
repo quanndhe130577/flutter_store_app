@@ -100,45 +100,39 @@ class _LogInScreen extends State<LogInScreen> {
 
   Future<void> signInWithFacebook() async {
     // Trigger the sign-in flow
-    AccessToken result = await FacebookAuth.instance.login();
+    try {
+      AccessToken result = await FacebookAuth.instance.login();
 
-    // Create a credential from the access token
-    AuthCredential facebookAuthCredential =
-        FacebookAuthProvider.getCredential(accessToken: result.token);
+      // Create a credential from the access token
+      AuthCredential facebookAuthCredential =
+      FacebookAuthProvider.getCredential(accessToken: result.token);
 
-    // Once signed in, return the UserCredential
-    await auth.signInWithCredential(facebookAuthCredential).then((value) => {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      HomeScreen(value.user.email)))
-        });
-
-    // FacebookLogin facebookSignIn = new FacebookLogin();
-    // FacebookLoginResult result = await facebookSignIn.logIn(['email']);
-    //
-    // switch (result.status) {
-    //   case FacebookLoginStatus.loggedIn:
-    //     final FacebookAccessToken accessToken = result.accessToken;
-    //     print('''
-    //      Logged in!
-    //
-    //      Token: ${accessToken.token}
-    //      User id: ${accessToken.userId}
-    //      Expires: ${accessToken.expires}
-    //      Permissions: ${accessToken.permissions}
-    //      Declined permissions: ${accessToken.declinedPermissions}
-    //      ''');
-    //     break;
-    //   case FacebookLoginStatus.cancelledByUser:
-    //     print('Login cancelled by the user.');
-    //     break;
-    //   case FacebookLoginStatus.error:
-    //     print('Something went wrong with the login process.\n'
-    //         'Here\'s the error Facebook gave us: ${result.errorMessage}');
-    //     break;
-    // }
+      // Once signed in, return the UserCredential
+      await auth.signInWithCredential(facebookAuthCredential).then((value) => {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    HomeScreen(value.user.email)))
+      });
+    }catch(e){
+      switch (e.code) {
+        case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
+          showError("You have a previous login operation in progress");
+          break;
+        case FacebookAuthErrorCode.CANCELLED:
+          showError("login cancelled");
+          break;
+        case FacebookAuthErrorCode.FAILED:
+          showError("login failed");
+          break;
+        case "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL":
+          showError("Email has registered");
+          break;
+        default:
+          showError("An undefined Error happened.");
+      }
+    }
   }
 
   @override
