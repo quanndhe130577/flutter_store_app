@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class UploadData extends StatefulWidget {
   @override
@@ -34,20 +35,42 @@ class _UploadDataState extends State<UploadData> {
             children: [
               Padding(padding: EdgeInsets.only(top: 15)),
               Expanded(
-                child: Container(
-                  child: imageFile == null
-                      ? TextButton(
-                          onPressed: () {
-                            _showDialog();
-                          },
-                          child: Icon(
-                            Icons.add_a_photo,
-                            size: 80,
-                            color: Color(0xffff2fc3),
-                          ))
-                      : Image.file(imageFile, width: 400, height: 400),
-                ),
+                child: Tooltip(
+                  message: "Test",
+                  child: Container(
+                    child: imageFile == null
+                        ? TextButton(
+                        onPressed: () {
+                          _showDialog();
+                        },
+                        child: Icon(
+                          Icons.add_a_photo,
+                          size: 80,
+                          color: Color(0xffff2fc3),
+                        ))
+                        : GestureDetector(
+                      onTap: () {
+                        _showDialog();
+                      },
+                      child: Image.file(imageFile,
+                          width: double.infinity, height: double.infinity),
+                    ),
+                  ),
+                )
+
               ),
+              // Visibility(
+              //   visible: imageFile == null ? false : true,
+              //   child: TextButton(
+              //     child: TextButton.icon(
+              //       onPressed: () {
+              //         _showDialog();
+              //       },
+              //       label: Text("Change", style: TextStyle(color: Colors.red)),
+              //       icon: Icon(Icons.autorenew, color: Colors.red),
+              //     ),
+              //   ),
+              // ),
               SizedBox(height: 10),
               Row(
                 children: [
@@ -266,32 +289,33 @@ class _UploadDataState extends State<UploadData> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-              title: Text("You want take a photo from ? "),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: [
-                    GestureDetector(
-                      child: Text("Gallery"),
-                      onTap: () {
-                        openGallery().then((value) => hideAlertDialog(),
-                            onError: (e) {
-                          hideAlertDialog();
-                        }).catchError(hideAlertDialog);
-                      },
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 20)),
-                    GestureDetector(
-                      child: Text("Camera"),
-                      onTap: () {
-                        openCamera().then((value) => hideAlertDialog(),
-                            onError: (e) {
-                          hideAlertDialog();
-                        }).catchError(hideAlertDialog);
-                      },
-                    ),
-                  ],
-                ),
-              ));
+            title: Text("You want take a photo from ? "),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [
+                  GestureDetector(
+                    child: Text("Gallery"),
+                    onTap: () {
+                      openGallery().then((value) => hideAlertDialog(),
+                          onError: (e) {
+                        hideAlertDialog();
+                      }).catchError(hideAlertDialog);
+                    },
+                  ),
+                  Padding(padding: EdgeInsets.only(top: 20)),
+                  GestureDetector(
+                    child: Text("Camera"),
+                    onTap: () {
+                      openCamera().then((value) => hideAlertDialog(),
+                          onError: (e) {
+                        hideAlertDialog();
+                      }).catchError(hideAlertDialog);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
         });
   }
 
@@ -316,6 +340,22 @@ class _UploadDataState extends State<UploadData> {
   }
 
   Future<void> upload() async {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          color: Colors.amber,
+          child: Center(
+            child: SpinKitFadingCircle(
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        );
+      },
+    );
+
     if (_formKey.currentState.validate()) {
       final StorageReference reference = FirebaseStorage()
           .ref()
@@ -339,10 +379,11 @@ class _UploadDataState extends State<UploadData> {
       map["imgUrl"] = url;
       map["description"] = description;
 
-      await databaseReference.child(uploadId).set(map).then(
-            (value) => Toast.show("Upload successfully", context,
-                duration: 2, gravity: Toast.CENTER),
-          );
+      await databaseReference.child(uploadId).set(map).then((value) {
+        Toast.show("Upload successfully", context,
+            duration: 2, gravity: Toast.CENTER);
+        Navigator.pop(context);
+      });
 
       // String email = "";
       // FirebaseAuth auth = FirebaseAuth.instance;

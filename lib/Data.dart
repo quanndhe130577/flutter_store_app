@@ -3,4 +3,5 @@ class Data {
   bool fav;
 
   Data (this.imgUrl, this.name, this.material, this.price, this.description, this.uploadId, this.fav );
+
 }

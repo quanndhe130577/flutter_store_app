@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Data.dart';
+import 'package:flutter_food_app/DetailProduct.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
 import 'UploadData.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -25,6 +26,7 @@ class _HomeScreen extends State<HomeScreen> {
   FirebaseUser currentUser;
   bool searchState = false;
   bool isLoading = true;
+  bool isLoadingMore = false;
   _HomeScreen(this.currentEmail);
 
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -39,16 +41,17 @@ class _HomeScreen extends State<HomeScreen> {
 
   ScrollController _controller;
 
+  int count = 5;
+
   void reloadData() {
-    // if (_controller.offset >= _controller.position.maxScrollExtent &&
-    //     !_controller.position.outOfRange) {
-    //   Toast.show(
-    //     "Reloading . . .",
-    //     context,
-    //     duration: 2,
-    //     gravity: Toast.CENTER,
-    //   );
-    // }
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        isLoadingMore = true;
+      });
+      count += 1;
+      loadData();
+    }
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
       // setState(() {
@@ -59,6 +62,7 @@ class _HomeScreen extends State<HomeScreen> {
       //     isLoading = false;
       //   });
       // });
+      count += 5;
       loadData();
     }
   }
@@ -73,7 +77,7 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void loadData() async {
-    if (this.mounted) {
+    if (this.mounted && !isLoadingMore) {
       setState(() {
         isLoading = true;
         //dataList = dataList;
@@ -81,7 +85,11 @@ class _HomeScreen extends State<HomeScreen> {
     }
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child("Data");
-    await reference.once().then((DataSnapshot dataSnapShot) async {
+    await reference
+        .orderByKey()
+        .limitToFirst(count)
+        .once()
+        .then((DataSnapshot dataSnapShot) async {
       dataList.clear();
       var keys = dataSnapShot.value.keys;
       var values = dataSnapShot.value;
@@ -113,15 +121,18 @@ class _HomeScreen extends State<HomeScreen> {
       dataList.sort((a, b) => a.name.compareTo(b.name));
       //searchList = new List<Data>.from(dataList);
       searchList = [...dataList]; //clone dataList
-    }).whenComplete(() => {
-          if (this.mounted)
-            {
-              setState(() {
-                isLoading = false;
-                //dataList = dataList;
-              })
-            }
-        });
+    }).whenComplete(
+      () => {
+        if (this.mounted)
+          {
+            setState(() {
+              isLoading = false;
+              isLoadingMore = false;
+              //dataList = dataList;
+            })
+          }
+      },
+    );
   }
 
   @override
@@ -168,17 +179,18 @@ class _HomeScreen extends State<HomeScreen> {
                   },
                 ),
           Visibility(
-              visible: !searchState,
-              child: TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => MyCart()));
-                },
-                icon: Icon(Icons.shopping_cart, color: Colors.black),
-                label: Text(""),
-              ))
+            visible: !searchState,
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => MyCart()));
+              },
+              icon: Icon(Icons.shopping_cart, color: Colors.black),
+              label: Text(""),
+            ),
+          )
         ],
       ),
       drawer: Drawer(
@@ -284,6 +296,17 @@ class _HomeScreen extends State<HomeScreen> {
                     },
                   ),
           ),
+          Visibility(
+            visible: isLoadingMore,
+            child: Padding(
+              padding: EdgeInsets.only(top: 15),
+              child: SpinKitWave(
+                color: Colors.red,
+                size: 35.0,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
         ],
       ),
     );
@@ -296,8 +319,13 @@ class _HomeScreen extends State<HomeScreen> {
       margin: EdgeInsets.all(15),
       color: Color(0xffff2fc3),
       child: GestureDetector(
-        onDoubleTap: () {
-          favoriteFunc(uploadId, !fav);
+        onTap: () {
+          Data data = new Data(
+              imgUrl, name, material, price, description, uploadId, fav);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => DetailProduct(data)));
         },
         child: Container(
           color: Colors.white,
@@ -305,60 +333,77 @@ class _HomeScreen extends State<HomeScreen> {
           padding: EdgeInsets.all(10),
           child: Column(
             children: [
-              Image.network(imgUrl, fit: BoxFit.cover, height: 100),
-              SizedBox(height: 5),
-              Text(
-                name,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 1),
-              Text("Material : $material"),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  '$price ${new String.fromCharCodes(new Runes('\u0024'))}',
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.right,
-                ),
-              ),
-              SizedBox(height: 1),
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  fav
-                      ? Tooltip(
-                          message: 'High quality',
-                          child: IconButton(
-                            icon: Icon(Icons.favorite),
-                            color: Colors.red,
-                            onPressed: () {
-                              favoriteFunc(uploadId, !fav);
-                            },
-                          ),
-                        )
-                      : IconButton(
-                          icon: Icon(Icons.favorite),
-                          color: Colors.grey,
-                          onPressed: () {
-                            favoriteFunc(uploadId, !fav);
-                          },
-                          tooltip: "Love",
-                        ),
+                  Image.network(imgUrl,
+                      fit: BoxFit.cover, width: 100, height: 100),
+                  SizedBox(width: 10),
                   Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () {},
-                        icon: Icon(Icons.add_shopping_cart),
-                        label: Text("Add to cart"),
-                      ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              '${new String.fromCharCodes(new Runes('\u0024'))} $price ',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.add_shopping_cart),
+                                  label: Text("Add to cart"),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+
+                        // SizedBox(height: 5),
+                        // Container(
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     "Material : $material",
+                        //     style: TextStyle(
+                        //       color: Colors.black,
+                        //       fontSize: 15,
+                        //     ),
+                        //     textAlign: TextAlign.left,
+                        //   ),
+                        // ),
+                        // SizedBox(height: 5),
+                        // Container(
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     "Description : ${description != null ? description : ""}",
+                        //     style: TextStyle(
+                        //       color: Colors.black,
+                        //       fontSize: 15,
+                        //     ),
+                        //     textAlign: TextAlign.left,
+                        //   ),
+                        // ),
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -368,39 +413,11 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  void favoriteFunc(String uploadId, bool fav) {
-    auth.currentUser().then((value) {
-      DatabaseReference favRef = FirebaseDatabase.instance
-          .reference()
-          .child("Data")
-          .child(uploadId)
-          .child("Fav")
-          .child(value.uid)
-          .child("state");
-      favRef.set(fav);
-      for (var item in dataList) {
-        if (item.uploadId == uploadId) {
-          item.fav = fav;
-        }
-      }
-      for (var item in searchList) {
-        if (item.uploadId == uploadId) {
-          item.fav = fav;
-        }
-      }
-
-      if (this.mounted) {
-        setState(() {
-          //dataList = dataList;
-        });
-      }
-    });
-  }
-
   void searchMethod(String text) {
     searchList.clear();
     for (var item in dataList) {
-      if (item.name.toLowerCase().contains(text.toLowerCase()) || item.material.toLowerCase().contains(text.toLowerCase())) {
+      if (item.name.toLowerCase().contains(text.toLowerCase()) ||
+          item.material.toLowerCase().contains(text.toLowerCase())) {
         searchList.add(item);
       }
     }
