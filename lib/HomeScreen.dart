@@ -41,15 +41,20 @@ class _HomeScreen extends State<HomeScreen> {
 
   ScrollController _controller;
 
-  int count = 5;
+  int currentIndex = 0;
+  int stepLoadMore = 2;
+  int lastIndex = 4;
+  int numberOfFirstLoad = 5;
 
   void reloadData() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      setState(() {
-        isLoadingMore = true;
-      });
-      count += 1;
+      if (this.mounted && !isLoadingMore) {
+        setState(() {
+          isLoadingMore = true;
+        });
+      }
+      lastIndex += stepLoadMore;
       loadData();
     }
     if (_controller.offset <= _controller.position.minScrollExtent &&
@@ -62,7 +67,6 @@ class _HomeScreen extends State<HomeScreen> {
       //     isLoading = false;
       //   });
       // });
-      count += 5;
       loadData();
     }
   }
@@ -86,15 +90,32 @@ class _HomeScreen extends State<HomeScreen> {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child("Data");
     await reference
-        .orderByKey()
-        .limitToFirst(count)
         .once()
         .then((DataSnapshot dataSnapShot) async {
-      dataList.clear();
+      //dataList.clear();
       var keys = dataSnapShot.value.keys;
       var values = dataSnapShot.value;
 
+      var count = 0;
       for (var key in keys) {
+        if(numberOfFirstLoad == 0){
+          if(count <= currentIndex){
+            count ++;
+            continue;
+          }
+          if(currentIndex > lastIndex){
+            //currentIndex = lastIndex;
+            break;
+          }else{
+            currentIndex ++ ;
+            count ++ ;
+          }
+        }else{
+          count ++;
+          currentIndex ++;
+          numberOfFirstLoad -- ;
+        }
+
         bool fav = false;
         DatabaseReference favRef = FirebaseDatabase.instance
             .reference()
@@ -118,7 +139,7 @@ class _HomeScreen extends State<HomeScreen> {
         });
       }
 
-      dataList.sort((a, b) => a.name.compareTo(b.name));
+      //dataList.sort((a, b) => a.name.compareTo(b.name));
       //searchList = new List<Data>.from(dataList);
       searchList = [...dataList]; //clone dataList
     }).whenComplete(
