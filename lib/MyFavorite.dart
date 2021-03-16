@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'Data.dart';
+import 'Model/MyFavoriteEntity.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'Common.dart';
 
 class MyFavorite extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class MyFavorite extends StatefulWidget {
 
 class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   FirebaseUser currentUser;
-  List<Data> dataList = [];
+  List<MyFavoriteModel> dataList = [];
   bool isLoading = true;
   FirebaseAuth auth = FirebaseAuth.instance;
   String test = "";
@@ -43,7 +44,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
             .child(currentUser.uid);
         await favRef.once().then((value) {
           if (value.value != null && value.value["state"] == true) {
-            Data data = new Data(
+            MyFavoriteModel data = new MyFavoriteModel(
               values[key]["imgUrl"],
               values[key]["name"],
               values[key]["material"],
@@ -123,15 +124,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
               // height: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  auth.currentUser().then((value) {
-                    DatabaseReference favRef = FirebaseDatabase.instance
-                        .reference()
-                        .child("Data")
-                        .child(uploadId)
-                        .child("Fav")
-                        .child(value.uid)
-                        .child("state");
-                    favRef.set(false);
+                  favoriteHandle(uploadId, false).then((value) {
                     removeFav(uploadId);
                   });
                 },
@@ -213,7 +206,9 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
             SizedBox(height: 5),
             Container(
               child: TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  addToCartHandle(uploadId);
+                },
                 icon: Icon(Icons.add_shopping_cart, color: Colors.black),
                 label:
                     Text("Add to cart", style: TextStyle(color: Colors.black)),
@@ -228,13 +223,6 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   }
 
   void removeFav(String uploadId) {
-    //loadData();
-    // for (var item in dataList) {
-    //   if (item.uploadId == uploadId) {
-    //     dataList.remove(item);
-    //   }
-    // }
-
     dataList.removeWhere((element) => element.uploadId == uploadId);
     if (this.mounted) {
       setState(() {

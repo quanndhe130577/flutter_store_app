@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_food_app/Data.dart';
+import 'Model/HomeEntity.dart';
 import 'package:flutter_food_app/DetailProduct.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
 import 'UploadData.dart';
@@ -10,6 +10,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'MyFavorite.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'MyCart.dart';
+import 'Common.dart';
 
 class HomeScreen extends StatefulWidget {
   String currentEmail = "";
@@ -21,8 +22,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreen extends State<HomeScreen> {
   String currentEmail = "";
-  List<Data> dataList = [];
-  List<Data> searchList = [];
+  List<HomeModel> dataList = [];
+  List<HomeModel> searchList = [];
   FirebaseUser currentUser;
   bool searchState = false;
   bool isLoading = true;
@@ -89,31 +90,29 @@ class _HomeScreen extends State<HomeScreen> {
     }
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child("Data");
-    await reference
-        .once()
-        .then((DataSnapshot dataSnapShot) async {
+    await reference.once().then((DataSnapshot dataSnapShot) async {
       //dataList.clear();
       var keys = dataSnapShot.value.keys;
       var values = dataSnapShot.value;
 
       var count = 0;
       for (var key in keys) {
-        if(numberOfFirstLoad == 0){
-          if(count <= currentIndex){
-            count ++;
+        if (numberOfFirstLoad == 0) {
+          if (count <= currentIndex) {
+            count++;
             continue;
           }
-          if(currentIndex > lastIndex){
+          if (currentIndex > lastIndex) {
             //currentIndex = lastIndex;
             break;
-          }else{
-            currentIndex ++ ;
-            count ++ ;
+          } else {
+            currentIndex++;
+            count++;
           }
-        }else{
-          count ++;
-          currentIndex ++;
-          numberOfFirstLoad -- ;
+        } else {
+          count++;
+          currentIndex++;
+          numberOfFirstLoad--;
         }
 
         bool fav = false;
@@ -127,14 +126,13 @@ class _HomeScreen extends State<HomeScreen> {
           if (value.value != null && value.value["state"] == true) {
             fav = true;
           }
-          Data data = new Data(
-              values[key]["imgUrl"],
-              values[key]["name"],
-              values[key]["material"],
-              values[key]["price"],
-              values[key]["description"],
-              key,
-              fav);
+          HomeModel data = new HomeModel(
+            key,
+            values[key]["imgUrl"],
+            values[key]["name"],
+            values[key]["price"],
+            values[key]["material"],
+          );
           dataList.add(data);
         });
       }
@@ -306,14 +304,7 @@ class _HomeScreen extends State<HomeScreen> {
                     itemCount: searchList.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (buildContext, index) {
-                      return cardUI(
-                          searchList[index].imgUrl,
-                          searchList[index].name,
-                          searchList[index].material,
-                          searchList[index].price,
-                          searchList[index].description,
-                          searchList[index].uploadId,
-                          searchList[index].fav);
+                      return cardUI(searchList[index]);
                     },
                   ),
           ),
@@ -333,20 +324,17 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, String price,
-      String description, String uploadId, bool fav) {
+  Widget cardUI(HomeModel item) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
       color: Color(0xffff2fc3),
       child: GestureDetector(
         onTap: () {
-          Data data = new Data(
-              imgUrl, name, material, price, description, uploadId, fav);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => DetailProduct(data)));
+                  builder: (BuildContext context) => DetailProduct(item.uploadId)));
         },
         child: Container(
           color: Colors.white,
@@ -357,7 +345,7 @@ class _HomeScreen extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.network(imgUrl,
+                  Image.network(item.imgUrl,
                       fit: BoxFit.cover, width: 100, height: 100),
                   SizedBox(width: 10),
                   Expanded(
@@ -366,7 +354,7 @@ class _HomeScreen extends State<HomeScreen> {
                         Container(
                           width: double.infinity,
                           child: Text(
-                            name,
+                            item.name,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 25,
@@ -378,7 +366,7 @@ class _HomeScreen extends State<HomeScreen> {
                         Row(
                           children: [
                             Text(
-                              '${new String.fromCharCodes(new Runes('\u0024'))} $price ',
+                              '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price} ',
                               style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 20,
@@ -389,39 +377,16 @@ class _HomeScreen extends State<HomeScreen> {
                               child: Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    addToCartHandle(item.uploadId);
+                                  },
                                   icon: Icon(Icons.add_shopping_cart),
                                   label: Text("Add to cart"),
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
-
-                        // SizedBox(height: 5),
-                        // Container(
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     "Material : $material",
-                        //     style: TextStyle(
-                        //       color: Colors.black,
-                        //       fontSize: 15,
-                        //     ),
-                        //     textAlign: TextAlign.left,
-                        //   ),
-                        // ),
-                        // SizedBox(height: 5),
-                        // Container(
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     "Description : ${description != null ? description : ""}",
-                        //     style: TextStyle(
-                        //       color: Colors.black,
-                        //       fontSize: 15,
-                        //     ),
-                        //     textAlign: TextAlign.left,
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),

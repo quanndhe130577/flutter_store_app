@@ -1,29 +1,76 @@
 import 'package:flutter/material.dart';
-import 'Data.dart';
+import 'Model/MyFavoriteEntity.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import "MyCart.dart";
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'Common.dart';
 
 class DetailProduct extends StatefulWidget {
-  Data data = new Data("", "", "", "", "", "", false);
-  DetailProduct(this.data);
+  String uploadId = "";
+  DetailProduct(this.uploadId);
 
   @override
-  _DetailProductState createState() => _DetailProductState(this.data);
+  _DetailProductState createState() => _DetailProductState(this.uploadId);
 }
 
 class _DetailProductState extends State<DetailProduct> {
-  Data data = new Data("", "", "", "", "", "", false);
-  _DetailProductState(this.data);
+  String uploadId = "";
+  _DetailProductState(this.uploadId);
 
   bool favInit = false;
+  MyFavoriteModel data;
+  FirebaseUser currentUser;
+  bool isLoading = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      favInit = data.fav;
+    auth
+        .currentUser()
+        .then((value) => {this.currentUser = value})
+        .whenComplete(() {
+      loadData(uploadId);
+      if (this.mounted) {
+        setState(() {
+          //favInit = data.fav;
+        });
+      }
+    });
+  }
+
+  void loadData(String uploadId) async {
+    data = null;
+
+    if (this.mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    DatabaseReference reference =
+        FirebaseDatabase.instance.reference().child("Data").child(uploadId);
+    await reference.once().then((DataSnapshot dataSnapShot) async {
+      var values = dataSnapShot.value;
+
+      bool fav = false;
+      if (values["Fav"] != null &&
+          values["Fav"][currentUser.uid] != null &&
+          values["Fav"][currentUser.uid]["state"] == true) {
+        fav = true;
+        favInit = true;
+      }
+
+      data = new MyFavoriteModel(values["imgUrl"], values["name"], values["material"],
+          values["price"], values["description"], uploadId, fav);
+    }).whenComplete(() {
+      if (this.mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -33,7 +80,19 @@ class _DetailProductState extends State<DetailProduct> {
       backgroundColor: Color(0xffffffff),
       appBar: AppBar(
         backgroundColor: Color(0xffff2fc3),
-        title: Text(data.name),
+        title: Text(isLoading ? "Loading . . ." : data.name),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => MyCart()));
+            },
+            icon: Icon(Icons.shopping_cart, color: Colors.black),
+            label: Text(""),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
@@ -61,7 +120,7 @@ class _DetailProductState extends State<DetailProduct> {
                             icon: Icon(Icons.favorite),
                             color: Colors.red,
                             onPressed: () {
-                              favoriteFunc(data.uploadId, !data.fav);
+                              favoriteFunc(data.uploadId, !favInit);
                             },
                           ),
                         )
@@ -69,7 +128,7 @@ class _DetailProductState extends State<DetailProduct> {
                           icon: Icon(Icons.favorite),
                           color: Colors.grey,
                           onPressed: () {
-                            favoriteFunc(data.uploadId, !data.fav);
+                            favoriteFunc(data.uploadId, !favInit);
                           },
                           tooltip: "Love",
                         ),
@@ -105,7 +164,9 @@ class _DetailProductState extends State<DetailProduct> {
                   child: Material(
                     type: MaterialType.transparency,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        addToCartHandle(data.uploadId);
+                      },
                       child: Icon(Icons.add_shopping_cart,
                           size: 24, color: Colors.blue),
                     ),
@@ -116,107 +177,94 @@ class _DetailProductState extends State<DetailProduct> {
           ),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(10),
-        child: Container(
-          child: ListView(
-            children: [
-              Image.network(
-                data.imgUrl,
-                fit: BoxFit.cover,
-                width: 400,
-                height: 400,
+      body: isLoading
+          ? Container(
+              child: SpinKitDualRing(
+                color: Colors.red,
+                size: 35.0,
               ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  data.name,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.left,
+            )
+          : Padding(
+              padding: EdgeInsets.all(10),
+              child: Container(
+                child: ListView(
+                  children: [
+                    Image.network(
+                      data.imgUrl,
+                      fit: BoxFit.cover,
+                      width: 400,
+                      height: 400,
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      child: Text(
+                        data.name,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: double.infinity,
+                      child: Text(
+                        '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: double.infinity,
+                      child: Text(
+                        "Material : ${data.material}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: double.infinity,
+                      child: Text(
+                        "Description : ${data.description != null ? data.description : ""}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  "Material : ${data.material}",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  "Description : ${data.description != null ? data.description : ""}",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-
-              // Row(
-              //   children: [
-              //     Text(
-              //       '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
-              //       style: TextStyle(
-              //           color: Colors.red,
-              //           fontSize: 20,
-              //           fontWeight: FontWeight.bold),
-              //       textAlign: TextAlign.center,
-              //     ),
-              //     // Expanded(
-              //     //   child: Align(
-              //     //     alignment: Alignment.centerRight,
-              //     //     child: TextButton.icon(
-              //     //       onPressed: () {},
-              //     //       icon: Icon(Icons.add_shopping_cart),
-              //     //       label: Text("Add to cart"),
-              //     //     ),
-              //     //   ),
-              //     // )
-              //   ],
-              // ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
   FirebaseAuth auth = FirebaseAuth.instance;
   void favoriteFunc(String uploadId, bool fav) {
-    auth.currentUser().then((value) {
-      DatabaseReference favRef = FirebaseDatabase.instance
-          .reference()
-          .child("Data")
-          .child(uploadId)
-          .child("Fav")
-          .child(value.uid)
-          .child("state");
-      favRef.set(fav);
+    // auth.currentUser().then((value) {
+    //   DatabaseReference favRef = FirebaseDatabase.instance
+    //       .reference()
+    //       .child("Data")
+    //       .child(uploadId)
+    //       .child("Fav")
+    //       .child(value.uid)
+    //       .child("state");
+    //   favRef.set(fav);
+
+    favoriteHandle(uploadId, fav).then((value) {
+      data.fav = fav;
 
       if (this.mounted) {
         setState(() {
@@ -224,5 +272,7 @@ class _DetailProductState extends State<DetailProduct> {
         });
       }
     });
+
   }
+
 }
