@@ -63,8 +63,15 @@ class _DetailProductState extends State<DetailProduct> {
         favInit = true;
       }
 
-      data = new MyFavoriteModel(values["imgUrl"], values["name"], values["material"],
-          values["price"], values["description"], uploadId, fav);
+      data = new MyFavoriteModel(
+        values["imgUrl"],
+        values["name"],
+        values["material"],
+        double.parse(values["price"].toString()),
+        values["description"],
+        uploadId,
+        fav,
+      );
     }).whenComplete(() {
       if (this.mounted) {
         setState(() {
@@ -81,6 +88,7 @@ class _DetailProductState extends State<DetailProduct> {
       appBar: AppBar(
         backgroundColor: Color(0xffff2fc3),
         title: Text(isLoading ? "Loading . . ." : data.name),
+        centerTitle: true,
         actions: [
           TextButton.icon(
             onPressed: () {
@@ -272,7 +280,5 @@ class _DetailProductState extends State<DetailProduct> {
         });
       }
     });
-
   }
-
 }

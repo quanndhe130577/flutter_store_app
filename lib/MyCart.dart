@@ -19,6 +19,7 @@ class _MyCartState extends State<MyCart> {
   List<CartModel> dataList = [];
   bool isLoading = false;
 
+  double total = 0;
   FirebaseAuth auth = FirebaseAuth.instance;
   @override
   void initState() {
@@ -56,9 +57,10 @@ class _MyCartState extends State<MyCart> {
                 key,
                 values[key]["imgUrl"],
                 values[key]["name"],
-                values[key]["price"],
+                double.parse(values[key]["price"].toString()),
                 inCartItem.value["quantity"]);
             dataList.add(data);
+            total += data.price * data.quantity;
           }
         });
       }
@@ -69,7 +71,6 @@ class _MyCartState extends State<MyCart> {
           {
             setState(() {
               isLoading = false;
-              //dataList = dataList;
             })
           }
       },
@@ -83,6 +84,62 @@ class _MyCartState extends State<MyCart> {
       appBar: AppBar(
         backgroundColor: Color(0xffff2fc3),
         title: Text("My Cart"),
+        centerTitle: true,
+      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {},
+      //   child: Text("Buy"),
+      //   elevation: 2,
+      //   backgroundColor: Colors.red,
+      // ),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        color: Colors.white,
+        child: Container(
+          height: 50,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      "Total : ${new String.fromCharCodes(new Runes('\u0024'))} $total ",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 20
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              SizedBox(
+                width: 180,
+                child: Material(
+                  //type: MaterialType.transparency,
+                  color: Colors.red,
+                  child: InkWell(
+                    onTap: () {
+                      //addToCartHandle(data.uploadId);
+                    },
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Buy",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -123,6 +180,7 @@ class _MyCartState extends State<MyCart> {
     removeFromCartHandle(uploadId).then((value) {
       for (int i = 0; i < dataList.length; i++) {
         if (dataList[i].uploadId == uploadId) {
+          total -= dataList[i].price * dataList[i].quantity;
           dataList.removeAt(i);
           break;
         }
@@ -144,10 +202,11 @@ class _MyCartState extends State<MyCart> {
         child: Container(
           color: Colors.white,
           //margin: EdgeInsets.all(1.5),
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(top: 5, right: 10, bottom: 5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Checkbox(value: true, onChanged: handleCheckBox),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -197,14 +256,14 @@ class _MyCartState extends State<MyCart> {
                               children: [
                                 TextButton(
                                   onPressed: () {
-                                    addToCartHandle(item.uploadId);
+                                    handleQuantity(item.uploadId, 1); // minus
                                   },
                                   child: Icon(Icons.remove),
                                 ),
                                 Text(item.quantity.toString()),
                                 TextButton(
                                   onPressed: () {
-                                    addToCartHandle(item.uploadId);
+                                    handleQuantity(item.uploadId, 0); // plus
                                   },
                                   child: Icon(Icons.add),
                                 ),
@@ -258,5 +317,32 @@ class _MyCartState extends State<MyCart> {
         ),
       ],
     );
+  }
+
+  void handleQuantity(String uploadId, int type) {
+    quantityHandle(uploadId, type).then((value) {
+      for (int i = 0; i < dataList.length; i++) {
+        if (dataList[i].uploadId == uploadId) {
+          if (type == 0) {
+            dataList[i].quantity++;
+            total += dataList[i].price;
+            break;
+          } else if (type == 1 && dataList[i].quantity > 1) {
+            dataList[i].quantity--;
+            total -= dataList[i].price;
+            break;
+          }
+        }
+      }
+      if (this.mounted) {
+        setState(() {
+          //
+        });
+      }
+    });
+  }
+
+  void handleCheckBox(bool value){
+
   }
 }

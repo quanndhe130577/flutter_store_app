@@ -16,7 +16,8 @@ class UploadData extends StatefulWidget {
 }
 
 class _UploadDataState extends State<UploadData> {
-  String name = "", material = "", price = "", description = "";
+  String name = "", material = "", description = "";
+  double price = 0;
   File imageFile;
   var _formKey = GlobalKey<FormState>();
   @override
@@ -173,7 +174,7 @@ class _UploadDataState extends State<UploadData> {
                           if (value.isEmpty) {
                             return "Please write the price of production";
                           } else {
-                            price = value;
+                            price = double.parse(value);
                             return null;
                           }
                         },

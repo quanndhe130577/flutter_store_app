@@ -107,7 +107,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, String price,
+  Widget cardUI(String imgUrl, String name, String material, double price,
       String description, String uploadId, bool fav) {
     return Card(
       elevation: 7,

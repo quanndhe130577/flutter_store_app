@@ -115,26 +115,15 @@ class _HomeScreen extends State<HomeScreen> {
           numberOfFirstLoad--;
         }
 
-        bool fav = false;
-        DatabaseReference favRef = FirebaseDatabase.instance
-            .reference()
-            .child("Data")
-            .child(key)
-            .child("Fav")
-            .child(currentUser.uid);
-        await favRef.once().then((value) {
-          if (value.value != null && value.value["state"] == true) {
-            fav = true;
-          }
-          HomeModel data = new HomeModel(
-            key,
-            values[key]["imgUrl"],
-            values[key]["name"],
-            values[key]["price"],
-            values[key]["material"],
-          );
-          dataList.add(data);
-        });
+        HomeModel data = new HomeModel(
+          key,
+          values[key]["imgUrl"],
+          values[key]["name"],
+          double.parse(values[key]["price"].toString()),
+          values[key]["material"],
+        );
+
+        dataList.add(data);
       }
 
       //dataList.sort((a, b) => a.name.compareTo(b.name));
@@ -176,6 +165,7 @@ class _HomeScreen extends State<HomeScreen> {
                 },
                 autofocus: true,
               ),
+        centerTitle: false,
         actions: [
           searchState
               ? IconButton(
@@ -334,7 +324,8 @@ class _HomeScreen extends State<HomeScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => DetailProduct(item.uploadId)));
+                  builder: (BuildContext context) =>
+                      DetailProduct(item.uploadId)));
         },
         child: Container(
           color: Colors.white,
@@ -366,7 +357,7 @@ class _HomeScreen extends State<HomeScreen> {
                         Row(
                           children: [
                             Text(
-                              '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price} ',
+                              '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price.toString()} ',
                               style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 20,
