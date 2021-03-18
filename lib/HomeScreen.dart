@@ -11,6 +11,8 @@ import 'MyFavorite.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'MyCart.dart';
 import 'Common.dart';
+import 'package:toast/toast.dart';
+import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
   String currentEmail = "";
@@ -189,17 +191,43 @@ class _HomeScreen extends State<HomeScreen> {
                 ),
           Visibility(
             visible: !searchState,
-            child: TextButton.icon(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => MyCart()));
-              },
-              icon: Icon(Icons.shopping_cart, color: Colors.black),
-              label: Text(""),
+            child: Badge(
+              badgeColor: Colors.blue,
+              position: BadgePosition.topEnd(top: 0, end: 15),
+              badgeContent: Text("3", style: TextStyle(color: Colors.white)),
+              child: Padding(
+                padding: EdgeInsets.only(right: 20),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => MyCart()));
+                  },
+                  child: Icon(
+                    Icons.shopping_cart,
+                    color: Colors.black,
+                    semanticLabel: "MyCart",
+                  ),
+                ),
+              ),
+
+              // TextButton.icon(
+              //   onPressed: () {
+              //     Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (BuildContext context) => MyCart()));
+              //   },
+              //   icon: Icon(
+              //     Icons.shopping_cart,
+              //     color: Colors.black,
+              //     semanticLabel: "MyCart",
+              //   ),
+              //   label: Text(""),
+              // ),
             ),
-          )
+          ),
         ],
       ),
       drawer: Drawer(
@@ -326,6 +354,12 @@ class _HomeScreen extends State<HomeScreen> {
               MaterialPageRoute(
                   builder: (BuildContext context) =>
                       DetailProduct(item.uploadId)));
+        },
+        onDoubleTap: () {
+          favoriteHandle(item.uploadId, true).then((value) {
+            Toast.show("Add to favorite", context,
+                duration: 1, gravity: Toast.BOTTOM);
+          });
         },
         child: Container(
           color: Colors.white,

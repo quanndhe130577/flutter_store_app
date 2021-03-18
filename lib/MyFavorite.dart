@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'Model/MyFavoriteEntity.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'Common.dart';
+import 'DetailProduct.dart';
 
 class MyFavorite extends StatefulWidget {
   @override
@@ -48,7 +49,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
               values[key]["imgUrl"],
               values[key]["name"],
               values[key]["material"],
-              values[key]["price"],
+              double.parse(values[key]["price"].toString()),
               values[key]["description"],
               key,
               true,
@@ -135,11 +136,19 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Container(
+            SizedBox(height: 3),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            DetailProduct(uploadId)));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
                     child: Column(
                       children: [
                         Image.network(imgUrl, fit: BoxFit.cover, height: 100),
@@ -154,56 +163,54 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        child: Text(
-                          'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
-                          style: TextStyle(
-                            //color: Colors.red,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          child: Text(
+                            'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
+                            style: TextStyle(
+                              //color: Colors.red,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
-                          textAlign: TextAlign.left,
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Container(
-                        width: double.infinity,
-                        child: Text(
-                          'Material : $material',
-                          style: TextStyle(
-                            //color: Colors.red,
-                            fontSize: 18,
+                        SizedBox(height: 5),
+                        Container(
+                          width: double.infinity,
+                          child: Text(
+                            'Material : $material',
+                            style: TextStyle(
+                              //color: Colors.red,
+                              fontSize: 18,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
-                          textAlign: TextAlign.left,
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Container(
+                        SizedBox(height: 5),
+                        Container(
                           child: Text(
                             'Descriptions: ${description != null ? description : ""}',
                             style: TextStyle(
-                                //color: Colors.red,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold),
+                              //color: Colors.red,
+                              fontSize: 15,
+                            ),
                             textAlign: TextAlign.left,
                           ),
                           width: double.infinity,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 5),
+            //SizedBox(height: 3),
             Container(
               child: TextButton.icon(
                 onPressed: () {

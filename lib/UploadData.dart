@@ -41,37 +41,25 @@ class _UploadDataState extends State<UploadData> {
                   child: Container(
                     child: imageFile == null
                         ? TextButton(
-                        onPressed: () {
-                          _showDialog();
-                        },
-                        child: Icon(
-                          Icons.add_a_photo,
-                          size: 80,
-                          color: Color(0xffff2fc3),
-                        ))
+                            onPressed: () {
+                              _showDialog();
+                            },
+                            child: Icon(
+                              Icons.add_a_photo,
+                              size: 80,
+                              color: Color(0xffff2fc3),
+                            ))
                         : GestureDetector(
-                      onTap: () {
-                        _showDialog();
-                      },
-                      child: Image.file(imageFile,
-                          width: double.infinity, height: double.infinity),
-                    ),
+                            onTap: () {
+                              _showDialog();
+                            },
+                            child: Image.file(imageFile,
+                                width: double.infinity,
+                                height: double.infinity),
+                          ),
                   ),
-                )
-
+                ),
               ),
-              // Visibility(
-              //   visible: imageFile == null ? false : true,
-              //   child: TextButton(
-              //     child: TextButton.icon(
-              //       onPressed: () {
-              //         _showDialog();
-              //       },
-              //       label: Text("Change", style: TextStyle(color: Colors.red)),
-              //       icon: Icon(Icons.autorenew, color: Colors.red),
-              //     ),
-              //   ),
-              // ),
               SizedBox(height: 10),
               Row(
                 children: [

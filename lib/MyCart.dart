@@ -17,9 +17,9 @@ class MyCart extends StatefulWidget {
 class _MyCartState extends State<MyCart> {
   FirebaseUser currentUser;
   List<CartModel> dataList = [];
+  List<CartModel> dataChoose = [];
   bool isLoading = false;
 
-  double total = 0;
   FirebaseAuth auth = FirebaseAuth.instance;
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _MyCartState extends State<MyCart> {
                 double.parse(values[key]["price"].toString()),
                 inCartItem.value["quantity"]);
             dataList.add(data);
-            total += data.price * data.quantity;
+            //total += data.price * data.quantity;
           }
         });
       }
@@ -77,8 +77,30 @@ class _MyCartState extends State<MyCart> {
     );
   }
 
+  double total = 0;
+  bool selectedAll = false;
+
   @override
   Widget build(BuildContext context) {
+    void handleSelectAll(bool value) {
+      if (value == true) {
+        dataChoose = [...dataList];
+        total = 0;
+        for (var item in dataList) {
+          total += item.price * item.quantity;
+        }
+      } else {
+        dataChoose = [];
+        total = 0;
+      }
+
+      if (this.mounted) {
+        setState(() {
+          selectedAll = !selectedAll;
+        });
+      }
+    }
+
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       appBar: AppBar(
@@ -102,21 +124,36 @@ class _MyCartState extends State<MyCart> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Material(
+                child: InkWell(
+                  onTap: () {
+                    handleSelectAll(!selectedAll);
+                  },
+                  child: Row(
+                    children: [
+                      Checkbox(value: selectedAll, onChanged: handleSelectAll),
+                      Text(
+                        "All",
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),
+              ),
               Expanded(
                 child: SizedBox(
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
                       "Total : ${new String.fromCharCodes(new Runes('\u0024'))} $total ",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 20
-                      ),
+                      style: TextStyle(color: Colors.red, fontSize: 20),
+                      textAlign: TextAlign.right,
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 5),
               SizedBox(
                 width: 180,
                 child: Material(
@@ -164,7 +201,6 @@ class _MyCartState extends State<MyCart> {
                     scrollDirection: Axis.vertical,
                     itemBuilder: (buildContext, index) {
                       return slideUI(dataList[index]);
-                      // cardUI(dataList[index]);
                     },
                     separatorBuilder: (context, index) {
                       return Divider();
@@ -176,24 +212,68 @@ class _MyCartState extends State<MyCart> {
     );
   }
 
-  void removeFromCart(String uploadId) {
-    removeFromCartHandle(uploadId).then((value) {
-      for (int i = 0; i < dataList.length; i++) {
-        if (dataList[i].uploadId == uploadId) {
-          total -= dataList[i].price * dataList[i].quantity;
-          dataList.removeAt(i);
-          break;
+  Widget slideUI(CartModel item) {
+    bool isSelected = dataChoose.contains(item);
+
+    void removeFromCart(String uploadId) {
+      removeFromCartHandle(uploadId).then((value) {
+        for (var subitem in dataList) {
+          if (subitem.uploadId == uploadId) {
+            if (isSelected) total -= subitem.price * subitem.quantity;
+            dataList.remove(subitem);
+            break;
+          }
         }
+        if (this.mounted) {
+          setState(() {
+            //
+          });
+        }
+      });
+    }
+
+    void handleQuantity(int type, bool isSelected) {
+      quantityHandle(item.uploadId, type).then((value) {
+        for (var sub_item in dataList) {
+          if (sub_item.uploadId == item.uploadId) {
+            if (type == 0) {
+              sub_item.quantity++;
+              if (isSelected) total += sub_item.price;
+              break;
+            } else if (type == 1 && sub_item.quantity > 1) {
+              sub_item.quantity--;
+              if (isSelected) total -= sub_item.price;
+              break;
+            }
+          }
+        }
+        if (this.mounted) {
+          setState(() {
+            //
+          });
+        }
+      });
+    }
+
+    void handleChooseItem(bool value) {
+      if (value == true) {
+        total += item.price * item.quantity;
+        dataChoose.add(item);
+        if (dataChoose.length == dataList.length) {
+          selectedAll = true;
+        }
+      } else {
+        total -= item.price * item.quantity;
+        dataChoose.remove(item);
+        selectedAll = false;
       }
       if (this.mounted) {
         setState(() {
           //
         });
       }
-    });
-  }
+    }
 
-  Widget slideUI(CartModel item) {
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
@@ -206,7 +286,13 @@ class _MyCartState extends State<MyCart> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Checkbox(value: true, onChanged: handleCheckBox),
+              Material(
+                color: Colors.white,
+                child: Checkbox(
+                  value: dataChoose.contains(item),
+                  onChanged: handleChooseItem,
+                ),
+              ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -256,14 +342,14 @@ class _MyCartState extends State<MyCart> {
                               children: [
                                 TextButton(
                                   onPressed: () {
-                                    handleQuantity(item.uploadId, 1); // minus
+                                    handleQuantity(1, isSelected); // minus
                                   },
                                   child: Icon(Icons.remove),
                                 ),
                                 Text(item.quantity.toString()),
                                 TextButton(
                                   onPressed: () {
-                                    handleQuantity(item.uploadId, 0); // plus
+                                    handleQuantity(0, isSelected); // plus
                                   },
                                   child: Icon(Icons.add),
                                 ),
@@ -317,32 +403,5 @@ class _MyCartState extends State<MyCart> {
         ),
       ],
     );
-  }
-
-  void handleQuantity(String uploadId, int type) {
-    quantityHandle(uploadId, type).then((value) {
-      for (int i = 0; i < dataList.length; i++) {
-        if (dataList[i].uploadId == uploadId) {
-          if (type == 0) {
-            dataList[i].quantity++;
-            total += dataList[i].price;
-            break;
-          } else if (type == 1 && dataList[i].quantity > 1) {
-            dataList[i].quantity--;
-            total -= dataList[i].price;
-            break;
-          }
-        }
-      }
-      if (this.mounted) {
-        setState(() {
-          //
-        });
-      }
-    });
-  }
-
-  void handleCheckBox(bool value){
-
   }
 }

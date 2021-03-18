@@ -20,7 +20,7 @@ class _DetailProductState extends State<DetailProduct> {
   _DetailProductState(this.uploadId);
 
   bool favInit = false;
-  MyFavoriteModel data;
+  MyFavoriteModel data = MyFavoriteModel.defaultValue();
   FirebaseUser currentUser;
   bool isLoading = false;
 
@@ -42,7 +42,7 @@ class _DetailProductState extends State<DetailProduct> {
   }
 
   void loadData(String uploadId) async {
-    data = null;
+    data = MyFavoriteModel.defaultValue();
 
     if (this.mounted) {
       setState(() {
