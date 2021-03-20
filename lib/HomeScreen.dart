@@ -15,7 +15,7 @@ import 'package:toast/toast.dart';
 import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
-  String currentEmail = "";
+  final String currentEmail ;
   HomeScreen(this.currentEmail);
 
   @override
@@ -48,6 +48,8 @@ class _HomeScreen extends State<HomeScreen> {
   int stepLoadMore = 2;
   int lastIndex = 4;
   int numberOfFirstLoad = 5;
+
+  int numberItemInCart = 0;
 
   void reloadData() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -194,7 +196,7 @@ class _HomeScreen extends State<HomeScreen> {
             child: Badge(
               badgeColor: Colors.blue,
               position: BadgePosition.topEnd(top: 0, end: 15),
-              badgeContent: Text("3", style: TextStyle(color: Colors.white)),
+              badgeContent: Text(numberItemInCart.toString(), style: TextStyle(color: Colors.white)),
               child: Padding(
                 padding: EdgeInsets.only(right: 20),
                 child: GestureDetector(
