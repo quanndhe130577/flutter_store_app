@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "202714471498",
+    "firebase_url": "https://flutter-store-app-f8344-default-rtdb.firebaseio.com",
     "project_id": "flutter-store-app-f8344",
     "storage_bucket": "flutter-store-app-f8344.appspot.com"
   },
@@ -13,6 +14,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "202714471498-ffb8s81o8hi7djj6p2c8gbg9p8rh7ktm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_food_app",
+            "certificate_hash": "0686d33f14f95153a0be14b7bbca5eeb5f821ea3"
+          }
+        },
+        {
+          "client_id": "202714471498-la2da52i7vh3lqlvbdlfa0imkph2blv1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_food_app",
+            "certificate_hash": "5db9c79c117c3d0260292138be279e1c8a136ca9"
+          }
+        },
         {
           "client_id": "202714471498-2d3qh2etsij8fkhlh1rbtphfggvan5nq.apps.googleusercontent.com",
           "client_type": 3

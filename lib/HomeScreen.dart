@@ -2,20 +2,26 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_food_app/redux/AppState.dart';
+import 'package:flutter_food_app/redux/Home/homeMiddleware.dart';
+import 'package:flutter_food_app/redux/actions.dart';
+import 'file:///E:/Flutter/flutter_store_app/lib/redux/Home/homeReducer.dart';
 import 'Model/HomeEntity.dart';
 import 'package:flutter_food_app/DetailProduct.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
 import 'UploadData.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'MyFavorite.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'MyCart.dart';
 import 'Common.dart';
 import 'package:toast/toast.dart';
 import 'package:badges/badges.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String currentEmail ;
+  final String currentEmail;
+
   HomeScreen(this.currentEmail);
 
   @override
@@ -23,16 +29,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
+  final Store<AppState> store = Store<AppState>(
+    homeReducers,
+    initialState: AppState(),
+    middleware: [appStateMiddleware],
+  );
+
   String currentEmail = "";
-  List<HomeModel> dataList = [];
-  List<HomeModel> searchList = [];
+
   FirebaseUser currentUser;
   bool searchState = false;
-  bool isLoading = true;
-  bool isLoadingMore = false;
+
   _HomeScreen(this.currentEmail);
 
   FirebaseAuth auth = FirebaseAuth.instance;
+
   Future<void> logOut() async {
     await auth.signOut().then((value) => {
           Navigator.pushReplacement(
@@ -44,35 +55,15 @@ class _HomeScreen extends State<HomeScreen> {
 
   ScrollController _controller;
 
-  int currentIndex = 0;
-  int stepLoadMore = 2;
-  int lastIndex = 4;
-  int numberOfFirstLoad = 5;
-
-  int numberItemInCart = 0;
-
   void reloadData() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      if (this.mounted && !isLoadingMore) {
-        setState(() {
-          isLoadingMore = true;
-        });
-      }
-      lastIndex += stepLoadMore;
-      loadData();
+      store.dispatch(LoadMoreDataAction());
     }
+
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
-      // setState(() {
-      //   isLoading = true;
-      // });
-      // Timer(Duration(milliseconds: 2000), () {
-      //   setState(() {
-      //     isLoading = false;
-      //   });
-      // });
-      loadData();
+      store.dispatch(RefreshDataAction());
     }
   }
 
@@ -82,264 +73,204 @@ class _HomeScreen extends State<HomeScreen> {
     _controller.addListener(reloadData);
     super.initState();
     auth.currentUser().then((value) => {this.currentUser = value});
-    loadData();
-  }
-
-  void loadData() async {
-    if (this.mounted && !isLoadingMore) {
-      setState(() {
-        isLoading = true;
-        //dataList = dataList;
-      });
-    }
-    DatabaseReference reference =
-        FirebaseDatabase.instance.reference().child("Data");
-    await reference.once().then((DataSnapshot dataSnapShot) async {
-      //dataList.clear();
-      var keys = dataSnapShot.value.keys;
-      var values = dataSnapShot.value;
-
-      var count = 0;
-      for (var key in keys) {
-        if (numberOfFirstLoad == 0) {
-          if (count <= currentIndex) {
-            count++;
-            continue;
-          }
-          if (currentIndex > lastIndex) {
-            //currentIndex = lastIndex;
-            break;
-          } else {
-            currentIndex++;
-            count++;
-          }
-        } else {
-          count++;
-          currentIndex++;
-          numberOfFirstLoad--;
-        }
-
-        HomeModel data = new HomeModel(
-          key,
-          values[key]["imgUrl"],
-          values[key]["name"],
-          double.parse(values[key]["price"].toString()),
-          values[key]["material"],
-        );
-
-        dataList.add(data);
-      }
-
-      //dataList.sort((a, b) => a.name.compareTo(b.name));
-      //searchList = new List<Data>.from(dataList);
-      searchList = [...dataList]; //clone dataList
-    }).whenComplete(
-      () => {
-        if (this.mounted)
-          {
-            setState(() {
-              isLoading = false;
-              isLoadingMore = false;
-              //dataList = dataList;
-            })
-          }
-      },
-    );
+    loadFirstData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffffffff),
-      appBar: AppBar(
-        backgroundColor: Color(0xffff2fc3),
-        title: !searchState
-            ? Text("Home")
-            : TextField(
-                decoration: InputDecoration(
-                  icon: Icon(Icons.search, color: Colors.white),
-                  hintText: "Search . . . ",
-                  hintStyle: TextStyle(color: Colors.white),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
+    return StoreProvider(
+      store: store,
+      child: StoreBuilder<AppState>(
+        onInit: (store) => store.dispatch(FirstLoadHomeModelAction()),
+        builder: (BuildContext context, Store<AppState> store) => Scaffold(
+          backgroundColor: Color(0xffffffff),
+          appBar: AppBar(
+            backgroundColor: Color(0xffff2fc3),
+            title: !searchState
+                ? Text("Home")
+                : TextField(
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.search, color: Colors.white),
+                      hintText: "Search . . . ",
+                      hintStyle: TextStyle(color: Colors.white),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                    ),
+                    onSubmitted: (text) {
+                      searchMethod(text.toLowerCase());
+                    },
+                    autofocus: true,
+                  ),
+            centerTitle: false,
+            actions: [
+              searchState
+                  ? IconButton(
+                      icon: Icon(Icons.cancel),
+                      color: Colors.white,
+                      onPressed: () {
+                        store.dispatch(RemoveSearchState());
+                        setState(() {
+                          searchState = !searchState;
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.search),
+                      color: Colors.white,
+                      onPressed: () {
+                        setState(() {
+                          searchState = !searchState;
+                        });
+                      },
+                    ),
+              Visibility(
+                visible: !searchState,
+                child: Badge(
+                  badgeColor: Colors.blue,
+                  position: BadgePosition.topEnd(top: 0, end: 15),
+                  badgeContent:
+                      Text("0", style: TextStyle(color: Colors.white)),
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => MyCart()));
+                      },
+                      child: Icon(
+                        Icons.shopping_cart,
+                        color: Colors.black,
+                        semanticLabel: "MyCart",
+                      ),
+                    ),
                   ),
                 ),
-                onChanged: (text) {
-                  searchMethod(text.toLowerCase());
-                },
-                autofocus: true,
               ),
-        centerTitle: false,
-        actions: [
-          searchState
-              ? IconButton(
-                  icon: Icon(Icons.cancel),
-                  color: Colors.white,
-                  onPressed: () {
-                    loadData();
-                    setState(() {
-                      searchState = !searchState;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: Icon(Icons.search),
-                  color: Colors.white,
-                  onPressed: () {
-                    setState(() {
-                      searchState = !searchState;
-                    });
+            ],
+          ),
+          drawer: Drawer(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 170,
+                  color: Color(0xff000725),
+                  child: Column(
+                    children: [
+                      Padding(padding: EdgeInsets.only(top: 30)),
+                      Image(
+                          image: AssetImage("images/icon.jpg"),
+                          height: 90,
+                          width: 90),
+                      SizedBox(height: 10),
+                      Text(currentEmail, style: TextStyle(color: Colors.white))
+                    ],
+                  ),
+                ),
+                ListTile(
+                  title: Text("Upload"),
+                  leading: Icon(Icons.cloud_upload),
+                  onTap: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                UploadData())).then((value) => {});
+                    //loadFirstData();
                   },
                 ),
-          Visibility(
-            visible: !searchState,
-            child: Badge(
-              badgeColor: Colors.blue,
-              position: BadgePosition.topEnd(top: 0, end: 15),
-              badgeContent: Text(numberItemInCart.toString(), style: TextStyle(color: Colors.white)),
-              child: Padding(
-                padding: EdgeInsets.only(right: 20),
-                child: GestureDetector(
+                ListTile(
+                  title: Text("My Favorite"),
+                  leading: Icon(Icons.favorite),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => MyCart()));
+                            builder: (BuildContext context) =>
+                                MyFavorite())).then((value) => loadFirstData());
                   },
-                  child: Icon(
-                    Icons.shopping_cart,
-                    color: Colors.black,
-                    semanticLabel: "MyCart",
+                ),
+                ListTile(
+                  title: Text("My Profile"),
+                  leading: Icon(Icons.person),
+                ),
+                Divider(),
+                //line
+                ListTile(
+                  title: Text("Contact Us"),
+                  leading: Icon(Icons.email),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ListTile(
+                      title: Text("Log out"),
+                      leading: Icon(Icons.logout),
+                      onTap: () {
+                        logOut();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          body: Column(
+            children: [
+              StoreConnector<AppState, bool>(
+                converter: (store) => store.state.isLoading,
+                builder: (BuildContext context, bool isLoading) => Visibility(
+                  visible: isLoading,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 15),
+                    child: SpinKitWave(
+                      color: Colors.red,
+                      size: 35.0,
+                    ),
                   ),
                 ),
               ),
-
-              // TextButton.icon(
-              //   onPressed: () {
-              //     Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //             builder: (BuildContext context) => MyCart()));
-              //   },
-              //   icon: Icon(
-              //     Icons.shopping_cart,
-              //     color: Colors.black,
-              //     semanticLabel: "MyCart",
-              //   ),
-              //   label: Text(""),
-              // ),
-            ),
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 170,
-              color: Color(0xff000725),
-              child: Column(
-                children: [
-                  Padding(padding: EdgeInsets.only(top: 30)),
-                  Image(
-                      image: AssetImage("images/icon.jpg"),
-                      height: 90,
-                      width: 90),
-                  SizedBox(height: 10),
-                  Text(currentEmail, style: TextStyle(color: Colors.white))
-                ],
-              ),
-            ),
-            ListTile(
-              title: Text("Upload"),
-              leading: Icon(Icons.cloud_upload),
-              onTap: () async {
-                await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => UploadData()))
-                    .then((value) => loadData());
-                loadData();
-              },
-            ),
-            ListTile(
-              title: Text("My Favorite"),
-              leading: Icon(Icons.favorite),
-              onTap: () {
-                Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => MyFavorite()))
-                    .then((value) => loadData());
-              },
-            ),
-            ListTile(
-              title: Text("My Profile"),
-              leading: Icon(Icons.person),
-            ),
-            Divider(),
-            //line
-            ListTile(
-              title: Text("Contact Us"),
-              leading: Icon(Icons.email),
-            ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ListTile(
-                  title: Text("Log out"),
-                  leading: Icon(Icons.logout),
-                  onTap: () {
-                    logOut();
-                  },
+              Expanded(
+                child: StoreConnector<AppState, List<HomeModel>>(
+                  converter: (store) => store.state.searchList,
+                  builder: (context, List<HomeModel> searchList) =>
+                      searchList.length == 0
+                          ? Center(
+                              child: Text("No data available",
+                                  style: TextStyle(fontSize: 30)),
+                            )
+                          : ListView.builder(
+                              physics: BouncingScrollPhysics(),
+                              controller: _controller,
+                              itemCount: searchList.length,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (buildContext, index) {
+                                return cardUI(searchList[index]);
+                              },
+                            ),
                 ),
               ),
-            ),
-          ],
+              StoreConnector<AppState, bool>(
+                converter: (store) => store.state.isLoadingMore,
+                builder: (BuildContext context, bool isLoadMore) => Visibility(
+                  visible: isLoadMore,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 15),
+                    child: SpinKitWave(
+                      color: Colors.red,
+                      size: 35.0,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
         ),
-      ),
-      body: Column(
-        children: [
-          Visibility(
-            visible: isLoading,
-            child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: SpinKitWave(
-                color: Colors.red,
-                size: 35.0,
-              ),
-            ),
-          ),
-          Expanded(
-            child: searchList.length == 0
-                ? Center(
-                    child: Text("No data available",
-                        style: TextStyle(fontSize: 30)),
-                  )
-                : ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    controller: _controller,
-                    itemCount: searchList.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (buildContext, index) {
-                      return cardUI(searchList[index]);
-                    },
-                  ),
-          ),
-          Visibility(
-            visible: isLoadingMore,
-            child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: SpinKitWave(
-                color: Colors.red,
-                size: 35.0,
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-        ],
       ),
     );
   }
@@ -427,17 +358,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void searchMethod(String text) {
-    searchList.clear();
-    for (var item in dataList) {
-      if (item.name.toLowerCase().contains(text.toLowerCase()) ||
-          item.material.toLowerCase().contains(text.toLowerCase())) {
-        searchList.add(item);
-      }
-    }
-    if (this.mounted) {
-      setState(() {
-        //
-      });
-    }
+    store.dispatch(SearchAction(text));
   }
 }

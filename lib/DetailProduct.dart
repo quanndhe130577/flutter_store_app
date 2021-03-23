@@ -8,7 +8,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'Common.dart';
 
 class DetailProduct extends StatefulWidget {
-  String uploadId = "";
+  final String uploadId;
   DetailProduct(this.uploadId);
 
   @override
