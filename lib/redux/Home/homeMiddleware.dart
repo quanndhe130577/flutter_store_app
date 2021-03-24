@@ -3,7 +3,7 @@ import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:redux/redux.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-import '../actions.dart';
+import 'actions.dart';
 
 Future<List<HomeModel>> loadMoreData(int currentNumber, String keyword) async {
   List<HomeModel> dataList = [];
@@ -147,14 +147,14 @@ Future<List<HomeModel>> refreshData(int number, String keyword) async {
 }
 
 void appStateMiddleware(
-    Store<AppState> store, action, NextDispatcher next) async {
+    Store<AppState> store, dynamic action, NextDispatcher next) async {
   next(action);
-
+  print(action.runtimeType);
   if (action is LoadMoreDataAction) {
     store.dispatch(StartLoadMoreState());
     await loadMoreData(store.state.dataList.length, store.state.searchText)
         .then((moreData) => store.dispatch(LoadMoreDataState(moreData)));
-  } else if (action is FirstLoadHomeModelAction) {
+  } else if (action.runtimeType.toString() == "FirstLoadHomeModelAction") {
     store.dispatch(StartLoadingFirstState());
     await loadFirstData()
         .then((dataList) => store.dispatch(FirstLoadHomeModelState(dataList)));

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/Home/homeMiddleware.dart';
-import 'package:flutter_food_app/redux/actions.dart';
+import 'file:///E:/Flutter/flutter_store_app/lib/redux/Home/actions.dart';
 import 'file:///E:/Flutter/flutter_store_app/lib/redux/Home/homeReducer.dart';
 import 'Model/HomeEntity.dart';
 import 'package:flutter_food_app/DetailProduct.dart';
@@ -73,7 +73,6 @@ class _HomeScreen extends State<HomeScreen> {
     _controller.addListener(reloadData);
     super.initState();
     auth.currentUser().then((value) => {this.currentUser = value});
-    loadFirstData();
   }
 
   @override

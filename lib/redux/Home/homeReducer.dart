@@ -1,15 +1,15 @@
 import 'package:flutter_food_app/Model/HomeEntity.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
-import 'package:flutter_food_app/redux/actions.dart';
+import 'file:///E:/Flutter/flutter_store_app/lib/redux/Home/actions.dart';
 
 AppState homeReducers(AppState state, dynamic action) {
-  if (action is StartLoadingFirstState) {
+  if (action.runtimeType.toString() == "StartLoadingFirstState") {
     return AppState(
       dataList: state.dataList,
       searchList: state.searchList,
       isLoading: true,
     );
-  } else if (action is FirstLoadHomeModelState) {
+  } else if (action.runtimeType.toString() == "FirstLoadHomeModelState") {
     return AppState(
       dataList: action.dataList,
       searchList: action.dataList,
