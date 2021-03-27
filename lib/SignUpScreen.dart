@@ -45,7 +45,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            HomeScreen(value.user.email)))
+                            HomeScreen(value.user.email, value.user.uid)))
               });
     } catch (e) {
       switch (e.code) {

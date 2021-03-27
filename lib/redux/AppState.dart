@@ -1,28 +1,35 @@
-import 'package:flutter_food_app/Model/HomeEntity.dart';
-import 'package:flutter_food_app/Model/MyCartEntity.dart';
-import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_food_app/redux/Home/HomeState.dart';
+import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
 
 class AppState {
-  bool isLoading;
-  bool isLoadingMore;
+  String uid;
+  HomeState homeState;
+  MyCartState myCartState;
 
-  String searchText;
-
-  List<HomeModel> dataList;
-  List<HomeModel> searchList;
-
-  List<CartModel> cartList;
-
-  List<MyFavoriteModel> favList;
-
-  AppState({
-    this.dataList = const [],
-    this.searchList = const [],
-    this.cartList = const [],
-    this.favList = const [],
-    this.isLoading = false,
-    this.isLoadingMore = false,
-
-    this.searchText = "",
+  AppState(
+    this.uid, {
+    this.homeState,
+    this.myCartState,
   });
+
+  AppState newState({HomeState homeState, MyCartState myCartState}) {
+    return AppState(
+      this.uid,
+      homeState: homeState != null ? homeState : HomeState(),
+      myCartState: myCartState != null ? myCartState : MyCartState(),
+    );
+  }
+
+// AppState newHomeState({HomeState homeState}) {
+//   return AppState(
+//     homeState: homeState != null ? homeState : HomeState(),
+//   );
+// }
+//
+// AppState newMyCartState({MyCartState myCartState}) {
+//   return AppState(
+//     myCartState: myCartState != null ? myCartState : MyCartState(),
+//   );
+// }
 }

@@ -53,7 +53,7 @@ class _LogInScreen extends State<LogInScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            HomeScreen(value.user.email)))
+                            HomeScreen(value.user.email, value.user.uid)))
               });
     } catch (e) {
       switch (e.code) {
@@ -94,7 +94,7 @@ class _LogInScreen extends State<LogInScreen> {
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      HomeScreen(value.user.email)))
+                      HomeScreen(value.user.email, value.user.uid)))
         });
   }
 
@@ -113,7 +113,7 @@ class _LogInScreen extends State<LogInScreen> {
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    HomeScreen(value.user.email)))
+                    HomeScreen(value.user.email, value.user.uid)))
       });
     }catch(e){
       switch (e.code) {
@@ -147,7 +147,7 @@ class _LogInScreen extends State<LogInScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            HomeScreen(value.email)))
+                            HomeScreen(value.email, value.uid)))
               }
           });
       // if (await auth.currentUser() != null) {
