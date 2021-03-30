@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_food_app/redux/AppState.dart';
 import 'Model/MyFavoriteEntity.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,18 +7,22 @@ import 'package:firebase_database/firebase_database.dart';
 import "MyCart.dart";
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'Common.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 class DetailProduct extends StatefulWidget {
+  final Store<AppState> store;
   final String uploadId;
-  DetailProduct(this.uploadId);
+  DetailProduct(this.uploadId, this.store);
 
   @override
-  _DetailProductState createState() => _DetailProductState(this.uploadId);
+  _DetailProductState createState() => _DetailProductState(this.uploadId, this.store);
 }
 
 class _DetailProductState extends State<DetailProduct> {
   String uploadId = "";
-  _DetailProductState(this.uploadId);
+  Store<AppState> store;
+  _DetailProductState(this.uploadId, this.store);
 
   bool favInit = false;
   MyFavoriteModel data = MyFavoriteModel.defaultValue();
@@ -95,7 +100,7 @@ class _DetailProductState extends State<DetailProduct> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => MyCart()));
+                      builder: (BuildContext context) => MyCart(this.store)));
             },
             icon: Icon(Icons.shopping_cart, color: Colors.black),
             label: Text(""),

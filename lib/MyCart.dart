@@ -1,81 +1,88 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_food_app/redux/AppState.dart';
+import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'Model/MyCartEntity.dart';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'DetailProduct.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'Common.dart';
+
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 class MyCart extends StatefulWidget {
+  final Store<AppState> store;
+
+  MyCart(this.store);
+
   @override
-  _MyCartState createState() => _MyCartState();
+  _MyCartState createState() => _MyCartState(this.store);
 }
 
 class _MyCartState extends State<MyCart> {
-  FirebaseUser currentUser;
-  List<CartModel> dataList = [];
   List<CartModel> dataChoose = [];
   bool isLoading = false;
+  Store<AppState> store;
+
+  _MyCartState(this.store);
 
   FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    auth.currentUser().then((value) => {this.currentUser = value});
-    loadData();
   }
 
-  void loadData() async {
-    if (this.mounted) {
-      setState(() {
-        isLoading = true;
-        //dataList = dataList;
-      });
-    }
-    DatabaseReference reference =
-        FirebaseDatabase.instance.reference().child("Data");
-    await reference.once().then((DataSnapshot dataSnapShot) async {
-      dataList.clear();
-      var keys = dataSnapShot.value.keys;
-      var values = dataSnapShot.value;
-
-      for (var key in keys) {
-        DatabaseReference inCartRef = FirebaseDatabase.instance
-            .reference()
-            .child("Data")
-            .child(key)
-            .child("InCart")
-            .child(currentUser.uid);
-
-        await inCartRef.once().then((inCartItem) {
-          if (inCartItem.value != null && inCartItem.value["state"] == true) {
-            CartModel data = new CartModel(
-                key,
-                values[key]["imgUrl"],
-                values[key]["name"],
-                double.parse(values[key]["price"].toString()),
-                inCartItem.value["quantity"]);
-            dataList.add(data);
-            //total += data.price * data.quantity;
-          }
-        });
-      }
-      //dataList.sort((a, b) => a.name.compareTo(b.name));
-    }).whenComplete(
-      () => {
-        if (this.mounted)
-          {
-            setState(() {
-              isLoading = false;
-            })
-          }
-      },
-    );
-  }
+  // void loadData() async {
+  //   if (this.mounted) {
+  //     setState(() {
+  //       isLoading = true;
+  //       //dataList = dataList;
+  //     });
+  //   }
+  //   DatabaseReference reference =
+  //       FirebaseDatabase.instance.reference().child("Data");
+  //   await reference.once().then((DataSnapshot dataSnapShot) async {
+  //     dataList.clear();
+  //     var keys = dataSnapShot.value.keys;
+  //     var values = dataSnapShot.value;
+  //
+  //     for (var key in keys) {
+  //       DatabaseReference inCartRef = FirebaseDatabase.instance
+  //           .reference()
+  //           .child("Data")
+  //           .child(key)
+  //           .child("InCart")
+  //           .child(currentUser.uid);
+  //
+  //       await inCartRef.once().then((inCartItem) {
+  //         if (inCartItem.value != null && inCartItem.value["state"] == true) {
+  //           CartModel data = new CartModel(
+  //               key,
+  //               values[key]["imgUrl"],
+  //               values[key]["name"],
+  //               double.parse(values[key]["price"].toString()),
+  //               inCartItem.value["quantity"]);
+  //           dataList.add(data);
+  //           //total += data.price * data.quantity;
+  //         }
+  //       });
+  //     }
+  //     //dataList.sort((a, b) => a.name.compareTo(b.name));
+  //   }).whenComplete(
+  //     () => {
+  //       if (this.mounted)
+  //         {
+  //           setState(() {
+  //             isLoading = false;
+  //           })
+  //         }
+  //     },
+  //   );
+  // }
 
   double total = 0;
   bool selectedAll = false;
@@ -84,9 +91,9 @@ class _MyCartState extends State<MyCart> {
   Widget build(BuildContext context) {
     void handleSelectAll(bool value) {
       if (value == true) {
-        dataChoose = [...dataList];
+        dataChoose = [...store.state.myCartState.cartList];
         total = 0;
-        for (var item in dataList) {
+        for (var item in store.state.myCartState.cartList) {
           total += item.price * item.quantity;
         }
       } else {
@@ -167,9 +174,7 @@ class _MyCartState extends State<MyCart> {
                       alignment: Alignment.center,
                       child: Text("Buy",
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30)),
+                              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30)),
                     ),
                   ),
                 ),
@@ -178,36 +183,41 @@ class _MyCartState extends State<MyCart> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Visibility(
-            visible: isLoading,
-            child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: SpinKitWave(
-                color: Colors.red,
-                size: 35.0,
+      body: StoreProvider(
+        store: this.store,
+        child: Column(
+          children: [
+            Visibility(
+              visible: isLoading,
+              child: Padding(
+                padding: EdgeInsets.only(top: 15),
+                child: SpinKitWave(
+                  color: Colors.red,
+                  size: 35.0,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: dataList.length == 0
-                ? Center(
-                    child: Text("No product in your cart",
-                        style: TextStyle(fontSize: 30)),
-                  )
-                : ListView.separated(
-                    itemCount: dataList.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (buildContext, index) {
-                      return slideUI(dataList[index]);
-                    },
-                    separatorBuilder: (context, index) {
-                      return Divider();
-                    },
-                  ),
-          ),
-        ],
+            StoreConnector<AppState, List<CartModel>>(
+              converter: (store) => store.state.myCartState.cartList,
+              builder: (BuildContext context, List<CartModel> dataList) => Expanded(
+                child: dataList.length == 0
+                    ? Center(
+                        child: Text("No product in your cart", style: TextStyle(fontSize: 30)),
+                      )
+                    : ListView.separated(
+                        itemCount: dataList.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (buildContext, index) {
+                          return slideUI(dataList[index]);
+                        },
+                        separatorBuilder: (context, index) {
+                          return Divider();
+                        },
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -216,50 +226,36 @@ class _MyCartState extends State<MyCart> {
     bool isSelected = dataChoose.contains(item);
 
     void removeFromCart(String uploadId) {
-      removeFromCartHandle(uploadId).then((value) {
-        for (var subitem in dataList) {
-          if (subitem.uploadId == uploadId) {
-            if (isSelected) total -= subitem.price * subitem.quantity;
-            dataList.remove(subitem);
-            break;
-          }
-        }
-        if (this.mounted) {
-          setState(() {
-            //
-          });
-        }
-      });
+      store.dispatch(RemoveFromCartMyCartAction(item.uploadId));
+      if (isSelected) total -= item.price * item.quantity;
+      if (this.mounted) {
+        setState(() {
+          //
+        });
+      }
     }
 
     void handleQuantity(int type, bool isSelected) {
-      quantityHandle(item.uploadId, type).then((value) {
-        for (var sub_item in dataList) {
-          if (sub_item.uploadId == item.uploadId) {
-            if (type == 0) {
-              sub_item.quantity++;
-              if (isSelected) total += sub_item.price;
-              break;
-            } else if (type == 1 && sub_item.quantity > 1) {
-              sub_item.quantity--;
-              if (isSelected) total -= sub_item.price;
-              break;
-            }
-          }
-        }
-        if (this.mounted) {
-          setState(() {
-            //
-          });
-        }
-      });
+      store.dispatch(HandleQuantityCartAction(item.uploadId, type));
+
+      if (type == 0) {
+        if (isSelected) total += item.price;
+      } else if (type == 1 && item.quantity > 1) {
+        if (isSelected) total -= item.price;
+      }
+
+      if (this.mounted) {
+        setState(() {
+          //
+        });
+      }
     }
 
     void handleChooseItem(bool value) {
       if (value == true) {
         total += item.price * item.quantity;
         dataChoose.add(item);
-        if (dataChoose.length == dataList.length) {
+        if (dataChoose.length == store.state.myCartState.cartList.length) {
           selectedAll = true;
         }
       } else {
@@ -298,11 +294,9 @@ class _MyCartState extends State<MyCart> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              DetailProduct(item.uploadId)));
+                          builder: (BuildContext context) => DetailProduct(item.uploadId, this.store)));
                 },
-                child: Image.network(item.imgUrl,
-                    fit: BoxFit.cover, width: 100, height: 100),
+                child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
               ),
               SizedBox(width: 10),
               Expanded(
@@ -325,9 +319,7 @@ class _MyCartState extends State<MyCart> {
                         Text(
                           '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price} ',
                           style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         Expanded(child: Container()),

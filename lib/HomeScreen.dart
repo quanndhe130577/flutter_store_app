@@ -141,7 +141,7 @@ class _HomeScreen extends State<HomeScreen> {
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (BuildContext context) => MyCart()));
+                              MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
                         },
                         child: Icon(
                           Icons.shopping_cart,
@@ -187,7 +187,7 @@ class _HomeScreen extends State<HomeScreen> {
                   leading: Icon(Icons.favorite),
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) => MyFavorite()));
+                        MaterialPageRoute(builder: (BuildContext context) => MyFavorite(this.store)));
                   },
                 ),
                 ListTile(
@@ -277,7 +277,7 @@ class _HomeScreen extends State<HomeScreen> {
       child: GestureDetector(
         onTap: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) => DetailProduct(item.uploadId)));
+              MaterialPageRoute(builder: (BuildContext context) => DetailProduct(item.uploadId, this.store)));
         },
         onDoubleTap: () {
           favoriteHandle(item.uploadId, true).then((value) {

@@ -5,18 +5,28 @@ import 'Model/MyFavoriteEntity.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'Common.dart';
 import 'DetailProduct.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'redux/AppState.dart';
 
 class MyFavorite extends StatefulWidget {
+  final Store<AppState> store;
+
+  MyFavorite(this.store);
+
   @override
-  _MyFavoriteState createState() => _MyFavoriteState();
+  _MyFavoriteState createState() => _MyFavoriteState(this.store);
 }
 
 class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
+  Store<AppState> store;
   FirebaseUser currentUser;
   List<MyFavoriteModel> dataList = [];
   bool isLoading = true;
   FirebaseAuth auth = FirebaseAuth.instance;
   String test = "";
+
+  _MyFavoriteState(this.store);
 
   @override
   void initState() {
@@ -29,8 +39,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   }
 
   void loadData() async {
-    DatabaseReference reference =
-        FirebaseDatabase.instance.reference().child("Data");
+    DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
     await reference.once().then((DataSnapshot dataSnapShot) async {
       dataList.clear();
       var keys = dataSnapShot.value.keys;
@@ -74,8 +83,8 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Favorite",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title:
+            Text("My Favorite", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color(0xffff2f3c),
       ),
       body: isLoading
@@ -89,8 +98,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
             )
           : dataList.length == 0
               ? Center(
-                  child:
-                      Text("No data available", style: TextStyle(fontSize: 30)),
+                  child: Text("No data available", style: TextStyle(fontSize: 30)),
                 )
               : ListView.builder(
                   itemCount: dataList.length,
@@ -108,8 +116,8 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, double price,
-      String description, String uploadId, bool fav) {
+  Widget cardUI(String imgUrl, String name, String material, double price, String description,
+      String uploadId, bool fav) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
@@ -139,11 +147,8 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
             SizedBox(height: 3),
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            DetailProduct(uploadId)));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) => DetailProduct(uploadId, this.store)));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -156,9 +161,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         Text(
                           name,
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -217,8 +220,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                   addToCartHandle(uploadId);
                 },
                 icon: Icon(Icons.add_shopping_cart, color: Colors.black),
-                label:
-                    Text("Add to cart", style: TextStyle(color: Colors.black)),
+                label: Text("Add to cart", style: TextStyle(color: Colors.black)),
               ),
               width: double.infinity,
               color: Colors.red,
