@@ -4,11 +4,7 @@ import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
 import 'MyCartActions.dart';
 
 MyCartState myCartReducers(MyCartState state, dynamic action) {
-  if (action.runtimeType.toString() == (FirstLoadCartModelMyCartState).toString()) {
-    return state.newState(
-      cartList: action.cartList,
-    );
-  } else if (action.runtimeType.toString() == (RemoveFromCartMyCartState).toString()) {
+  if (action.runtimeType.toString() == (RemoveFromCartMyCartState).toString()) {
     List<CartModel> list = []..addAll(state.cartList);
     list.removeWhere((element) => element.uploadId == action.productId);
     return state.newState(

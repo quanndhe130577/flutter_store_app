@@ -4,6 +4,7 @@ import 'package:flutter_food_app/redux/Home/HomeReducer.dart';
 import 'package:flutter_food_app/redux/Home/HomeState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartReducer.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
+import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteReducer.dart';
 
 AppState appReducers(AppState state, dynamic action) {
   if (action.runtimeType.toString() == (InitAppState).toString()) {
@@ -15,6 +16,9 @@ AppState appReducers(AppState state, dynamic action) {
       ),
       myCartState: state.myCartState.newState(
         cartList: action.cartList,
+      ),
+      myFavState: state.myFavState.newState(
+        favList: action.favList,
       ),
     );
   } else if (action.runtimeType.toString() == (StartInitAppState).toString()) {
@@ -36,6 +40,10 @@ AppState appReducers(AppState state, dynamic action) {
     ),
     myCartState: myCartReducers(
       state.myCartState,
+      action,
+    ),
+    myFavState: myFavReducers(
+      state.myFavState,
       action,
     ),
   );

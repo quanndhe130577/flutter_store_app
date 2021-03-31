@@ -1,12 +1,12 @@
-class MyFavoriteModel {
+class FavModel {
   String imgUrl, name, material, uploadId, description;
   bool fav;
   double price;
 
-  MyFavoriteModel(this.imgUrl, this.name, this.material, this.price,
+  FavModel(this.imgUrl, this.name, this.material, this.price,
       this.description, this.uploadId, this.fav);
 
-  MyFavoriteModel.defaultValue() {
+  FavModel.defaultValue() {
     this.imgUrl = "https://i.imgur.com/0UsUl1m.jpg";
     this.name = "";
     this.material = "";

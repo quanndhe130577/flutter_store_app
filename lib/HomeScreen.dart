@@ -9,6 +9,7 @@ import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/AppMiddleware.dart';
 import 'package:flutter_food_app/redux/Home/HomeActions.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
+import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Model/HomeEntity.dart';
 import 'package:flutter_food_app/DetailProduct.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
@@ -16,7 +17,6 @@ import 'UploadData.dart';
 import 'MyFavorite.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'MyCart.dart';
-import 'Common.dart';
 import 'package:toast/toast.dart';
 import 'package:badges/badges.dart';
 import 'package:redux/redux.dart';
@@ -48,8 +48,8 @@ class _HomeScreen extends State<HomeScreen> {
   Future<void> logOut() async {
     await auth.signOut().then((value) {
       store.dispatch(ClearStateAppAction());
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => LogInScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (BuildContext context) => LogInScreen()));
     });
   }
 
@@ -133,23 +133,18 @@ class _HomeScreen extends State<HomeScreen> {
                 visible: !searchState,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                MyCart(this.store)));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
                   },
                   child: Padding(
                     padding: EdgeInsets.only(right: 5),
                     child: StoreConnector<AppState, List<CartModel>>(
                       converter: (store) => store.state.myCartState.cartList,
-                      builder:
-                          (BuildContext context, List<CartModel> cartList) =>
-                              Badge(
+                      builder: (BuildContext context, List<CartModel> cartList) => Badge(
                         badgeColor: Colors.blue,
                         position: BadgePosition.bottomEnd(bottom: 10),
-                        badgeContent: Text(cartList.length.toString(),
-                            style: TextStyle(color: Colors.white)),
+                        badgeContent:
+                            Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
                         child: Icon(
                           Icons.shopping_cart,
                           color: Colors.black,
@@ -173,10 +168,7 @@ class _HomeScreen extends State<HomeScreen> {
                   child: Column(
                     children: [
                       Padding(padding: EdgeInsets.only(top: 30)),
-                      Image(
-                          image: AssetImage("images/icon.jpg"),
-                          height: 90,
-                          width: 90),
+                      Image(image: AssetImage("images/icon.jpg"), height: 90, width: 90),
                       SizedBox(height: 10),
                       Text(currentEmail, style: TextStyle(color: Colors.white))
                     ],
@@ -186,11 +178,9 @@ class _HomeScreen extends State<HomeScreen> {
                   title: Text("Upload"),
                   leading: Icon(Icons.cloud_upload),
                   onTap: () async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                UploadData())).then((value) => {});
+                    await Navigator.push(context,
+                            MaterialPageRoute(builder: (BuildContext context) => UploadData()))
+                        .then((value) => {});
                     //loadFirstData();
                   },
                 ),
@@ -201,8 +191,7 @@ class _HomeScreen extends State<HomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                MyFavorite(this.store)));
+                            builder: (BuildContext context) => MyFavorite(this.store)));
                   },
                 ),
                 ListTile(
@@ -248,27 +237,24 @@ class _HomeScreen extends State<HomeScreen> {
               Expanded(
                 child: StoreConnector<AppState, List<HomeModel>>(
                   converter: (store) => store.state.homeState.searchList,
-                  builder: (context, List<HomeModel> searchList) =>
-                      searchList.length == 0
-                          ? Center(
-                              child: Text("No data available",
-                                  style: TextStyle(fontSize: 30)),
-                            )
-                          : ListView.builder(
-                              physics: BouncingScrollPhysics(),
-                              controller: _controller,
-                              itemCount: searchList.length,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (buildContext, index) {
-                                return cardUI(searchList[index]);
-                              },
-                            ),
+                  builder: (context, List<HomeModel> searchList) => searchList.length == 0
+                      ? Center(
+                          child: Text("No data available", style: TextStyle(fontSize: 30)),
+                        )
+                      : ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          controller: _controller,
+                          itemCount: searchList.length,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (buildContext, index) {
+                            return cardUI(searchList[index]);
+                          },
+                        ),
                 ),
               ),
               StoreConnector<AppState, bool>(
                 converter: (store) => store.state.homeState.isLoadingMore,
-                builder: (BuildContext context, bool isLoadingMore) =>
-                    Visibility(
+                builder: (BuildContext context, bool isLoadingMore) => Visibility(
                   visible: isLoadingMore,
                   child: Padding(
                     padding: EdgeInsets.only(top: 15),
@@ -310,13 +296,13 @@ class _HomeScreen extends State<HomeScreen> {
                                 DetailProduct(item.uploadId, this.store)));
                   },
                   onDoubleTap: () {
-                    favoriteHandle(item.uploadId, true).then((value) {
-                      Toast.show("Add to favorite", context,
-                          duration: 1, gravity: Toast.BOTTOM);
-                    });
+                    Toast.show("Add to favorite", context, duration: 1, gravity: Toast.BOTTOM);
+                    if (!store.state.myFavState.favList
+                        .any((element) => element.uploadId == item.uploadId)) {
+                      store.dispatch(HandleFavMyFavAction(item.uploadId, true));
+                    }
                   },
-                  child: Image.network(item.imgUrl,
-                      fit: BoxFit.cover, width: 100, height: 100),
+                  child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
                 ),
                 SizedBox(width: 10),
                 Expanded(
@@ -339,9 +325,7 @@ class _HomeScreen extends State<HomeScreen> {
                           Text(
                             '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price.toString()} ',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
+                                color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           Expanded(

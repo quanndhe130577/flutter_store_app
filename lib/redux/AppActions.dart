@@ -1,5 +1,6 @@
 import 'package:flutter_food_app/Model/HomeEntity.dart';
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
+import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
 
 class StartInitAppState {}
 
@@ -12,8 +13,9 @@ class InitAppAction {
 class InitAppState {
   List<HomeModel> dataList;
   List<CartModel> cartList;
+  List<FavModel> favList;
 
-  InitAppState(this.dataList, this.cartList);
+  InitAppState(this.dataList, this.cartList, this.favList);
 }
 
 class ClearStateAppAction {}

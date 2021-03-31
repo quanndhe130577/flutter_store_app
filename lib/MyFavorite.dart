@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
+import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Model/MyFavoriteEntity.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'Common.dart';
 import 'DetailProduct.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -21,104 +18,43 @@ class MyFavorite extends StatefulWidget {
 
 class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   Store<AppState> store;
-  FirebaseUser currentUser;
-  List<MyFavoriteModel> dataList = [];
-  bool isLoading = true;
-  FirebaseAuth auth = FirebaseAuth.instance;
-  String test = "";
 
   _MyFavoriteState(this.store);
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      isLoading = true;
-    });
-    auth.currentUser().then((value) => {this.currentUser = value});
-    loadData();
-  }
-
-  void loadData() async {
-    DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
-    await reference.once().then((DataSnapshot dataSnapShot) async {
-      dataList.clear();
-      var keys = dataSnapShot.value.keys;
-      var values = dataSnapShot.value;
-
-      for (var key in keys) {
-        DatabaseReference favRef = FirebaseDatabase.instance
-            .reference()
-            .child("Data")
-            .child(key)
-            .child("Fav")
-            .child(currentUser.uid);
-        await favRef.once().then((value) {
-          if (value.value != null && value.value["state"] == true) {
-            MyFavoriteModel data = new MyFavoriteModel(
-              values[key]["imgUrl"],
-              values[key]["name"],
-              values[key]["material"],
-              double.parse(values[key]["price"].toString()),
-              values[key]["description"],
-              key,
-              true,
-            );
-            dataList.add(data);
-          }
-        });
-      }
-
-      dataList.sort((a, b) => a.name.compareTo(b.name));
-    });
-
-    if (this.mounted) {
-      setState(() {
-        isLoading = false;
-        //dataList = dataList;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text("My Favorite", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Color(0xffff2f3c),
-      ),
-      body: isLoading
-          ? Center(
-              //child: Text("No data available", style: TextStyle(fontSize: 30)),
-              child: SpinKitSquareCircle(
-                color: Colors.red,
-                size: 50.0,
-                duration: Duration(milliseconds: 1200),
-              ),
-            )
-          : dataList.length == 0
+    return StoreProvider(
+      store: this.store,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("My Favorite",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: Color(0xffff2f3c),
+        ),
+        body: StoreConnector<AppState, List<FavModel>>(
+          converter: (store) => store.state.myFavState.favList,
+          builder: (BuildContext context, List<FavModel> favList) => favList.length == 0
               ? Center(
                   child: Text("No data available", style: TextStyle(fontSize: 30)),
                 )
               : ListView.builder(
-                  itemCount: dataList.length,
+                  itemCount: favList.length,
                   scrollDirection: Axis.vertical,
                   itemBuilder: (buildContext, index) {
-                    return cardUI(
-                        dataList[index].imgUrl,
-                        dataList[index].name,
-                        dataList[index].material,
-                        dataList[index].price,
-                        dataList[index].description,
-                        dataList[index].uploadId,
-                        dataList[index].fav);
-                  }),
+                    return cardUI(favList[index]);
+                  },
+                ),
+        ),
+      ),
     );
   }
 
-  Widget cardUI(String imgUrl, String name, String material, double price, String description,
-      String uploadId, bool fav) {
+  Widget cardUI(FavModel item) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
@@ -134,9 +70,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
               // height: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  favoriteHandle(uploadId, false).then((value) {
-                    removeFav(uploadId);
-                  });
+                  removeFav(item.uploadId);
                 },
                 child: Icon(Icons.remove, color: Colors.red),
                 style: TextButton.styleFrom(
@@ -148,34 +82,30 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
             SizedBox(height: 3),
             GestureDetector(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) => DetailProduct(uploadId, this.store)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            DetailProduct(item.uploadId, this.store)));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Image.network(imgUrl, fit: BoxFit.cover, height: 100),
-                        SizedBox(height: 5),
-                        Text(
-                          name,
-                          style: TextStyle(
-                              color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
+                  Image.network(item.imgUrl, fit: BoxFit.cover, height: 100, width: 100),
                   SizedBox(width: 5),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                              color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
                         Container(
                           width: double.infinity,
                           child: Text(
-                            'Price : $price ${new String.fromCharCodes(new Runes('\u0024'))}',
+                            'Price : ${item.price} ${new String.fromCharCodes(new Runes('\u0024'))}',
                             style: TextStyle(
                               //color: Colors.red,
                               fontSize: 20,
@@ -188,7 +118,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         Container(
                           width: double.infinity,
                           child: Text(
-                            'Material : $material',
+                            'Material : ${item.material}',
                             style: TextStyle(
                               //color: Colors.red,
                               fontSize: 18,
@@ -199,7 +129,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         SizedBox(height: 5),
                         Container(
                           child: Text(
-                            'Descriptions: ${description != null ? description : ""}',
+                            'Descriptions: ${item.description != null ? item.description.substring(0, item.description.length > 15 ? 15 : item.description.length) : ""} ${(item.description != null && item.description.length > 15) ? "..." : ""}',
                             style: TextStyle(
                               //color: Colors.red,
                               fontSize: 15,
@@ -214,11 +144,11 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            //SizedBox(height: 3),
+            SizedBox(height: 3),
             Container(
               child: TextButton.icon(
                 onPressed: () {
-                  addToCartHandle(uploadId);
+                  addToCartHandle(item.uploadId);
                 },
                 icon: Icon(Icons.add_shopping_cart, color: Colors.black),
                 label: Text("Add to cart", style: TextStyle(color: Colors.black)),
@@ -233,14 +163,10 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   }
 
   void removeFav(String uploadId) {
-    dataList.removeWhere((element) => element.uploadId == uploadId);
-    if (this.mounted) {
-      setState(() {
-        //dataList = dataList;
-      });
-    }
+    store.dispatch(HandleFavMyFavAction(uploadId, false));
   }
-  void addToCartHandle(String uploadId){
+
+  void addToCartHandle(String uploadId) {
     store.dispatch(AddToCartMyCartAction(uploadId));
   }
 }
