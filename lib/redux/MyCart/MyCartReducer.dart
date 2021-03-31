@@ -14,7 +14,7 @@ MyCartState myCartReducers(MyCartState state, dynamic action) {
     return state.newState(
       cartList: list,
     );
-  } else if (action.runtimeType.toString() == (HandleQuantityCartState).toString()) {
+  } else if (action.runtimeType.toString() == (HandleQuantityMyCartState).toString()) {
     List<CartModel> list = []..addAll(state.cartList);
     list.forEach((element) {
       if (element.uploadId == action.uploadId) {
@@ -25,6 +25,20 @@ MyCartState myCartReducers(MyCartState state, dynamic action) {
         }
       }
     });
+    return state.newState(
+      cartList: list,
+    );
+  } else if (action.runtimeType.toString() == (AddToCartMyCartState).toString()) {
+    List<CartModel> list = []..addAll(state.cartList);
+    if (list.any((element) => element.uploadId == action.item.uploadId)) {
+      list.forEach((element) {
+        if (element.uploadId == action.item.uploadId) {
+          element.quantity++;
+        }
+      });
+    } else {
+      list.add(action.item);
+    }
     return state.newState(
       cartList: list,
     );

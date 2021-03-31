@@ -24,16 +24,28 @@ class RemoveFromCartMyCartState {
   RemoveFromCartMyCartState(this.productId);
 }
 
-class HandleQuantityCartAction{
+class HandleQuantityMyCartAction {
   int type;
   String uploadId;
 
-  HandleQuantityCartAction(this.uploadId, this.type);
+  HandleQuantityMyCartAction(this.uploadId, this.type);
 }
 
-class HandleQuantityCartState{
+class HandleQuantityMyCartState {
   int type;
   String uploadId;
 
-  HandleQuantityCartState(this.uploadId, this.type);
+  HandleQuantityMyCartState(this.uploadId, this.type);
+}
+
+class AddToCartMyCartAction {
+  String uploadId;
+
+  AddToCartMyCartAction(this.uploadId);
+}
+
+class AddToCartMyCartState {
+  CartModel item;
+
+  AddToCartMyCartState(this.item);
 }

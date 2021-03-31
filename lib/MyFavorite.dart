@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'Model/MyFavoriteEntity.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'Common.dart';
@@ -238,5 +239,8 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
         //dataList = dataList;
       });
     }
+  }
+  void addToCartHandle(String uploadId){
+    store.dispatch(AddToCartMyCartAction(uploadId));
   }
 }

@@ -36,54 +36,6 @@ class _MyCartState extends State<MyCart> {
     super.initState();
   }
 
-  // void loadData() async {
-  //   if (this.mounted) {
-  //     setState(() {
-  //       isLoading = true;
-  //       //dataList = dataList;
-  //     });
-  //   }
-  //   DatabaseReference reference =
-  //       FirebaseDatabase.instance.reference().child("Data");
-  //   await reference.once().then((DataSnapshot dataSnapShot) async {
-  //     dataList.clear();
-  //     var keys = dataSnapShot.value.keys;
-  //     var values = dataSnapShot.value;
-  //
-  //     for (var key in keys) {
-  //       DatabaseReference inCartRef = FirebaseDatabase.instance
-  //           .reference()
-  //           .child("Data")
-  //           .child(key)
-  //           .child("InCart")
-  //           .child(currentUser.uid);
-  //
-  //       await inCartRef.once().then((inCartItem) {
-  //         if (inCartItem.value != null && inCartItem.value["state"] == true) {
-  //           CartModel data = new CartModel(
-  //               key,
-  //               values[key]["imgUrl"],
-  //               values[key]["name"],
-  //               double.parse(values[key]["price"].toString()),
-  //               inCartItem.value["quantity"]);
-  //           dataList.add(data);
-  //           //total += data.price * data.quantity;
-  //         }
-  //       });
-  //     }
-  //     //dataList.sort((a, b) => a.name.compareTo(b.name));
-  //   }).whenComplete(
-  //     () => {
-  //       if (this.mounted)
-  //         {
-  //           setState(() {
-  //             isLoading = false;
-  //           })
-  //         }
-  //     },
-  //   );
-  // }
-
   double total = 0;
   bool selectedAll = false;
 
@@ -209,6 +161,7 @@ class _MyCartState extends State<MyCart> {
                         scrollDirection: Axis.vertical,
                         itemBuilder: (buildContext, index) {
                           return slideUI(dataList[index]);
+                          //return SlideUI(store, dataChoose, dataList[index], total, selectedAll);
                         },
                         separatorBuilder: (context, index) {
                           return Divider();
@@ -225,8 +178,30 @@ class _MyCartState extends State<MyCart> {
   Widget slideUI(CartModel item) {
     bool isSelected = dataChoose.contains(item);
 
-    void removeFromCart(String uploadId) {
-      store.dispatch(RemoveFromCartMyCartAction(item.uploadId));
+    void _showSimpleModalDialog(context) {
+      showDialog(
+        barrierDismissible: true,
+        barrierColor: Colors.white10,
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.black54,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            child: Container(
+              constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
+              child: SpinKitFadingCircle(
+                itemBuilder: (BuildContext context, int index) {
+                  return Icon(Icons.circle, color: Colors.white, size: 10);
+                },
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    Future<void> removeFromCart(String uploadId) async {
+      await store.dispatch(RemoveFromCartMyCartAction(item.uploadId));
       if (isSelected) total -= item.price * item.quantity;
       if (this.mounted) {
         setState(() {
@@ -236,7 +211,7 @@ class _MyCartState extends State<MyCart> {
     }
 
     void handleQuantity(int type, bool isSelected) {
-      store.dispatch(HandleQuantityCartAction(item.uploadId, type));
+      store.dispatch(HandleQuantityMyCartAction(item.uploadId, type));
 
       if (type == 0) {
         if (isSelected) total += item.price;
@@ -273,6 +248,44 @@ class _MyCartState extends State<MyCart> {
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
+      actions: [
+        IconSlideAction(
+          caption: 'Archive',
+          color: Colors.blue,
+          icon: Icons.archive,
+          onTap: () {
+            print('archive');
+          },
+        ),
+        IconSlideAction(
+          caption: 'Share',
+          color: Colors.indigo,
+          icon: Icons.share,
+          onTap: () {
+            print('share');
+          },
+        ),
+      ],
+      secondaryActions: [
+        IconSlideAction(
+          caption: 'More',
+          color: Colors.black45,
+          icon: Icons.more_horiz,
+          onTap: () {
+            //print('more');
+          },
+        ),
+        IconSlideAction(
+          caption: 'Delete',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () {
+            // modal not working
+            _showSimpleModalDialog(context);
+            removeFromCart(item.uploadId).then((value) => Navigator.of(context).pop());
+          },
+        ),
+      ],
       child: Container(
         color: Colors.white,
         child: Container(
@@ -294,7 +307,8 @@ class _MyCartState extends State<MyCart> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (BuildContext context) => DetailProduct(item.uploadId, this.store)));
+                          builder: (BuildContext context) =>
+                              DetailProduct(item.uploadId, this.store)));
                 },
                 child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
               ),
@@ -358,42 +372,235 @@ class _MyCartState extends State<MyCart> {
           ),
         ),
       ),
-      actions: <Widget>[
-        IconSlideAction(
-          caption: 'Archive',
-          color: Colors.blue,
-          icon: Icons.archive,
-          onTap: () {
-            print('archive');
-          },
-        ),
-        IconSlideAction(
-          caption: 'Share',
-          color: Colors.indigo,
-          icon: Icons.share,
-          onTap: () {
-            print('share');
-          },
-        ),
-      ],
-      secondaryActions: <Widget>[
-        IconSlideAction(
-          caption: 'More',
-          color: Colors.black45,
-          icon: Icons.more_horiz,
-          onTap: () {
-            //print('more');
-          },
-        ),
-        IconSlideAction(
-          caption: 'Delete',
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () {
-            removeFromCart(item.uploadId);
-          },
-        ),
-      ],
     );
   }
 }
+
+// class SlideUI extends StatefulWidget {
+//   final CartModel item;
+//   final Store<AppState> store;
+//   final List<CartModel> dataChoose;
+//   final double total;
+//   final bool selectedAll;
+//
+//   SlideUI(this.store, this.dataChoose, this.item, this.total, this.selectedAll);
+//
+//   @override
+//   _SlideUIState createState() =>
+//       _SlideUIState(this.store, this.dataChoose, this.item, this.total, this.selectedAll);
+// }
+//
+// class _SlideUIState extends State<SlideUI> {
+//   Store<AppState> store;
+//   List<CartModel> dataChoose;
+//   CartModel item;
+//   double total;
+//   bool selectedAll;
+//
+//   _SlideUIState(this.store, this.dataChoose, this.item, this.total, this.selectedAll);
+//
+//   bool isSelected;
+//
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+//     isSelected = dataChoose.contains(item);
+//   }
+//
+//   void _showSimpleModalDialog(context) {}
+//
+//   Future<void> removeFromCart(String uploadId) async {
+//     await store.dispatch(RemoveFromCartMyCartAction(item.uploadId));
+//     if (isSelected) total -= item.price * item.quantity;
+//     if (this.mounted) {
+//       setState(() {
+//         //
+//       });
+//     }
+//   }
+//
+//   void handleQuantity(int type, bool isSelected) {
+//     store.dispatch(HandleQuantityMyCartAction(item.uploadId, type));
+//
+//     if (type == 0) {
+//       if (isSelected) total += item.price;
+//     } else if (type == 1 && item.quantity > 1) {
+//       if (isSelected) total -= item.price;
+//     }
+//
+//     if (this.mounted) {
+//       setState(() {
+//         //
+//       });
+//     }
+//   }
+//
+//   void handleChooseItem(bool value) {
+//     if (value == true) {
+//       total += item.price * item.quantity;
+//       dataChoose.add(item);
+//       if (dataChoose.length == store.state.myCartState.cartList.length) {
+//         selectedAll = true;
+//       }
+//     } else {
+//       total -= item.price * item.quantity;
+//       dataChoose.remove(item);
+//       selectedAll = false;
+//     }
+//     if (this.mounted) {
+//       setState(() {
+//         //
+//       });
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Slidable(
+//       actionPane: SlidableDrawerActionPane(),
+//       actionExtentRatio: 0.25,
+//       actions: [
+//         IconSlideAction(
+//           caption: 'Archive',
+//           color: Colors.blue,
+//           icon: Icons.archive,
+//           onTap: () {
+//             print('archive');
+//           },
+//         ),
+//         IconSlideAction(
+//           caption: 'Share',
+//           color: Colors.indigo,
+//           icon: Icons.share,
+//           onTap: () {
+//             print('share');
+//           },
+//         ),
+//       ],
+//       secondaryActions: [
+//         IconSlideAction(
+//           caption: 'More',
+//           color: Colors.black45,
+//           icon: Icons.more_horiz,
+//           onTap: () {
+//             //print('more');
+//           },
+//         ),
+//         IconSlideAction(
+//           caption: 'Delete',
+//           color: Colors.red,
+//           icon: Icons.delete,
+//           onTap: () {
+//             showDialog(
+//               barrierDismissible: true,
+//               barrierColor: Colors.white10,
+//               context: context,
+//               builder: (BuildContext context) {
+//                 return Dialog(
+//                   backgroundColor: Colors.black54,
+//                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+//                   child: Container(
+//                     constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
+//                     child: SpinKitFadingCircle(
+//                       itemBuilder: (BuildContext context, int index) {
+//                         return Icon(Icons.circle, color: Colors.white, size: 10);
+//                       },
+//                     ),
+//                   ),
+//                 );
+//               },
+//             );
+//             removeFromCart(item.uploadId).then((value) => Navigator.of(context).pop());
+//           },
+//         ),
+//       ],
+//       child: Container(
+//         color: Colors.white,
+//         child: Container(
+//           color: Colors.white,
+//           //margin: EdgeInsets.all(1.5),
+//           padding: EdgeInsets.only(top: 5, right: 10, bottom: 5),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             children: [
+//               Material(
+//                 color: Colors.white,
+//                 child: Checkbox(
+//                   value: dataChoose.contains(item),
+//                   onChanged: handleChooseItem,
+//                 ),
+//               ),
+//               GestureDetector(
+//                 onTap: () {
+//                   Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                           builder: (BuildContext context) =>
+//                               DetailProduct(item.uploadId, this.store)));
+//                 },
+//                 child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
+//               ),
+//               SizedBox(width: 10),
+//               Expanded(
+//                 child: Column(
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Text(
+//                         item.name,
+//                         style: TextStyle(
+//                           color: Colors.black,
+//                           fontSize: 25,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                         textAlign: TextAlign.left,
+//                       ),
+//                     ),
+//                     Row(
+//                       children: [
+//                         Text(
+//                           '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price} ',
+//                           style: TextStyle(
+//                               color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+//                           textAlign: TextAlign.center,
+//                         ),
+//                         Expanded(child: Container()),
+//                         Align(
+//                           alignment: Alignment.centerRight,
+//                           child: Container(
+//                             decoration: BoxDecoration(
+//                               border: Border.all(color: Colors.blue),
+//                               borderRadius: BorderRadius.circular(10),
+//                             ),
+//                             child: Row(
+//                               children: [
+//                                 TextButton(
+//                                   onPressed: () {
+//                                     handleQuantity(1, isSelected); // minus
+//                                   },
+//                                   child: Icon(Icons.remove),
+//                                 ),
+//                                 Text(item.quantity.toString()),
+//                                 TextButton(
+//                                   onPressed: () {
+//                                     handleQuantity(0, isSelected); // plus
+//                                   },
+//                                   child: Icon(Icons.add),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

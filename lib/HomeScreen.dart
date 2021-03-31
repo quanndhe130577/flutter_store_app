@@ -8,6 +8,7 @@ import 'package:flutter_food_app/redux/AppReducers.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/AppMiddleware.dart';
 import 'package:flutter_food_app/redux/Home/HomeActions.dart';
+import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'Model/HomeEntity.dart';
 import 'package:flutter_food_app/DetailProduct.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
@@ -129,20 +130,20 @@ class _HomeScreen extends State<HomeScreen> {
                     ),
               Visibility(
                 visible: !searchState,
-                child: StoreConnector<AppState, List<CartModel>>(
-                  converter: (store) => store.state.myCartState.cartList,
-                  builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                    badgeColor: Colors.blue,
-                    position: BadgePosition.topEnd(top: 0, end: 15),
-                    badgeContent:
-                        Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-                        },
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 5),
+                    child: StoreConnector<AppState, List<CartModel>>(
+                      converter: (store) => store.state.myCartState.cartList,
+                      builder: (BuildContext context, List<CartModel> cartList) => Badge(
+                        badgeColor: Colors.blue,
+                        position: BadgePosition.bottomEnd(bottom: 10),
+                        badgeContent:
+                            Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
                         child: Icon(
                           Icons.shopping_cart,
                           color: Colors.black,
@@ -186,8 +187,10 @@ class _HomeScreen extends State<HomeScreen> {
                   title: Text("My Favorite"),
                   leading: Icon(Icons.favorite),
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) => MyFavorite(this.store)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => MyFavorite(this.store)));
                   },
                 ),
                 ListTile(
@@ -273,72 +276,75 @@ class _HomeScreen extends State<HomeScreen> {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
-      color: Color(0xffff2fc3),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) => DetailProduct(item.uploadId, this.store)));
-        },
-        onDoubleTap: () {
-          favoriteHandle(item.uploadId, true).then((value) {
-            Toast.show("Add to favorite", context, duration: 1, gravity: Toast.BOTTOM);
-          });
-        },
-        child: Container(
-          color: Colors.white,
-          margin: EdgeInsets.all(1.5),
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          child: Text(
-                            item.name,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.left,
+      //color: Color(0xffff2fc3),
+      child: Container(
+        color: Colors.white,
+        margin: EdgeInsets.all(1.5),
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                DetailProduct(item.uploadId, this.store)));
+                  },
+                  onDoubleTap: () {
+                    favoriteHandle(item.uploadId, true).then((value) {
+                      Toast.show("Add to favorite", context, duration: 1, gravity: Toast.BOTTOM);
+                    });
+                  },
+                  child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          item.name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.left,
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price.toString()} ',
-                              style: TextStyle(
-                                  color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: () {
-                                    addToCartHandle(item.uploadId);
-                                  },
-                                  icon: Icon(Icons.add_shopping_cart),
-                                  label: Text("Add to cart"),
-                                ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price.toString()} ',
+                            style: TextStyle(
+                                color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  addToCartHandle(item.uploadId);
+                                },
+                                icon: Icon(Icons.add_shopping_cart),
+                                label: Text("Add to cart"),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -346,5 +352,9 @@ class _HomeScreen extends State<HomeScreen> {
 
   void searchMethod(String text) {
     store.dispatch(SearchHomeAction(text));
+  }
+
+  void addToCartHandle(String uploadId) {
+    store.dispatch(AddToCartMyCartAction(uploadId));
   }
 }
