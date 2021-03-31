@@ -1,7 +1,9 @@
 import 'package:flutter_food_app/redux/AppActions.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/Home/HomeReducer.dart';
+import 'package:flutter_food_app/redux/Home/HomeState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartReducer.dart';
+import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
 
 AppState appReducers(AppState state, dynamic action) {
   if (action.runtimeType.toString() == (InitAppState).toString()) {
@@ -20,6 +22,11 @@ AppState appReducers(AppState state, dynamic action) {
       homeState: state.homeState.newState(
         isLoading: true,
       ),
+    );
+  } else if (action.runtimeType.toString() == (ClearStateAppState).toString()) {
+    return state.newState(
+      homeState: new HomeState(),
+      myCartState: new MyCartState(),
     );
   }
   return state.newState(

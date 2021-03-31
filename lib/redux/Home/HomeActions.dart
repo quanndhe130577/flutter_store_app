@@ -1,15 +1,5 @@
 import 'package:flutter_food_app/Model/HomeEntity.dart';
 
-// class StartLoadingFirstHomeState {}
-
-// class FirstLoadHomeModelHomeAction {}
-//
-// class FirstLoadHomeModelHomeState {
-//   List<HomeModel> dataList;
-//
-//   FirstLoadHomeModelHomeState(this.dataList);
-// }
-
 class LoadMoreDataHomeAction {}
 
 class StartLoadMoreHomeState {}

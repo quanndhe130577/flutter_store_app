@@ -15,3 +15,7 @@ class InitAppState {
 
   InitAppState(this.dataList, this.cartList);
 }
+
+class ClearStateAppAction {}
+
+class ClearStateAppState {}

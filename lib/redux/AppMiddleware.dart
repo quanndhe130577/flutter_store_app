@@ -93,5 +93,8 @@ void appStateMiddleware(
       List<CartModel> cartList = await _loadCartModelData(store.state.uid);
       store.dispatch(InitAppState(dataList, cartList));
     }
+  } else if (action.runtimeType.toString() ==
+      (ClearStateAppAction).toString()) {
+    store.dispatch(ClearStateAppState());
   }
 }
