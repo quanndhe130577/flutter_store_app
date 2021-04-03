@@ -20,6 +20,7 @@ class _UploadDataState extends State<UploadData> {
   double price = 0;
   File imageFile;
   var _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,8 +55,7 @@ class _UploadDataState extends State<UploadData> {
                               _showDialog();
                             },
                             child: Image.file(imageFile,
-                                width: double.infinity,
-                                height: double.infinity),
+                                width: double.infinity, height: double.infinity),
                           ),
                   ),
                 ),
@@ -83,23 +83,19 @@ class _UploadDataState extends State<UploadData> {
                           labelText: "Name",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                         ),
                       ),
@@ -125,23 +121,19 @@ class _UploadDataState extends State<UploadData> {
                           labelText: "Material",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                         ),
                       ),
@@ -171,23 +163,19 @@ class _UploadDataState extends State<UploadData> {
                           labelText: "Price",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                         ),
                       ),
@@ -220,23 +208,19 @@ class _UploadDataState extends State<UploadData> {
                           labelText: "Description",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Color(0xffff2fc3), width: 1),
+                            borderSide: BorderSide(color: Color(0xffff2fc3), width: 1),
                           ),
                         ),
                       ),
@@ -256,12 +240,10 @@ class _UploadDataState extends State<UploadData> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         primary: Color(0xffff2fc3),
                       ),
-                      child: Text("Upload",
-                          style: TextStyle(fontSize: 19, color: Colors.blue)),
+                      child: Text("Upload", style: TextStyle(fontSize: 19, color: Colors.blue)),
                     ),
                   ],
                 ),
@@ -285,8 +267,7 @@ class _UploadDataState extends State<UploadData> {
                   GestureDetector(
                     child: Text("Gallery"),
                     onTap: () {
-                      openGallery().then((value) => hideAlertDialog(),
-                          onError: (e) {
+                      handleSelectImage(0).then((value) => hideAlertDialog(), onError: (e) {
                         hideAlertDialog();
                       }).catchError(hideAlertDialog);
                     },
@@ -295,8 +276,7 @@ class _UploadDataState extends State<UploadData> {
                   GestureDetector(
                     child: Text("Camera"),
                     onTap: () {
-                      openCamera().then((value) => hideAlertDialog(),
-                          onError: (e) {
+                      handleSelectImage(1).then((value) => hideAlertDialog(), onError: (e) {
                         hideAlertDialog();
                       }).catchError(hideAlertDialog);
                     },
@@ -312,17 +292,15 @@ class _UploadDataState extends State<UploadData> {
     Navigator.of(context).pop(true);
   }
 
-  Future<void> openGallery() async {
+  Future<void> handleSelectImage(int type) async {
     final picker = ImagePicker();
-    var picture = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {
-      this.imageFile = File(picture.path);
-    });
-  }
-
-  Future<void> openCamera() async {
-    final picker = ImagePicker();
-    var picture = await picker.getImage(source: ImageSource.camera);
+    var picture =
+        await picker.getImage(source: type == 0 ? ImageSource.gallery : ImageSource.camera);
+    File image = new File(picture.path);
+    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+    if (decodedImage.width != 400 && decodedImage.height != 400) {
+      Toast.show("Recommend a 400x400 px file", context, duration: 2, gravity: Toast.CENTER);
+    }
     this.setState(() {
       this.imageFile = File(picture.path);
     });
@@ -349,16 +327,13 @@ class _UploadDataState extends State<UploadData> {
       final StorageReference reference = FirebaseStorage()
           .ref()
           .child("images")
-          .child(new DateTime.now().microsecondsSinceEpoch.toString() +
-              "." +
-              imageFile.path);
+          .child(new DateTime.now().microsecondsSinceEpoch.toString() + "." + imageFile.path);
       StorageUploadTask uploadTask = reference.putFile(imageFile);
 
       var imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
       String url = imageUrl.toString();
 
-      DatabaseReference databaseReference =
-          FirebaseDatabase.instance.reference().child("Data");
+      DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child("Data");
       String uploadId = databaseReference.push().key;
 
       HashMap map = new HashMap();
@@ -369,15 +344,9 @@ class _UploadDataState extends State<UploadData> {
       map["description"] = description;
 
       await databaseReference.child(uploadId).set(map).then((value) {
-        Toast.show("Upload successfully", context,
-            duration: 2, gravity: Toast.CENTER);
+        Toast.show("Upload successfully", context, duration: 2, gravity: Toast.CENTER);
         Navigator.pop(context);
       });
-
-      // String email = "";
-      // FirebaseAuth auth = FirebaseAuth.instance;
-      // auth.currentUser().then((value) => {email = value.email});
-
     }
   }
 }

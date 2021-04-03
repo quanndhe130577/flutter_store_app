@@ -66,6 +66,13 @@ class _MyCartState extends State<MyCart> {
         backgroundColor: Color(0xffff2fc3),
         title: Text("My Cart"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            color: Colors.white,
+            onPressed: () {},
+          ),
+        ],
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // floatingActionButton: FloatingActionButton(
@@ -319,7 +326,7 @@ class _MyCartState extends State<MyCart> {
                     Container(
                       width: double.infinity,
                       child: Text(
-                        item.name,
+                        "${item.name.length < 15 ? item.name : item.name.substring(0, 15) + " ..."}",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 25,
