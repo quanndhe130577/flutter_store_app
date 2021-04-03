@@ -9,8 +9,7 @@ import 'HomeActions.dart';
 Future<List<HomeModel>> _loadMoreData(int currentNumber, String keyword) async {
   List<HomeModel> dataList = [];
 
-  DatabaseReference reference =
-      FirebaseDatabase.instance.reference().child("Data");
+  DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
   await reference.once().then((DataSnapshot dataSnapShot) {
     var keys = dataSnapShot.value.keys;
     var values = dataSnapShot.value;
@@ -50,8 +49,7 @@ Future<List<HomeModel>> _loadMoreData(int currentNumber, String keyword) async {
 Future<List<HomeModel>> _loadFirstData(String keyword) async {
   List<HomeModel> dataList = [];
 
-  DatabaseReference reference =
-      FirebaseDatabase.instance.reference().child("Data");
+  DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
   await reference.once().then((DataSnapshot dataSnapShot) {
     var keys = dataSnapShot.value.keys;
     var values = dataSnapShot.value;
@@ -84,8 +82,7 @@ Future<List<HomeModel>> _loadFirstData(String keyword) async {
 Future<List<HomeModel>> _refreshData(int number, String keyword) async {
   List<HomeModel> dataList = [];
 
-  DatabaseReference reference =
-      FirebaseDatabase.instance.reference().child("Data");
+  DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
   await reference.once().then((DataSnapshot dataSnapShot) async {
     //dataList.clear();
     var keys = dataSnapShot.value.keys;
@@ -118,32 +115,19 @@ Future<List<HomeModel>> _refreshData(int number, String keyword) async {
   return dataList;
 }
 
-void homeStateMiddleware(
-    Store<AppState> store, action, NextDispatcher next) async {
+void homeStateMiddleware(Store<AppState> store, action, NextDispatcher next) async {
   next(action);
   if (action.runtimeType.toString() == (LoadMoreDataHomeAction).toString()) {
     store.dispatch(StartLoadMoreHomeState());
-    await _loadMoreData(store.state.homeState.searchList.length,
-            store.state.homeState.searchText)
+    await _loadMoreData(store.state.homeState.searchList.length, store.state.homeState.searchText)
         .then((moreData) => store.dispatch(LoadMoreDataHomeState(moreData)));
-  }
-  // else if (action.runtimeType.toString() ==
-  //     (FirstLoadHomeModelHomeAction).toString()) {
-  //   store.dispatch(StartLoadingFirstHomeState());
-  //   await _loadFirstData(store.state.homeState.searchText).then(
-  //       (dataList) => store.dispatch(FirstLoadHomeModelHomeState(dataList)));
-  //   store.dispatch(FirstLoadCartModelMyCartAction(store.state.uid));
-  // }
-  else if (action.runtimeType.toString() == (SearchHomeAction).toString()) {
+  } else if (action.runtimeType.toString() == (SearchHomeAction).toString()) {
     store.dispatch(StartLoadingSearchHomeState());
-    await _loadFirstData(action.keyword).then((searchList) =>
-        store.dispatch(LoadingSearchHomeState(action.keyword, searchList)));
-  } else if (action.runtimeType.toString() ==
-      (RefreshDataHomeAction).toString()) {
+    await _loadFirstData(action.keyword)
+        .then((searchList) => store.dispatch(LoadingSearchHomeState(action.keyword, searchList)));
+  } else if (action.runtimeType.toString() == (RefreshDataHomeAction).toString()) {
     store.dispatch(StartRefreshDataHomeState());
-    await _refreshData(store.state.homeState.searchList.length,
-            store.state.homeState.searchText)
-        .then((dataList) =>
-            store.dispatch(RefreshDataHomeState(dataList)));
+    await _refreshData(store.state.homeState.searchList.length, store.state.homeState.searchText)
+        .then((dataList) => store.dispatch(RefreshDataHomeState(dataList)));
   }
 }

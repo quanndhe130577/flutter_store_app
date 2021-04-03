@@ -6,6 +6,7 @@ import 'DetailProduct.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'redux/AppState.dart';
+import 'package:toast/toast.dart';
 
 class MyFavorite extends StatefulWidget {
   final Store<AppState> store;
@@ -167,6 +168,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
   }
 
   void addToCartHandle(String uploadId) {
+    Toast.show("Add to cart", context, duration: 1, gravity: Toast.BOTTOM);
     store.dispatch(AddToCartMyCartAction(uploadId));
   }
 }

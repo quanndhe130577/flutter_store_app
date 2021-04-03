@@ -7,23 +7,18 @@ HomeState homeReducers(HomeState state, dynamic action) {
     return state.newState(
       isLoading: true,
     );
-  } else if (action.runtimeType.toString() ==
-      (RefreshDataHomeState).toString()) {
+  } else if (action.runtimeType.toString() == (RefreshDataHomeState).toString()) {
     return state.newState(
-      dataList: action.dataList,
+      dataList: state.searchText.isEmpty ? action.dataList : state.dataList,
       searchList: action.dataList,
       isLoading: false,
     );
-  } else if (action.runtimeType.toString() ==
-      (StartLoadMoreHomeState).toString()) {
+  } else if (action.runtimeType.toString() == (StartLoadMoreHomeState).toString()) {
     return state.newState(
       isLoadingMore: true,
     );
-  } else if (action.runtimeType.toString() ==
-      (LoadMoreDataHomeState).toString()) {
-    List<HomeModel> searchList = []
-      ..addAll(state.searchList)
-      ..addAll(action.moreData);
+  } else if (action.runtimeType.toString() == (LoadMoreDataHomeState).toString()) {
+    List<HomeModel> searchList = []..addAll(state.searchList)..addAll(action.moreData);
     List<HomeModel> dataList = []..addAll(state.dataList);
     if (state.searchText.isEmpty) {
       dataList.addAll(action.moreData);
@@ -33,23 +28,18 @@ HomeState homeReducers(HomeState state, dynamic action) {
       searchList: searchList,
       isLoadingMore: false,
     );
-  } else if (action.runtimeType.toString() ==
-      (StartLoadingSearchHomeState).toString()) {
+  } else if (action.runtimeType.toString() == (StartLoadingSearchHomeState).toString()) {
     return state.newState(
       isLoading: true,
     );
-  } else if (action.runtimeType.toString() ==
-      (LoadingSearchHomeState).toString()) {
+  } else if (action.runtimeType.toString() == (LoadingSearchHomeState).toString()) {
     return state.newState(
       searchText: action.keyword,
       searchList: action.searchList,
       isLoading: false,
     );
-  } else if (action.runtimeType.toString() ==
-      (RemoveSearchHomeState).toString()) {
-    return state.newState(
-      searchText: "",
-    );
+  } else if (action.runtimeType.toString() == (RemoveSearchHomeState).toString()) {
+    return state.newState(searchText: "", searchList: state.dataList);
   }
   return state;
 }
