@@ -9,6 +9,7 @@ import 'package:flutter_food_app/redux/AppReducers.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/AppMiddleware.dart';
 import 'package:flutter_food_app/redux/Home/HomeActions.dart';
+import 'package:flutter_food_app/redux/Home/HomeMiddleware.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Model/HomeEntity.dart';
@@ -241,7 +242,7 @@ class _HomeScreen extends State<HomeScreen> {
                   converter: (store) => store.state.homeState.searchList,
                   onDidChange: (prev, cur) {
                     _controller.animateTo(
-                      _controller.position.maxScrollExtent - 50,
+                      _controller.offset + double.parse(stepLoadMore.toString()) * 100 - 50,
                       curve: Curves.linear,
                       duration: Duration(seconds: 1),
                     );

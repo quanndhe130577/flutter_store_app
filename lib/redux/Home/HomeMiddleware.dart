@@ -5,6 +5,8 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'HomeActions.dart';
 
+final int stepLoadMore = 2;
+
 Future<List<HomeModel>> _loadMoreData(int currentNumber, String keyword) async {
   List<HomeModel> dataList = [];
 
@@ -24,7 +26,7 @@ Future<List<HomeModel>> _loadMoreData(int currentNumber, String keyword) async {
       if (count < currentNumber) {
         count++;
         continue;
-      } else if (count >= currentNumber + 2) {
+      } else if (count >= currentNumber + stepLoadMore) {
         break;
       }
 
