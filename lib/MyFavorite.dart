@@ -99,7 +99,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.name,
+                          '${item.shortenName()}',
                           style: TextStyle(
                               color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
@@ -130,7 +130,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         SizedBox(height: 5),
                         Container(
                           child: Text(
-                            'Descriptions: ${item.description != null ? item.description.substring(0, item.description.length > 15 ? 15 : item.description.length) : ""} ${(item.description != null && item.description.length > 15) ? "..." : ""}',
+                            'Descriptions: ${item.shortenDes()}',
                             style: TextStyle(
                               //color: Colors.red,
                               fontSize: 15,

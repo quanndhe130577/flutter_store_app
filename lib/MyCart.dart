@@ -326,7 +326,7 @@ class _MyCartState extends State<MyCart> {
                     Container(
                       width: double.infinity,
                       child: Text(
-                        "${item.name.length < 15 ? item.name : item.name.substring(0, 15) + " ..."}",
+                        item.shortenName(),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 25,
