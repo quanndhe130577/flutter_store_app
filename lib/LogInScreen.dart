@@ -82,19 +82,19 @@ class _LogInScreen extends State<LogInScreen> {
   }
 
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
   Future<void> googleSignInApp() async {
     GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
-    GoogleSignInAuthentication signInAuthentication =
-        await signInAccount.authentication;
+    GoogleSignInAuthentication signInAuthentication = await signInAccount.authentication;
     AuthCredential credential = GoogleAuthProvider.getCredential(
-        idToken: signInAuthentication.idToken,
-        accessToken: signInAuthentication.accessToken);
+      idToken: signInAuthentication.idToken,
+      accessToken: signInAuthentication.accessToken,
+    );
     await auth.signInWithCredential(credential).then((value) => {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      HomeScreen(value.user.email, value.user.uid)))
+                  builder: (BuildContext context) => HomeScreen(value.user.email, value.user.uid)))
         });
   }
 
@@ -105,17 +105,17 @@ class _LogInScreen extends State<LogInScreen> {
 
       // Create a credential from the access token
       AuthCredential facebookAuthCredential =
-      FacebookAuthProvider.getCredential(accessToken: result.token);
+          FacebookAuthProvider.getCredential(accessToken: result.token);
 
       // Once signed in, return the UserCredential
       await auth.signInWithCredential(facebookAuthCredential).then((value) => {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    HomeScreen(value.user.email, value.user.uid)))
-      });
-    }catch(e){
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        HomeScreen(value.user.email, value.user.uid)))
+          });
+    } catch (e) {
       switch (e.code) {
         case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
           showError("You have a previous login operation in progress");
@@ -146,8 +146,7 @@ class _LogInScreen extends State<LogInScreen> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            HomeScreen(value.email, value.uid)))
+                        builder: (BuildContext context) => HomeScreen(value.email, value.uid)))
               }
           });
       // if (await auth.currentUser() != null) {
@@ -182,9 +181,7 @@ class _LogInScreen extends State<LogInScreen> {
                       Text(
                         "Log in",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 35),
+                            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 35),
                       ),
                       Text(
                         "Welcome to our store",
@@ -219,20 +216,16 @@ class _LogInScreen extends State<LogInScreen> {
                       labelText: "Email",
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                     ),
                   ),
                 ),
@@ -257,20 +250,16 @@ class _LogInScreen extends State<LogInScreen> {
                       labelText: "Password",
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: Color(0xffff2fc3), width: 1)),
+                          borderSide: BorderSide(color: Color(0xffff2fc3), width: 1)),
                     ),
                   ),
                 ),
@@ -292,10 +281,8 @@ class _LogInScreen extends State<LogInScreen> {
                 width: double.infinity,
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => ForgotScreen()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) => ForgotScreen()));
                   },
                   child: Text(
                     "Forgot password",
@@ -324,10 +311,7 @@ class _LogInScreen extends State<LogInScreen> {
                   ),
                   child: Text(
                     "Log In",
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
+                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ),
               ),
@@ -401,13 +385,12 @@ class _LogInScreen extends State<LogInScreen> {
               Center(
                 child: Column(
                   children: [
-                    Text("Don't have an account ? ",
-                        style: TextStyle(color: Colors.white)),
+                    Text("Don't have an account ? ", style: TextStyle(color: Colors.white)),
                     SizedBox(height: 5),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (BuildContext context) => SignUpScreen()));
+                        Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (BuildContext context) => SignUpScreen()));
                       },
                       child: Column(
                         children: [
