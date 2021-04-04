@@ -15,12 +15,4 @@ class FavModel {
     this.uploadId = "";
     this.fav = true;
   }
-
-  String shortenName() {
-    return "${this.name.length < 15 ? this.name : this.name.substring(0, 15) + "..."}";
-  }
-
-  String shortenDes() {
-    return '${this.description != null ? (this.description.length < 15 ? this.description.substring(0, 15) : this.description) : ""}';
-  }
 }

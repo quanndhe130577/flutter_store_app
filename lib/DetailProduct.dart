@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
+import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Model/MyCartEntity.dart';
 import 'Model/MyFavoriteEntity.dart';
 
@@ -8,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import "MyCart.dart";
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'Common.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:badges/badges.dart';
@@ -29,7 +29,7 @@ class _DetailProductState extends State<DetailProduct> {
 
   _DetailProductState(this.uploadId, this.store);
 
-  bool favInit = false;
+  //bool favInit = false;
   FavModel data = FavModel.defaultValue();
   FirebaseUser currentUser;
   bool isLoading = false;
@@ -62,13 +62,7 @@ class _DetailProductState extends State<DetailProduct> {
     await reference.once().then((DataSnapshot dataSnapShot) async {
       var values = dataSnapShot.value;
 
-      bool fav = false;
-      if (values["Fav"] != null &&
-          values["Fav"][currentUser.uid] != null &&
-          values["Fav"][currentUser.uid]["state"] == true) {
-        fav = true;
-        favInit = true;
-      }
+      bool fav = store.state.myFavState.favList.any((element) => element.uploadId == this.uploadId);
 
       data = new FavModel(
         values["imgUrl"],
@@ -143,25 +137,29 @@ class _DetailProductState extends State<DetailProduct> {
                 Expanded(
                   child: SizedBox(
                     height: 60,
-                    child: favInit
-                        ? Tooltip(
-                            message: 'High quality',
-                            child: IconButton(
-                              icon: Icon(Icons.favorite),
-                              color: Colors.red,
-                              onPressed: () {
-                                favoriteFunc(data.uploadId, !favInit);
-                              },
-                            ),
-                          )
-                        : IconButton(
-                            icon: Icon(Icons.favorite),
-                            color: Colors.grey,
-                            onPressed: () {
-                              favoriteFunc(data.uploadId, !favInit);
-                            },
-                            tooltip: "Love",
-                          ),
+                    child: StoreConnector<AppState, List<FavModel>>(
+                      converter: (store) => store.state.myFavState.favList,
+                      builder: (BuildContext context, List<FavModel> favList) =>
+                          favList.any((element) => element.uploadId == data.uploadId)
+                              ? Tooltip(
+                                  message: 'High quality',
+                                  child: IconButton(
+                                    icon: Icon(Icons.favorite),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      favoriteFunc(data.uploadId, false);
+                                    },
+                                  ),
+                                )
+                              : IconButton(
+                                  icon: Icon(Icons.favorite),
+                                  color: Colors.grey,
+                                  onPressed: () {
+                                    favoriteFunc(data.uploadId, true);
+                                  },
+                                  tooltip: "Love",
+                                ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -282,15 +280,7 @@ class _DetailProductState extends State<DetailProduct> {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   void favoriteFunc(String uploadId, bool fav) {
-    favoriteHandle(uploadId, fav).then((value) {
-      data.fav = fav;
-
-      if (this.mounted) {
-        setState(() {
-          favInit = fav;
-        });
-      }
-    });
+    store.dispatch(HandleFavMyFavAction(uploadId, fav));
   }
 
   void addToCartHandle(String uploadId) {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
 import 'package:flutter_food_app/redux/AppActions.dart';
 import 'package:flutter_food_app/redux/AppReducers.dart';
@@ -236,7 +237,29 @@ class _HomeScreen extends State<HomeScreen> {
               ),
               Expanded(
                 child: StoreConnector<AppState, List<HomeModel>>(
+                  distinct: true,
                   converter: (store) => store.state.homeState.searchList,
+                  onDidChange: (prev, cur) {
+                    _controller.animateTo(
+                      _controller.position.maxScrollExtent - 50,
+                      curve: Curves.linear,
+                      duration: Duration(seconds: 1),
+                    );
+                    if (_controller.offset == _controller.position.maxScrollExtent) {
+                      Toast.show("You reached the end", context);
+                    }
+                    // if (prev != cur) {
+                    //   _controller.animateTo(
+                    //     _controller.position.maxScrollExtent - 50,
+                    //     curve: Curves.linear,
+                    //     duration: Duration(seconds: 1),
+                    //   );
+                    // } else {
+                    //   if (_controller.offset == _controller.position.maxScrollExtent) {
+                    //     Toast.show("You reached the end", context);
+                    //   }
+                    // }
+                  },
                   builder: (context, List<HomeModel> searchList) => searchList.length == 0
                       ? Center(
                           child: Text("No data available", style: TextStyle(fontSize: 30)),
@@ -311,7 +334,7 @@ class _HomeScreen extends State<HomeScreen> {
                       Container(
                         width: double.infinity,
                         child: Text(
-                          item.shortenName(),
+                          shortenString(item.name, 15),
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 25,

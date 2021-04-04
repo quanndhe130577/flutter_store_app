@@ -43,28 +43,26 @@ Future<CartModel> _addToCartHandle(String uploadId, String uid) async {
 
   DatabaseReference itemRef = FirebaseDatabase.instance.reference().child("Data").child(uploadId);
 
-  itemRef.once().then((item) {
+  await itemRef.once().then((item) async {
     pro.imgUrl = item.value["imgUrl"].toString();
     pro.name = item.value["name"].toString();
     pro.price = double.parse(item.value["price"].toString());
 
     if (item.value["InCart"] == null || item.value["InCart"][uid] == null) {
-      itemRef.child("InCart").child(uid).child("state").set(true);
-      itemRef.child("InCart").child(uid).child("quantity").set(1);
+      await itemRef.child("InCart").child(uid).child("state").set(true);
+      await itemRef.child("InCart").child(uid).child("quantity").set(1);
     } else {
-      itemRef.child("InCart").child(uid).once().then((itemInCart) {
-        //if (item.value["state"] != null) {
+      await itemRef.child("InCart").child(uid).once().then((itemInCart) async {
         if (itemInCart.value["state"] == true) {
-          itemRef
+          await itemRef
               .child("InCart")
               .child(uid)
               .child("quantity")
               .set(itemInCart.value["quantity"] + 1);
         } else {
-          itemRef.child("InCart").child(uid).child("state").set(true);
-          itemRef.child("InCart").child(uid).child("quantity").set(1);
+          await itemRef.child("InCart").child(uid).child("state").set(true);
+          await itemRef.child("InCart").child(uid).child("quantity").set(1);
         }
-        //}
       });
     }
   });

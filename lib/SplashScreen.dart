@@ -56,7 +56,7 @@ class _SplashScreen extends State<SplashScreen> {
     );
   }
 
-  void NavigateToLogIn() {
+  void navigateToLogIn() {
     Timer(
         Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -67,7 +67,7 @@ class _SplashScreen extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    NavigateToLogIn();
+    navigateToLogIn();
   }
 }
 

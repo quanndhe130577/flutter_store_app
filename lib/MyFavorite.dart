@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
+import 'Common.dart';
 import 'Model/MyFavoriteEntity.dart';
 import 'DetailProduct.dart';
 import 'package:redux/redux.dart';
@@ -99,7 +100,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${item.shortenName()}',
+                          shortenString(item.name, 15),
                           style: TextStyle(
                               color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
@@ -130,7 +131,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                         SizedBox(height: 5),
                         Container(
                           child: Text(
-                            'Descriptions: ${item.shortenDes()}',
+                            'Descriptions: ${shortenString(item.description, 15)}',
                             style: TextStyle(
                               //color: Colors.red,
                               fontSize: 15,

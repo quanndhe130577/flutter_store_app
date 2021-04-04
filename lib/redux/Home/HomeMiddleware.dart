@@ -1,6 +1,5 @@
 import 'package:flutter_food_app/Model/HomeEntity.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
-import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:redux/redux.dart';
 import 'package:firebase_database/firebase_database.dart';
 
