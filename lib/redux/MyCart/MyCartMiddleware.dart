@@ -16,7 +16,8 @@ Future<void> _removeFromCartHandle(List<String> listId, String uid) async {
   }
 }
 
-Future<void> _quantityHandle(String uploadId, int type, String uid) async {
+Future<int> _quantityHandle(String uploadId, int type, String uid) async {
+  int number = 0;
   DatabaseReference favRef = FirebaseDatabase.instance
       .reference()
       .child("Data")
@@ -26,14 +27,16 @@ Future<void> _quantityHandle(String uploadId, int type, String uid) async {
   await favRef.once().then((item) async {
     if (item.value["state"] != null) {
       if (item.value["state"] == true) {
+        number = item.value["quantity"];
         if (type == 0) {
-          await favRef.child("quantity").set(item.value["quantity"] + 1);
+          await favRef.child("quantity").set(++number);
         } else if (type == 1 && item.value["quantity"] > 1) {
-          await favRef.child("quantity").set(item.value["quantity"] - 1);
+          await favRef.child("quantity").set(--number);
         }
       }
     }
   });
+  return number;
 }
 
 Future<CartModel> _addToCartHandle(String uploadId, String uid) async {
@@ -52,6 +55,7 @@ Future<CartModel> _addToCartHandle(String uploadId, String uid) async {
     } else {
       await itemRef.child("InCart").child(uid).once().then((itemInCart) async {
         if (itemInCart.value["state"] == true) {
+          pro.quantity = itemInCart.value["quantity"] + 1;
           await itemRef
               .child("InCart")
               .child(uid)
@@ -79,7 +83,7 @@ void myCartStateMiddleware(Store<AppState> store, action, NextDispatcher next) a
         .then((value) => store.dispatch(RemoveFromCartMyCartState(action.listId)));
   } else if (action.runtimeType.toString() == (HandleQuantityMyCartAction).toString()) {
     await _quantityHandle(action.uploadId, action.type, store.state.uid)
-        .then((value) => store.dispatch(HandleQuantityMyCartState(action.uploadId, action.type)));
+        .then((quantity) => store.dispatch(HandleQuantityMyCartState(action.uploadId, quantity)));
   } else if (action.runtimeType.toString() == (AddToCartMyCartAction).toString()) {
     await _addToCartHandle(action.uploadId, store.state.uid)
         .then((item) => store.dispatch(AddToCartMyCartState(item)));

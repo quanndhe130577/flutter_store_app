@@ -10,7 +10,7 @@ final numberOfFirstLoad = 5;
 
 void showSimpleLoadingModalDialog(context) {
   showDialog(
-    barrierDismissible: true,
+    barrierDismissible: false,
     barrierColor: Colors.white10,
     context: context,
     builder: (BuildContext context) {

@@ -6,11 +6,6 @@ import 'MyCartActions.dart';
 MyCartState myCartReducers(MyCartState state, dynamic action) {
   if (action.runtimeType.toString() == (RemoveFromCartMyCartState).toString()) {
     List<CartModel> list = []..addAll(state.cartList);
-    // list.forEach((element) {
-    //   if (action.listId.any((subElement) => subElement == element.uploadId)) {
-    //     list.remove(element);
-    //   }
-    // });
     list.removeWhere(
         (element) => action.listId.any((subElement) => subElement == element.uploadId));
     return state.newState(
@@ -20,11 +15,7 @@ MyCartState myCartReducers(MyCartState state, dynamic action) {
     List<CartModel> list = []..addAll(state.cartList);
     list.forEach((element) {
       if (element.uploadId == action.uploadId) {
-        if (action.type == 0) {
-          element.quantity++;
-        } else if (action.type == 1 && element.quantity > 1) {
-          element.quantity--;
-        }
+        element.quantity = action.quantity;
       }
     });
     return state.newState(
@@ -35,7 +26,7 @@ MyCartState myCartReducers(MyCartState state, dynamic action) {
     if (list.any((element) => element.uploadId == action.item.uploadId)) {
       list.forEach((element) {
         if (element.uploadId == action.item.uploadId) {
-          element.quantity++;
+          element.quantity = action.item.quantity;
         }
       });
     } else {

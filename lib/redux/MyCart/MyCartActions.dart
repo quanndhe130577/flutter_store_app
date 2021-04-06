@@ -20,10 +20,10 @@ class HandleQuantityMyCartAction {
 }
 
 class HandleQuantityMyCartState {
-  int type;
+  int quantity;
   String uploadId;
 
-  HandleQuantityMyCartState(this.uploadId, this.type);
+  HandleQuantityMyCartState(this.uploadId, this.quantity);
 }
 
 class AddToCartMyCartAction {
