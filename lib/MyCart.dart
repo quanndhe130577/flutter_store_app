@@ -168,7 +168,7 @@ class _MyCartState extends State<MyCart> {
               //Note: Using a BuildContext inside this callback can cause problems if the callback performs navigation.
               // For navigation purposes, please use an OnWillChangeCallback.
               onWillChange: (prev, cur) {
-                Toast.show('Remove', context);
+                Toast.show('Remove', context, duration: 1, gravity: Toast.BOTTOM);
                 Navigator.of(this.context).pop();
               },
               builder: (BuildContext context, List<CartModel> dataList) => Expanded(

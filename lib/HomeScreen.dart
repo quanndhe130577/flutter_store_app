@@ -57,11 +57,17 @@ class _HomeScreen extends State<HomeScreen> {
 
   ScrollController _controller;
 
-  void reloadData() {
+  void reloadData() async {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      store.dispatch(LoadMoreDataHomeAction());
+      await Future.delayed(Duration(seconds: 1));
     }
+    // if (_controller.offset >=
+    //         _controller.position.maxScrollExtent - double.parse(stepLoadMore.toString()) * 50 &&
+    //     !store.state.homeState.isLoadingMore) {
+    //   //await Future.delayed(Duration(seconds: 1));
+    //   store.dispatch(LoadMoreDataHomeAction());
+    // }
 
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
@@ -241,25 +247,23 @@ class _HomeScreen extends State<HomeScreen> {
                   distinct: true,
                   converter: (store) => store.state.homeState.searchList,
                   onDidChange: (prev, cur) {
-                    _controller.animateTo(
-                      _controller.offset + double.parse(stepLoadMore.toString()) * 100 - 50,
-                      curve: Curves.linear,
-                      duration: Duration(seconds: 1),
-                    );
+                    // if (prev.length != cur.length) {
+                    //   if (_controller.offset != 0) {
+                    //     _controller.animateTo(
+                    //       _controller.offset + double.parse(stepLoadMore.toString()) * 100 - 50,
+                    //       curve: Curves.linear,
+                    //       duration: Duration(seconds: 1),
+                    //     );
+                    //   }
+                    // } else
                     if (_controller.offset == _controller.position.maxScrollExtent) {
                       Toast.show("You reached the end", context);
+                      _controller.animateTo(
+                        _controller.position.maxScrollExtent - 50,
+                        curve: Curves.linear,
+                        duration: Duration(microseconds: 1),
+                      );
                     }
-                    // if (prev != cur) {
-                    //   _controller.animateTo(
-                    //     _controller.position.maxScrollExtent - 50,
-                    //     curve: Curves.linear,
-                    //     duration: Duration(seconds: 1),
-                    //   );
-                    // } else {
-                    //   if (_controller.offset == _controller.position.maxScrollExtent) {
-                    //     Toast.show("You reached the end", context);
-                    //   }
-                    // }
                   },
                   builder: (context, List<HomeModel> searchList) => searchList.length == 0
                       ? Center(
@@ -268,27 +272,39 @@ class _HomeScreen extends State<HomeScreen> {
                       : ListView.builder(
                           physics: BouncingScrollPhysics(),
                           controller: _controller,
-                          itemCount: searchList.length,
+                          itemCount: searchList.length + 1,
                           scrollDirection: Axis.vertical,
                           itemBuilder: (buildContext, index) {
+                            // if(index == 0){
+                            //   return SpinKitWave(color: Colors.red, size: 35.0);
+                            // }
+                            if (index == searchList.length) {
+                              if (searchList.length > 4) {
+                                return Container(
+                                  margin: EdgeInsets.all(10),
+                                  child: SpinKitWave(color: Colors.red, size: 35.0),
+                                );
+                              }
+                              return null;
+                            }
                             return cardUI(searchList[index]);
                           },
                         ),
                 ),
               ),
-              StoreConnector<AppState, bool>(
-                converter: (store) => store.state.homeState.isLoadingMore,
-                builder: (BuildContext context, bool isLoadingMore) => Visibility(
-                  visible: isLoadingMore,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 15),
-                    child: SpinKitWave(
-                      color: Colors.red,
-                      size: 35.0,
-                    ),
-                  ),
-                ),
-              ),
+              // StoreConnector<AppState, bool>(
+              //   converter: (store) => store.state.homeState.isLoadingMore,
+              //   builder: (BuildContext context, bool isLoadingMore) => Visibility(
+              //     visible: isLoadingMore,
+              //     child: Padding(
+              //       padding: EdgeInsets.only(top: 15),
+              //       child: SpinKitWave(
+              //         color: Colors.red,
+              //         size: 35.0,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               SizedBox(height: 10),
             ],
           ),
