@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
@@ -88,35 +89,38 @@ class _DetailProductState extends State<DetailProduct> {
       store: this.store,
       child: Scaffold(
         backgroundColor: Color(0xffffffff),
-        appBar: AppBar(
-          backgroundColor: Color(0xffff2fc3),
-          title: Text(isLoading ? "Loading . . ." : data.name),
-          centerTitle: true,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-              },
-              child: Padding(
-                padding: EdgeInsets.only(right: 5),
-                child: StoreConnector<AppState, List<CartModel>>(
-                  converter: (store) => store.state.myCartState.cartList,
-                  builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                    badgeColor: Colors.blue,
-                    position: BadgePosition.bottomEnd(bottom: 10),
-                    badgeContent:
-                        Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                    child: Icon(
-                      Icons.shopping_cart,
-                      color: Colors.black,
-                      semanticLabel: "MyCart",
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(heightOfAppBar),
+          child: AppBar(
+            backgroundColor: Color(0xffff2fc3),
+            title: Text(isLoading ? "Loading . . ." : data.name),
+            centerTitle: true,
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(right: 5),
+                  child: StoreConnector<AppState, List<CartModel>>(
+                    converter: (store) => store.state.myCartState.cartList,
+                    builder: (BuildContext context, List<CartModel> cartList) => Badge(
+                      badgeColor: Colors.blue,
+                      position: BadgePosition.bottomEnd(bottom: 10),
+                      badgeContent:
+                          Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
+                      child: Icon(
+                        Icons.shopping_cart,
+                        color: Colors.black,
+                        semanticLabel: "MyCart",
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(

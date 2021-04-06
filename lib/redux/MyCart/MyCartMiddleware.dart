@@ -7,15 +7,13 @@ import 'MyCartActions.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 
-Future<void> _removeFromCartHandle(String uploadId, String uid) async {
-  DatabaseReference favRef = FirebaseDatabase.instance
-      .reference()
-      .child("Data")
-      .child(uploadId)
-      .child("InCart")
-      .child(uid);
-  await favRef.child("state").set(false);
-  await favRef.child("quantity").set(0);
+Future<void> _removeFromCartHandle(List<String> listId, String uid) async {
+  DatabaseReference dataRef = FirebaseDatabase.instance.reference().child("Data");
+  for (int i = 0; i < listId.length; i++) {
+    DatabaseReference favRef = dataRef.child(listId[i]).child("InCart").child(uid);
+    await favRef.child("state").set(false);
+    await favRef.child("quantity").set(0);
+  }
 }
 
 Future<void> _quantityHandle(String uploadId, int type, String uid) async {
@@ -77,8 +75,8 @@ void myCartStateMiddleware(Store<AppState> store, action, NextDispatcher next) a
   //       .then((cartList) => store.dispatch(FirstLoadCartModelMyCartState(cartList)));
   // } else
   if (action.runtimeType.toString() == (RemoveFromCartMyCartAction).toString()) {
-    await _removeFromCartHandle(action.productId, store.state.uid)
-        .then((value) => store.dispatch(RemoveFromCartMyCartState(action.productId)));
+    await _removeFromCartHandle(action.listId, store.state.uid)
+        .then((value) => store.dispatch(RemoveFromCartMyCartState(action.listId)));
   } else if (action.runtimeType.toString() == (HandleQuantityMyCartAction).toString()) {
     await _quantityHandle(action.uploadId, action.type, store.state.uid)
         .then((value) => store.dispatch(HandleQuantityMyCartState(action.uploadId, action.type)));

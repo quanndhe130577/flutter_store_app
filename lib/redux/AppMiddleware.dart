@@ -7,8 +7,11 @@ import 'package:flutter_food_app/redux/MyCart/MyCartMiddleware.dart';
 import 'package:redux/redux.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import '../Common.dart';
 import 'AppActions.dart';
 import 'MyFavorite/MyFavoriteMiddleware.dart';
+
+
 
 Future<List<HomeModel>> _loadFirstHomeModelData() async {
   List<HomeModel> dataList = [];
@@ -20,7 +23,7 @@ Future<List<HomeModel>> _loadFirstHomeModelData() async {
 
     var count = 0;
     for (var key in keys) {
-      if (count >= 5) {
+      if (count >= numberOfFirstLoad) {
         break;
       }
       HomeModel data = new HomeModel(

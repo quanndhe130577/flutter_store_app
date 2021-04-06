@@ -62,20 +62,53 @@ class _MyCartState extends State<MyCart> {
       }
     }
 
+    void _removeItems() {
+      showSimpleLoadingModalDialog(context);
+
+      List<String> list = dataChoose.map((e) => e.uploadId).toList();
+      store.dispatch(RemoveFromCartMyCartAction(list));
+
+      dataChoose.forEach((element) {
+        total -= element.price * element.quantity;
+      });
+      dataChoose = [];
+      if (this.mounted) {
+        setState(() {
+          //
+        });
+      }
+    }
+
     return Scaffold(
       backgroundColor: Color(0xffffffff),
-      appBar: AppBar(
-        backgroundColor: Color(0xffff2fc3),
-        title: Text("My Cart"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.delete),
-            color: Colors.white,
-            onPressed: () {},
-          ),
-        ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(heightOfAppBar),
+        child: AppBar(
+          backgroundColor: Color(0xffff2fc3),
+          title: Text("My Cart"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.delete),
+              color: Colors.white,
+              onPressed: () {
+                if (dataChoose.length > 0) {
+                  showDialogConfirm(
+                    title: Text("Remove"),
+                    content: Text("Do you want to remove ? "),
+                    context: context,
+                    yesCallback: () {
+                      _removeItems();
+                    },
+                    noCallback: () {},
+                  );
+                }
+              },
+            ),
+          ],
+        ),
       ),
+
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {},
@@ -161,15 +194,11 @@ class _MyCartState extends State<MyCart> {
             StoreConnector<AppState, List<CartModel>>(
               converter: (store) => store.state.myCartState.cartList,
               distinct: true,
-              // onDidChange: (prev, cur) {
-              //   Toast.show('${prev.length.toString()} + ${cur.length.toString()}', context);
-              //   Navigator.of(this.context).pop();
-              // },
-              //Note: Using a BuildContext inside this callback can cause problems if the callback performs navigation.
-              // For navigation purposes, please use an OnWillChangeCallback.
               onWillChange: (prev, cur) {
-                Toast.show('Remove', context, duration: 1, gravity: Toast.BOTTOM);
-                Navigator.of(this.context).pop();
+                if (prev.length != cur.length) {
+                  Toast.show('Remove', context, duration: 1, gravity: Toast.BOTTOM);
+                  Navigator.of(this.context).pop();
+                }
               },
               builder: (BuildContext context, List<CartModel> dataList) => Expanded(
                 child: dataList.length == 0
@@ -197,32 +226,14 @@ class _MyCartState extends State<MyCart> {
   Widget slideUI(CartModel item) {
     bool isSelected = dataChoose.contains(item);
 
-    void _showSimpleModalDialog(context) {
-      showDialog(
-        barrierDismissible: false,
-        barrierColor: Colors.white10,
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            backgroundColor: Colors.black54,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            child: Container(
-              constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
-              child: SpinKitFadingCircle(
-                itemBuilder: (BuildContext context, int index) {
-                  return Icon(Icons.circle, color: Colors.white, size: 10);
-                },
-              ),
-            ),
-          );
-        },
-      );
-    }
+    void removeFromCart() {
+      showSimpleLoadingModalDialog(context);
+      store.dispatch(RemoveFromCartMyCartAction([item.uploadId]));
+      if (isSelected) {
+        total -= item.price * item.quantity;
+      }
+      dataChoose.removeWhere((element) => element.uploadId == item.uploadId);
 
-    void removeFromCart(String uploadId) {
-      _showSimpleModalDialog(context);
-      store.dispatch(RemoveFromCartMyCartAction(item.uploadId));
-      if (isSelected) total -= item.price * item.quantity;
       if (this.mounted) {
         setState(() {
           //
@@ -231,8 +242,6 @@ class _MyCartState extends State<MyCart> {
     }
 
     void handleQuantity(int type, bool isSelected) {
-      store.dispatch(HandleQuantityMyCartAction(item.uploadId, type));
-
       if (type == 0) {
         if (isSelected) total += item.price;
       } else if (type == 1 && item.quantity > 1) {
@@ -244,6 +253,7 @@ class _MyCartState extends State<MyCart> {
           //
         });
       }
+      store.dispatch(HandleQuantityMyCartAction(item.uploadId, type));
     }
 
     void handleChooseItem(bool value) {
@@ -300,7 +310,21 @@ class _MyCartState extends State<MyCart> {
           color: Colors.red,
           icon: Icons.delete,
           onTap: () {
-            removeFromCart(item.uploadId);
+            showDialogConfirm(
+              context: context,
+              yesCallback: () {
+                removeFromCart();
+              },
+              noCallback: () {},
+              title: Text(
+                "Confirm !!!",
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "Do you want to remove this product from cart ???",
+                textAlign: TextAlign.center,
+              ),
+            );
           },
         ),
       ],

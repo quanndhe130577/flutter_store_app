@@ -33,10 +33,13 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
     return StoreProvider(
       store: this.store,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("My Favorite",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          backgroundColor: Color(0xffff2f3c),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(heightOfAppBar),
+          child: AppBar(
+            title: Text("My Favorite",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            backgroundColor: Color(0xffff2f3c),
+          ),
         ),
         body: StoreConnector<AppState, List<FavModel>>(
           converter: (store) => store.state.myFavState.favList,

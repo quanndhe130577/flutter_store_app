@@ -35,15 +35,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
-  _HomeScreen(this.currentEmail, this.uid);
+  final String currentEmail;
+  final String uid;
 
-  String currentEmail = "";
-  String uid = "";
+  _HomeScreen(this.currentEmail, this.uid);
 
   Store<AppState> store;
 
-  FirebaseUser currentUser;
+  // declare state for HomeScreen
   bool searchState = false;
+  bool isInLoadingMore = false;
+  bool isInLoadingSearch = false;
+
+  //
+
+  // declare final variable
+  final double numberOfCartInScreen = 4.6;
+
+  //
 
   FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -56,7 +65,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   ScrollController _controller;
-  bool isInLoading = true;
 
   void reloadData() async {
     // if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -66,12 +74,14 @@ class _HomeScreen extends State<HomeScreen> {
     // }
 
     if (_controller.offset >=
-            _controller.position.maxScrollExtent - double.parse(stepLoadMore.toString()) * 100 &&
-        !store.state.homeState.isLoadingMore &&
-        isInLoading) {
+            _controller.position.maxScrollExtent -
+                double.parse(stepLoadMore.toString()) *
+                    (_getHeightForCart(this.context, dividedBy: numberOfCartInScreen) / 2) &&
+        //!store.state.homeState.isLoadingMore &&
+        !isInLoadingMore) {
       if (this.mounted) {
         setState(() {
-          this.isInLoading = false;
+          this.isInLoadingMore = true;
         });
       }
       await Future.delayed(Duration(seconds: 1));
@@ -95,8 +105,19 @@ class _HomeScreen extends State<HomeScreen> {
     _controller = ScrollController();
     _controller.addListener(reloadData);
     super.initState();
-    auth.currentUser().then((value) => {this.currentUser = value});
   }
+
+  double _getHeightForCart(BuildContext context, {double dividedBy = 1}) {
+    double height = MediaQuery.of(context).size.height - heightOfAppBar;
+
+    // Height (without SafeArea)
+    var padding = MediaQuery.of(context).padding;
+    double newHeight = height - padding.top - padding.bottom;
+
+    return newHeight / dividedBy;
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,73 +127,78 @@ class _HomeScreen extends State<HomeScreen> {
         onInit: (store) => store.dispatch(InitAppAction(store.state.uid)),
         builder: (BuildContext context, Store<AppState> store) => Scaffold(
           backgroundColor: Color(0xffffffff),
-          appBar: AppBar(
-            backgroundColor: Color(0xffff2fc3),
-            title: !searchState
-                ? Text("Home")
-                : TextField(
-                    decoration: InputDecoration(
-                      icon: Icon(Icons.search, color: Colors.white),
-                      hintText: "Search . . . ",
-                      hintStyle: TextStyle(color: Colors.white),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(heightOfAppBar),
+            child: AppBar(
+              backgroundColor: Color(0xffff2fc3),
+              title: !searchState
+                  ? Text("Home")
+                  : TextField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.search, color: Colors.white),
+                        hintText: "Search . . . ",
+                        hintStyle: TextStyle(color: Colors.white),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
                       ),
+                      onSubmitted: (text) {
+                        searchMethod(text.toLowerCase());
+                      },
+                      autofocus: true,
                     ),
-                    onSubmitted: (text) {
-                      searchMethod(text.toLowerCase());
+              centerTitle: false,
+              actions: [
+                searchState
+                    ? IconButton(
+                        icon: Icon(Icons.cancel),
+                        color: Colors.white,
+                        onPressed: () {
+                          store.dispatch(RemoveSearchHomeState());
+                          setState(() {
+                            searchState = !searchState;
+                          });
+                        },
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.search),
+                        color: Colors.white,
+                        onPressed: () {
+                          if (this.mounted) {
+                            setState(() {
+                              searchState = !searchState;
+                            });
+                          }
+                        },
+                      ),
+                Visibility(
+                  visible: !searchState,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
                     },
-                    autofocus: true,
-                  ),
-            centerTitle: false,
-            actions: [
-              searchState
-                  ? IconButton(
-                      icon: Icon(Icons.cancel),
-                      color: Colors.white,
-                      onPressed: () {
-                        store.dispatch(RemoveSearchHomeState());
-                        setState(() {
-                          searchState = !searchState;
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.search),
-                      color: Colors.white,
-                      onPressed: () {
-                        setState(() {
-                          searchState = !searchState;
-                        });
-                      },
-                    ),
-              Visibility(
-                visible: !searchState,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 5),
-                    child: StoreConnector<AppState, List<CartModel>>(
-                      converter: (store) => store.state.myCartState.cartList,
-                      builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                        badgeColor: Colors.blue,
-                        position: BadgePosition.bottomEnd(bottom: 10),
-                        badgeContent:
-                            Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                        child: Icon(
-                          Icons.shopping_cart,
-                          color: Colors.black,
-                          semanticLabel: "MyCart",
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 5),
+                      child: StoreConnector<AppState, List<CartModel>>(
+                        converter: (store) => store.state.myCartState.cartList,
+                        builder: (BuildContext context, List<CartModel> cartList) => Badge(
+                          badgeColor: Colors.blue,
+                          position: BadgePosition.bottomEnd(bottom: 10),
+                          badgeContent: Text(cartList.length.toString(),
+                              style: TextStyle(color: Colors.white)),
+                          child: Icon(
+                            Icons.shopping_cart,
+                            color: Colors.black,
+                            semanticLabel: "MyCart",
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           drawer: Drawer(
             child: Column(
@@ -241,7 +267,7 @@ class _HomeScreen extends State<HomeScreen> {
               StoreConnector<AppState, bool>(
                 converter: (store) => store.state.homeState.isLoading,
                 builder: (BuildContext context, bool isLoading) => Visibility(
-                  visible: isLoading,
+                  visible: isLoading && !this.isInLoadingSearch,
                   child: Padding(
                     padding: EdgeInsets.only(top: 15),
                     child: SpinKitWave(
@@ -255,28 +281,31 @@ class _HomeScreen extends State<HomeScreen> {
                 child: StoreConnector<AppState, List<HomeModel>>(
                   distinct: true,
                   converter: (store) => store.state.homeState.searchList,
-                  onDidChange: (prev, cur) {
-                    // if (prev.length != cur.length) {
-                    //   if (_controller.offset != 0) {
-                    //     _controller.animateTo(
-                    //       _controller.offset + double.parse(stepLoadMore.toString()) * 100 - 50,
-                    //       curve: Curves.linear,
-                    //       duration: Duration(seconds: 1),
-                    //     );
-                    //   }
-                    // } else
-                    if (this.mounted) {
-                      setState(() {
-                        this.isInLoading = true;
-                      });
+                  onWillChange: (prev, cur) {
+                    if (prev != cur && this.isInLoadingSearch) {
+                      Navigator.of(this.context).pop();
                     }
-                    if (_controller.offset == _controller.position.maxScrollExtent) {
+                  },
+                  onDidChange: (prev, cur) {
+                    if (isInLoadingSearch) {
+                      _controller.animateTo(0.1,
+                          duration: Duration(milliseconds: 1), curve: Curves.linear);
+                    } else if (store.state.homeState.searchList.length >
+                            this.numberOfCartInScreen &&
+                        _controller.offset == _controller.position.maxScrollExtent) {
                       Toast.show("You reached the end", context);
                       _controller.animateTo(
-                        _controller.position.maxScrollExtent - 50,
+                        _controller.position.maxScrollExtent -
+                            _getHeightForCart(this.context, dividedBy: this.numberOfCartInScreen),
                         curve: Curves.linear,
                         duration: Duration(microseconds: 1),
                       );
+                    }
+                    if (this.mounted) {
+                      setState(() {
+                        this.isInLoadingMore = false;
+                        this.isInLoadingSearch = false;
+                      });
                     }
                   },
                   builder: (context, List<HomeModel> searchList) => searchList.length == 0
@@ -288,16 +317,15 @@ class _HomeScreen extends State<HomeScreen> {
                           controller: _controller,
                           itemCount: searchList.length + 1,
                           scrollDirection: Axis.vertical,
+                          itemExtent:
+                              _getHeightForCart(this.context, dividedBy: numberOfCartInScreen),
                           itemBuilder: (buildContext, index) {
                             // if(index == 0){
                             //   return SpinKitWave(color: Colors.red, size: 35.0);
                             // }
                             if (index == searchList.length) {
                               if (searchList.length > 4) {
-                                return Container(
-                                  margin: EdgeInsets.all(10),
-                                  child: SpinKitWave(color: Colors.red, size: 35.0),
-                                );
+                                return SpinKitWave(color: Colors.red, size: 35.0);
                               }
                               return null;
                             }
@@ -306,20 +334,6 @@ class _HomeScreen extends State<HomeScreen> {
                         ),
                 ),
               ),
-              // StoreConnector<AppState, bool>(
-              //   converter: (store) => store.state.homeState.isLoadingMore,
-              //   builder: (BuildContext context, bool isLoadingMore) => Visibility(
-              //     visible: isLoadingMore,
-              //     child: Padding(
-              //       padding: EdgeInsets.only(top: 15),
-              //       child: SpinKitWave(
-              //         color: Colors.red,
-              //         size: 35.0,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              SizedBox(height: 10),
             ],
           ),
         ),
@@ -330,12 +344,12 @@ class _HomeScreen extends State<HomeScreen> {
   Widget cardUI(HomeModel item) {
     return Card(
       elevation: 7,
-      margin: EdgeInsets.all(15),
+      //margin: EdgeInsets.all(3),
       //color: Color(0xffff2fc3),
       child: Container(
         color: Colors.white,
         margin: EdgeInsets.all(1.5),
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.only(top: 10, right: 10, left: 10),
         child: Column(
           children: [
             Row(
@@ -407,7 +421,14 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  void searchMethod(String text) {
+  void searchMethod(String text) async {
+    if (this.mounted) {
+      setState(() {
+        isInLoadingSearch = true;
+      });
+    }
+    showSimpleLoadingModalDialog(this.context);
+    await Future.delayed(Duration(seconds: 1));
     store.dispatch(SearchHomeAction(text));
   }
 

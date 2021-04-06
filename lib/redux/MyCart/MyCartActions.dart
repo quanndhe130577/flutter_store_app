@@ -1,15 +1,15 @@
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
 
 class RemoveFromCartMyCartAction {
-  String productId;
+  List<String> listId;
 
-  RemoveFromCartMyCartAction(this.productId);
+  RemoveFromCartMyCartAction(this.listId);
 }
 
 class RemoveFromCartMyCartState {
-  String productId;
+  List<String> listId;
 
-  RemoveFromCartMyCartState(this.productId);
+  RemoveFromCartMyCartState(this.listId);
 }
 
 class HandleQuantityMyCartAction {

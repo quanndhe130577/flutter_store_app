@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_food_app/Common.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,9 +26,12 @@ class _UploadDataState extends State<UploadData> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff000725),
-      appBar: AppBar(
-        backgroundColor: Color(0xffff2f3c),
-        title: Text("Upload Data", style: TextStyle(color: Color(0xffffffff))),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(heightOfAppBar),
+        child: AppBar(
+          backgroundColor: Color(0xffff2f3c),
+          title: Text("Upload Data", style: TextStyle(color: Color(0xffffffff))),
+        ),
       ),
       body: Form(
         key: _formKey,
