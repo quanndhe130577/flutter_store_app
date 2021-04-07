@@ -56,18 +56,27 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   ScrollController _controller;
+  bool isInLoading = true;
 
   void reloadData() async {
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
-      await Future.delayed(Duration(seconds: 1));
-    }
-    // if (_controller.offset >=
-    //         _controller.position.maxScrollExtent - double.parse(stepLoadMore.toString()) * 50 &&
-    //     !store.state.homeState.isLoadingMore) {
+    // if (_controller.offset >= _controller.position.maxScrollExtent &&
+    //     !_controller.position.outOfRange) {
     //   //await Future.delayed(Duration(seconds: 1));
-    //   store.dispatch(LoadMoreDataHomeAction());
+    //   //store.dispatch(LoadMoreDataHomeAction());
     // }
+
+    if (_controller.offset >=
+            _controller.position.maxScrollExtent - double.parse(stepLoadMore.toString()) * 100 &&
+        !store.state.homeState.isLoadingMore &&
+        isInLoading) {
+      if (this.mounted) {
+        setState(() {
+          this.isInLoading = false;
+        });
+      }
+      await Future.delayed(Duration(seconds: 1));
+      store.dispatch(LoadMoreDataHomeAction());
+    }
 
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
@@ -256,6 +265,11 @@ class _HomeScreen extends State<HomeScreen> {
                     //     );
                     //   }
                     // } else
+                    if (this.mounted) {
+                      setState(() {
+                        this.isInLoading = true;
+                      });
+                    }
                     if (_controller.offset == _controller.position.maxScrollExtent) {
                       Toast.show("You reached the end", context);
                       _controller.animateTo(
