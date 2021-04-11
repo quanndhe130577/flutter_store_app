@@ -6,7 +6,7 @@ import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'Model/MyCartEntity.dart';
 
-import 'DetailProduct.dart';
+import 'DetailProductScreen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -62,15 +62,24 @@ class _MyCartState extends State<MyCart> {
       }
     }
 
-    void _removeItems() {
+    void handleTotalAmount() {
+      total = 0;
+      dataChoose.forEach((element) {
+        total += element.quantity * element.price;
+      });
+      if (this.mounted) {
+        setState(() {
+          //
+        });
+      }
+    }
+
+    void _removeAllChoseItems() {
       showSimpleLoadingModalDialog(context);
 
       List<String> list = dataChoose.map((e) => e.uploadId).toList();
       store.dispatch(RemoveFromCartMyCartAction(list));
 
-      dataChoose.forEach((element) {
-        total -= element.price * element.quantity;
-      });
       dataChoose = [];
       if (this.mounted) {
         setState(() {
@@ -98,7 +107,7 @@ class _MyCartState extends State<MyCart> {
                     content: Text("Do you want to remove ? "),
                     context: context,
                     yesCallback: () {
-                      _removeItems();
+                      _removeAllChoseItems();
                     },
                     noCallback: () {},
                   );
@@ -195,6 +204,7 @@ class _MyCartState extends State<MyCart> {
               converter: (store) => store.state.myCartState.cartList,
               distinct: true,
               onWillChange: (prev, cur) {
+                handleTotalAmount();
                 if (prev.length != cur.length) {
                   Toast.show('Remove', context, duration: 1, gravity: Toast.BOTTOM);
                   Navigator.of(this.context).pop();
@@ -228,10 +238,6 @@ class _MyCartState extends State<MyCart> {
 
     void removeFromCart() {
       showSimpleLoadingModalDialog(context);
-      store.dispatch(RemoveFromCartMyCartAction([item.uploadId]));
-      if (isSelected) {
-        total -= item.price * item.quantity;
-      }
       dataChoose.removeWhere((element) => element.uploadId == item.uploadId);
 
       if (this.mounted) {
@@ -239,20 +245,11 @@ class _MyCartState extends State<MyCart> {
           //
         });
       }
+
+      store.dispatch(RemoveFromCartMyCartAction([item.uploadId]));
     }
 
     void handleQuantity(int type, bool isSelected) {
-      if (type == 0) {
-        if (isSelected) total += item.price;
-      } else if (type == 1 && item.quantity > 1) {
-        if (isSelected) total -= item.price;
-      }
-
-      if (this.mounted) {
-        setState(() {
-          //
-        });
-      }
       store.dispatch(HandleQuantityMyCartAction(item.uploadId, type));
     }
 
@@ -350,7 +347,7 @@ class _MyCartState extends State<MyCart> {
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              DetailProduct(item.uploadId, this.store)));
+                              DetailProductScreen(item.uploadId, this.store)));
                 },
                 child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
               ),

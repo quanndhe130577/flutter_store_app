@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter_food_app/Model/HomeEntity.dart';
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
 import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
@@ -11,12 +13,11 @@ import '../Common.dart';
 import 'AppActions.dart';
 import 'MyFavorite/MyFavoriteMiddleware.dart';
 
-
-
 Future<List<HomeModel>> _loadFirstHomeModelData() async {
   List<HomeModel> dataList = [];
 
   DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
+
   await reference.once().then((DataSnapshot dataSnapShot) {
     var keys = dataSnapShot.value.keys;
     var values = dataSnapShot.value;

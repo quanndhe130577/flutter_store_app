@@ -3,7 +3,7 @@ import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Common.dart';
 import 'Model/MyFavoriteEntity.dart';
-import 'DetailProduct.dart';
+import 'DetailProductScreen.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'redux/AppState.dart';
@@ -91,7 +91,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            DetailProduct(item.uploadId, this.store)));
+                            DetailProductScreen(item.uploadId, this.store)));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,

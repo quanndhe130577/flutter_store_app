@@ -13,7 +13,7 @@ import 'package:flutter_food_app/redux/Home/HomeMiddleware.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'Model/HomeEntity.dart';
-import 'package:flutter_food_app/DetailProduct.dart';
+import 'package:flutter_food_app/DetailProductScreen.dart';
 import 'package:flutter_food_app/LogInScreen.dart';
 import 'UploadData.dart';
 import 'MyFavorite.dart';
@@ -361,7 +361,7 @@ class _HomeScreen extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                DetailProduct(item.uploadId, this.store)));
+                                DetailProductScreen(item.uploadId, this.store)));
                   },
                   onDoubleTap: () {
                     Toast.show("Add to favorite", context, duration: 1, gravity: Toast.BOTTOM);
