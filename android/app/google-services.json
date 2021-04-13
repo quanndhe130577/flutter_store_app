@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:202714471498:android:3d840978c38b0a277c5ab3",
         "android_client_info": {
-          "package_name": "com.example.flutter_store_app"
+          "package_name": "com.example.flutter_food_app"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "202714471498-ffb8s81o8hi7djj6p2c8gbg9p8rh7ktm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.flutter_store_app",
+            "package_name": "com.example.flutter_food_app",
             "certificate_hash": "0686d33f14f95153a0be14b7bbca5eeb5f821ea3"
           }
         },
@@ -26,10 +26,39 @@
           "client_id": "202714471498-la2da52i7vh3lqlvbdlfa0imkph2blv1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.flutter_store_app",
+            "package_name": "com.example.flutter_food_app",
             "certificate_hash": "5db9c79c117c3d0260292138be279e1c8a136ca9"
           }
         },
+        {
+          "client_id": "202714471498-2d3qh2etsij8fkhlh1rbtphfggvan5nq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1mU9SVuv40M4Mglr6M8IR9mK8PwaBr8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "202714471498-2d3qh2etsij8fkhlh1rbtphfggvan5nq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:202714471498:android:068b25f51a0a1f617c5ab3",
+        "android_client_info": {
+          "package_name": "com.example.flutter_store_app"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "202714471498-2d3qh2etsij8fkhlh1rbtphfggvan5nq.apps.googleusercontent.com",
           "client_type": 3

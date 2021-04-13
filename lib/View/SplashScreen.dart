@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'LogInScreen.dart';
+import 'package:flutter_food_app/View/LogInScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

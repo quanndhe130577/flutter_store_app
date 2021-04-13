@@ -328,13 +328,13 @@ class _UploadDataState extends State<UploadData> {
     );
 
     if (_formKey.currentState.validate()) {
-      final StorageReference reference = FirebaseStorage()
+      final Reference reference = FirebaseStorage.instance
           .ref()
           .child("images")
           .child(new DateTime.now().microsecondsSinceEpoch.toString() + "." + imageFile.path);
-      StorageUploadTask uploadTask = reference.putFile(imageFile);
+      UploadTask uploadTask = reference.putFile(imageFile);
 
-      var imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+      var imageUrl = await (await uploadTask).ref.getDownloadURL();
       String url = imageUrl.toString();
 
       DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child("Data");
@@ -346,6 +346,7 @@ class _UploadDataState extends State<UploadData> {
       map["price"] = price;
       map["imgUrl"] = url;
       map["description"] = description;
+      map["store"] = "-MXm7LVIEqtErevPnLua";
 
       await databaseReference.child(uploadId).set(map).then((value) {
         Toast.show("Upload successfully", context, duration: 2, gravity: Toast.CENTER);

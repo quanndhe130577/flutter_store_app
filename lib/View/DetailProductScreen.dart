@@ -3,13 +3,13 @@ import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
-import 'Model/DetailProductEntity.dart';
-import 'Model/MyCartEntity.dart';
-import 'Model/MyFavoriteEntity.dart';
+import 'package:flutter_food_app/Model/DetailProductEntity.dart';
+import 'package:flutter_food_app/Model/MyCartEntity.dart';
+import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import "MyCart.dart";
+import 'package:flutter_food_app/View//MyCartScreen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -32,21 +32,21 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
   _DetailProductScreenState(this.uploadId, this.store);
 
   DetailProductModel data = new DetailProductModel();
-  FirebaseUser currentUser;
+  User currentUser;
   bool isLoading = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    auth.currentUser().then((value) => {this.currentUser = value}).whenComplete(() {
-      loadData(uploadId);
-      if (this.mounted) {
-        setState(() {
-          //favInit = data.fav;
-        });
-      }
-    });
+    this.currentUser = auth.currentUser;
+
+    loadData(uploadId);
+    if (this.mounted) {
+      setState(() {
+        //
+      });
+    }
   }
 
   void loadData(String uploadId) async {
@@ -233,12 +233,91 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
             : Container(
                 child: ListView(
                   children: [
-                    DetailProduct(data),
+                    Container(
+                      child: Column(
+                        children: [
+                          Image.network(
+                            data.imgUrl,
+                            fit: BoxFit.cover,
+                            width: 500,
+                            height: 400,
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            width: double.infinity,
+                            child: Text(
+                              data.name,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            width: double.infinity,
+                            child: Text(
+                              '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
+                              style: TextStyle(
+                                  color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            width: double.infinity,
+                            child: Text(
+                              "Material : ${data.material}",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Divider(
                       thickness: 10,
                       height: 50,
                     ),
                     StoreProduct(data.store),
+                    Divider(
+                      thickness: 10,
+                      height: 50,
+                    ),
+                    Container(
+                      //alignment: Alignment.topLeft,
+                      padding: EdgeInsets.only(left: 10, right: 10),
+                      //width: double.infinity,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            child: Text(
+                              "Detail of product : ",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Divider(),
+                          Container(
+                            width: double.infinity,
+                            child: Text(
+                              "${data.description != null ? data.description : ""}",
+                              style: TextStyle(color: Colors.black, fontSize: 15),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Divider(
                       thickness: 10,
                       height: 50,
@@ -338,7 +417,7 @@ class _StoreProductState extends State<StoreProduct> {
                       ),
                     ),
                   ),
-                  VerticalDivider(),
+                  VerticalDivider(thickness: 3),
                   Expanded(
                     child: Align(
                       alignment: Alignment.center,
@@ -353,7 +432,7 @@ class _StoreProductState extends State<StoreProduct> {
                       ),
                     ),
                   ),
-                  VerticalDivider(),
+                  VerticalDivider(thickness: 3),
                   Expanded(
                     child: Align(
                       alignment: Alignment.center,
@@ -378,83 +457,83 @@ class _StoreProductState extends State<StoreProduct> {
   }
 }
 
-class DetailProduct extends StatefulWidget {
-  final DetailProductModel data;
-
-  DetailProduct(this.data);
-
-  @override
-  _DetailProductState createState() => _DetailProductState(this.data);
-}
-
-class _DetailProductState extends State<DetailProduct> {
-  DetailProductModel data;
-
-  _DetailProductState(this.data);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Image.network(
-            data.imgUrl,
-            fit: BoxFit.cover,
-            width: 400,
-            height: 400,
-          ),
-          SizedBox(height: 10),
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            width: double.infinity,
-            child: Text(
-              data.name,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          SizedBox(height: 5),
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            width: double.infinity,
-            child: Text(
-              '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
-              style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          SizedBox(height: 5),
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            width: double.infinity,
-            child: Text(
-              "Material : ${data.material}",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          SizedBox(height: 5),
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            width: double.infinity,
-            child: Text(
-              "Description : ${data.description != null ? data.description : ""}",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// class DetailProduct extends StatefulWidget {
+//   final DetailProductModel data;
+//
+//   DetailProduct(this.data);
+//
+//   @override
+//   _DetailProductState createState() => _DetailProductState(this.data);
+// }
+//
+// class _DetailProductState extends State<DetailProduct> {
+//   DetailProductModel data;
+//
+//   _DetailProductState(this.data);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       child: Column(
+//         children: [
+//           Image.network(
+//             data.imgUrl,
+//             fit: BoxFit.cover,
+//             width: 500,
+//             height: 400,
+//           ),
+//           SizedBox(height: 10),
+//           Container(
+//             padding: EdgeInsets.only(left: 10, right: 10),
+//             width: double.infinity,
+//             child: Text(
+//               data.name,
+//               style: TextStyle(
+//                 color: Colors.black,
+//                 fontSize: 25,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//               textAlign: TextAlign.left,
+//             ),
+//           ),
+//           SizedBox(height: 5),
+//           Container(
+//             padding: EdgeInsets.only(left: 10, right: 10),
+//             width: double.infinity,
+//             child: Text(
+//               '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
+//               style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+//               textAlign: TextAlign.left,
+//             ),
+//           ),
+//           SizedBox(height: 5),
+//           Container(
+//             padding: EdgeInsets.only(left: 10, right: 10),
+//             width: double.infinity,
+//             child: Text(
+//               "Material : ${data.material}",
+//               style: TextStyle(
+//                 color: Colors.black,
+//                 fontSize: 15,
+//               ),
+//               textAlign: TextAlign.left,
+//             ),
+//           ),
+//           SizedBox(height: 5),
+//           Container(
+//             padding: EdgeInsets.only(left: 10, right: 10),
+//             width: double.infinity,
+//             child: Text(
+//               "Description : ${data.description != null ? data.description : ""}",
+//               style: TextStyle(
+//                 color: Colors.black,
+//                 fontSize: 15,
+//               ),
+//               textAlign: TextAlign.left,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

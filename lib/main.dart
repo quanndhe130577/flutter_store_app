@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_food_app/SplashScreen.dart';
+import 'package:flutter_food_app/View/SplashScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget{
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(

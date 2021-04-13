@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
-import 'Common.dart';
-import 'Model/MyFavoriteEntity.dart';
-import 'DetailProductScreen.dart';
+import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
+import 'package:flutter_food_app/View/DetailProductScreen.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'redux/AppState.dart';
+import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:toast/toast.dart';
 
 class MyFavorite extends StatefulWidget {

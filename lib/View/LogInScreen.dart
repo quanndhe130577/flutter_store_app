@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_food_app/HomeScreen.dart';
+import 'package:flutter_food_app/View/HomeScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'SignUpScreen.dart';
+import 'package:flutter_food_app/View//SignUpScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'ForgotScreen.dart';
+import 'package:flutter_food_app/View/ForgotScreen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
@@ -81,21 +81,28 @@ class _LogInScreen extends State<LogInScreen> {
     }
   }
 
-  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
 
   Future<void> googleSignInApp() async {
-    GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
-    GoogleSignInAuthentication signInAuthentication = await signInAccount.authentication;
-    AuthCredential credential = GoogleAuthProvider.getCredential(
-      idToken: signInAuthentication.idToken,
-      accessToken: signInAuthentication.accessToken,
-    );
-    await auth.signInWithCredential(credential).then((value) => {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => HomeScreen(value.user.email, value.user.uid)))
-        });
+    try {
+      //GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+      GoogleSignInAccount signInAccount = await GoogleSignIn().signIn();
+      //GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication signInAuthentication = await signInAccount.authentication;
+      AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: signInAuthentication.idToken,
+        accessToken: signInAuthentication.accessToken,
+      );
+      await auth.signInWithCredential(credential).then((value) => {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        HomeScreen(value.user.email, value.user.uid)))
+          });
+    } catch (e) {
+      print(e.code);
+    }
   }
 
   Future<void> signInWithFacebook() async {
@@ -104,8 +111,7 @@ class _LogInScreen extends State<LogInScreen> {
       AccessToken result = await FacebookAuth.instance.login();
 
       // Create a credential from the access token
-      AuthCredential facebookAuthCredential =
-          FacebookAuthProvider.getCredential(accessToken: result.token);
+      AuthCredential facebookAuthCredential = FacebookAuthProvider.credential(result.token);
 
       // Once signed in, return the UserCredential
       await auth.signInWithCredential(facebookAuthCredential).then((value) => {
@@ -140,15 +146,23 @@ class _LogInScreen extends State<LogInScreen> {
     // TODO: implement initState
     super.initState();
     Future(() async {
-      auth.currentUser().then((value) => {
-            if (value != null)
-              {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => HomeScreen(value.email, value.uid)))
-              }
-          });
+      if (auth.currentUser != null) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    HomeScreen(auth.currentUser.email, auth.currentUser.uid)));
+      }
+
+      // auth.currentUser().then((value) => {
+      //       if (value != null)
+      //         {
+      //           Navigator.pushReplacement(
+      //               context,
+      //               MaterialPageRoute(
+      //                   builder: (BuildContext context) => HomeScreen(value.email, value.uid)))
+      //         }
+      //     });
       // if (await auth.currentUser() != null) {
       //   Navigator.pushReplacement(context,
       //       MaterialPageRoute(builder: (BuildContext context) => HomeScreen(auth.currentUser().then((value) => value.email))));

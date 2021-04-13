@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
-import 'Model/MyCartEntity.dart';
+import 'package:flutter_food_app/Model/MyCartEntity.dart';
 
-import 'DetailProductScreen.dart';
+import 'package:flutter_food_app/View/DetailProductScreen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
