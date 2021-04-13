@@ -9,7 +9,8 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="flutter_store_app"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/shops">
+<!--        android:icon="@mipmap/ic_launcher">-->
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
