@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/View/StoreScreen.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
@@ -390,7 +391,10 @@ class _StoreProductState extends State<StoreProduct> {
                   child: Text(storeProduct.name),
                 ),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) => StoreScreen()));
+                  },
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),

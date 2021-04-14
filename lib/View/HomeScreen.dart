@@ -139,13 +139,19 @@ class _HomeScreen extends State<HomeScreen> {
                         hintText: "Search . . . ",
                         hintStyle: TextStyle(color: Colors.white),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: BorderSide.none,
+                        ),
+                        disabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
                         ),
                       ),
                       onSubmitted: (text) {
                         searchMethod(text.toLowerCase());
                       },
-                      autofocus: true,
+                      autofocus: false,
                     ),
               centerTitle: false,
               actions: [
