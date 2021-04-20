@@ -190,7 +190,7 @@ class _HomeScreen extends State<HomeScreen> {
                         converter: (store) => store.state.myCartState.cartList,
                         builder: (BuildContext context, List<CartModel> cartList) => Badge(
                           badgeColor: Colors.blue,
-                          position: BadgePosition.bottomEnd(bottom: 10),
+                          position: BadgePosition.bottomStart(bottom: 10, start: 15),
                           badgeContent: Text(cartList.length.toString(),
                               style: TextStyle(color: Colors.white)),
                           child: Icon(

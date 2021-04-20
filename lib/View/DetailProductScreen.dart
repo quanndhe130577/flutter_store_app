@@ -104,11 +104,14 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
     return StoreProvider(
       store: this.store,
       child: Scaffold(
-        backgroundColor: Color(0xffffffff),
+        extendBodyBehindAppBar: true,
+        //backgroundColor: Color(0xffffffff),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: AppBar(
-            backgroundColor: Color(0xffff2fc3),
+            // backgroundColor: Color(0xffff2fc3),
+            backgroundColor: Colors.black54.withOpacity(0.3),
+            elevation: 0.0,
             title: Text(isLoading ? "Loading . . ." : data.name),
             centerTitle: true,
             actions: [
@@ -233,6 +236,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
               )
             : Container(
                 child: ListView(
+                  padding: EdgeInsets.only(top: 0),
                   children: [
                     Container(
                       child: Column(

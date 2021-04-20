@@ -1,3 +1,4 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/Common.dart';
@@ -11,11 +12,14 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffffffff),
+      extendBodyBehindAppBar: true,
+      //backgroundColor: Color(0xffffffff),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(heightOfAppBar),
         child: AppBar(
-          backgroundColor: Color(0xffff2fc3),
+          backgroundColor: Colors.black54.withOpacity(0.3),
+          elevation: 0,
+          //backgroundColor: Colors.black54.withOpacity(0.3),
           title: TextField(
             decoration: InputDecoration(
               icon: Icon(Icons.search, color: Colors.white),
@@ -38,9 +42,25 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
           centerTitle: false,
           actions: [
+            /*TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.filter_alt_outlined, color: Colors.white, size: 30),
+              label: Text("Filter", style: TextStyle(color: Colors.white, fontSize: 15)),
+            ),*/
             IconButton(
-              icon: Icon(Icons.filter_alt_outlined),
+              icon: Icon(Icons.filter_alt_outlined, size: 30),
               tooltip: "Filter",
+              color: Colors.white,
+              onPressed: () {
+                if (this.mounted) {
+                  setState(() {
+                    //searchState = !searchState;
+                  });
+                }
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.more_vert),
               color: Colors.white,
               onPressed: () {
                 if (this.mounted) {
@@ -56,6 +76,7 @@ class _StoreScreenState extends State<StoreScreen> {
       body: Column(
         children: [
           Container(
+            padding: EdgeInsets.only(top: heightOfAppBar + MediaQuery.of(context).padding.top),
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage("https://i.imgur.com/NCGELsD.jpg"),
@@ -102,8 +123,10 @@ class _StoreScreenState extends State<StoreScreen> {
                             icon: Icon(Icons.add),
                             label: Text("Follow", style: TextStyle(fontSize: 12)),
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0))),
+                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                                side: BorderSide(width: 2.0, color: Colors.white),
+                              )),
                               minimumSize: MaterialStateProperty.all(Size(100, 35)),
                               backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
                             ),
@@ -113,9 +136,12 @@ class _StoreScreenState extends State<StoreScreen> {
                             icon: Icon(Icons.message),
                             label: Text("Chat", style: TextStyle(fontSize: 12)),
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0))),
+                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                                side: BorderSide(width: 2.0, color: Colors.white),
+                              )),
                               minimumSize: MaterialStateProperty.all(Size(100, 35)),
+                              backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
                             ),
                           ),
                           // OutlinedButton(
@@ -127,8 +153,8 @@ class _StoreScreenState extends State<StoreScreen> {
                           //   ),
                           //   child: TextButton.icon(
                           //     onPressed: () {},
-                          //     icon: Icon(Icons.add),
-                          //     label: Text("Follow", style: TextStyle(fontSize: 12)),
+                          //     icon: Icon(Icons.add, color: Colors.white),
+                          //     label: Text("Follow", style: TextStyle(fontSize: 12, color: Colors.white)),
                           //   ),
                           // ),
                           // SizedBox(height: 5),
@@ -158,10 +184,10 @@ class _StoreScreenState extends State<StoreScreen> {
                             alignment: Alignment.center,
                             child: Column(
                               children: [
-                                Text("50",
+                                Text("${4.7}/5.0",
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
                                 SizedBox(height: 5),
-                                Text("Products", style: TextStyle(fontSize: 15, color: Colors.white)),
+                                Text("Evaluate", style: TextStyle(fontSize: 15, color: Colors.white)),
                               ],
                             ),
                           ),
@@ -172,10 +198,10 @@ class _StoreScreenState extends State<StoreScreen> {
                             alignment: Alignment.center,
                             child: Column(
                               children: [
-                                Text("4.7",
+                                Text("${10.1}k",
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
                                 SizedBox(height: 5),
-                                Text("Evaluate", style: TextStyle(fontSize: 15, color: Colors.white)),
+                                Text("Followers", style: TextStyle(fontSize: 15, color: Colors.white)),
                               ],
                             ),
                           ),
