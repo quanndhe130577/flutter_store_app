@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/CommonWidget/InheritedDataProvider.dart';
+import 'package:flutter_food_app/CommonWidget/LeadingAppbar.dart';
+import 'package:flutter_food_app/CommonWidget/StoreActionAppbar.dart';
 import 'package:flutter_food_app/View/StoreScreen.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
@@ -33,14 +36,67 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
   _DetailProductScreenState(this.uploadId, this.store);
 
   DetailProductModel data = new DetailProductModel();
-  User currentUser;
   bool isLoading = false;
+  bool isHeadOfContext = true;
+  double opacityAppbar = 0;
+
+  ScrollController _controller;
+
+  void handleController() async {
+    if (_controller.offset >= _controller.position.maxScrollExtent && !_controller.position.outOfRange) {}
+
+    if (_controller.offset <= _controller.position.minScrollExtent && !_controller.position.outOfRange) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 0;
+          this.isHeadOfContext = true;
+        });
+      }
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 20) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 0.2;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 40) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 0.4;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 60) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 0.6;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 80) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 0.8;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 1;
+          this.isHeadOfContext = false;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
+    _controller = ScrollController();
+    _controller.addListener(handleController);
+
     super.initState();
-    this.currentUser = auth.currentUser;
 
     loadData(uploadId);
     if (this.mounted) {
@@ -59,8 +115,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
       });
     }
 
-    DatabaseReference reference =
-        FirebaseDatabase.instance.reference().child("Data").child(uploadId);
+    DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data").child(uploadId);
     await reference.once().then((DataSnapshot dataSnapShot) async {
       var values = dataSnapShot.value;
 
@@ -76,8 +131,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
         price: double.parse(values["price"].toString()),
       );
 
-      DatabaseReference refStore =
-          FirebaseDatabase.instance.reference().child("Store").child(values["store"]);
+      DatabaseReference refStore = FirebaseDatabase.instance.reference().child("Store").child(values["store"]);
       await refStore.once().then((DataSnapshot dataSnapShot) async {
         var storeValues = dataSnapShot.value;
 
@@ -105,38 +159,26 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
       store: this.store,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        //backgroundColor: Color(0xffffffff),
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: AppBar(
-            // backgroundColor: Color(0xffff2fc3),
-            backgroundColor: Colors.black54.withOpacity(0.3),
+            leading: InheritedDataProvider(
+              child: LeadingAppbar(iconData: Icons.arrow_back),
+              data: (1 - opacityAppbar) * 0.2,
+            ),
+
+            //LeadingAppbar(iconData: Icons.arrow_back, opacity: 1 - this.opacityAppbar),
+            backgroundColor: isHeadOfContext ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
             elevation: 0.0,
-            title: Text(isLoading ? "Loading . . ." : data.name),
+            title: isHeadOfContext
+                ? Text("")
+                : Text(isLoading ? "Loading . . ." : data.name, style: TextStyle(color: Colors.black)),
             centerTitle: true,
             actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-                },
-                child: Padding(
-                  padding: EdgeInsets.only(right: 5),
-                  child: StoreConnector<AppState, List<CartModel>>(
-                    converter: (store) => store.state.myCartState.cartList,
-                    builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                      badgeColor: Colors.blue,
-                      position: BadgePosition.bottomEnd(bottom: 10),
-                      badgeContent:
-                          Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                      child: Icon(
-                        Icons.shopping_cart,
-                        color: Colors.black,
-                        semanticLabel: "MyCart",
-                      ),
-                    ),
-                  ),
-                ),
+              InheritedDataProvider(
+                child: StoreActionAppbar(store: this.store),
+                data: (1 - opacityAppbar) * 0.2,
               ),
             ],
           ),
@@ -236,7 +278,8 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
               )
             : Container(
                 child: ListView(
-                  padding: EdgeInsets.only(top: 0),
+                  controller: _controller,
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top), // add to fix error padding appbar
                   children: [
                     Container(
                       child: Column(
@@ -267,8 +310,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
                             width: double.infinity,
                             child: Text(
                               '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
-                              style: TextStyle(
-                                  color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.left,
                             ),
                           ),
@@ -396,12 +438,10 @@ class _StoreProductState extends State<StoreProduct> {
                 ),
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) => StoreScreen()));
+                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => StoreScreen()));
                   },
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                   ),
                   child: Text("View Store"),
                 ),
@@ -417,8 +457,7 @@ class _StoreProductState extends State<StoreProduct> {
                       child: Column(
                         children: [
                           Text(storeProduct.numberOfProduct.toString(),
-                              style: TextStyle(
-                                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
+                              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
                           SizedBox(height: 5),
                           Text("Products", style: TextStyle(fontSize: 15)),
                         ],
@@ -432,8 +471,7 @@ class _StoreProductState extends State<StoreProduct> {
                       child: Column(
                         children: [
                           Text(storeProduct.evaluate.toString(),
-                              style: TextStyle(
-                                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
+                              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
                           SizedBox(height: 5),
                           Text("Evaluate", style: TextStyle(fontSize: 15)),
                         ],
@@ -447,8 +485,7 @@ class _StoreProductState extends State<StoreProduct> {
                       child: Column(
                         children: [
                           Text("${storeProduct.chatResponseRate} %",
-                              style: TextStyle(
-                                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
+                              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
                           SizedBox(height: 5),
                           Text("Chat Response", style: TextStyle(fontSize: 15)),
                         ],
