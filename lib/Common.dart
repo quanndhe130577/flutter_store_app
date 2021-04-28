@@ -7,6 +7,7 @@ String shortenString(String word, int length) {
 
 final double heightOfAppBar = 50.0;
 final numberOfFirstLoad = 5;
+//final padding
 
 void showSimpleLoadingModalDialog(context) {
   showDialog(

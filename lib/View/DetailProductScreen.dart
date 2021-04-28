@@ -8,16 +8,13 @@ import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'package:flutter_food_app/Model/DetailProductEntity.dart';
-import 'package:flutter_food_app/Model/MyCartEntity.dart';
 import 'package:flutter_food_app/Model/MyFavoriteEntity.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter_food_app/View//MyCartScreen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:badges/badges.dart';
 
 class DetailProductScreen extends StatefulWidget {
   final Store<AppState> store;
