@@ -14,9 +14,7 @@ HomeState homeReducers(HomeState state, dynamic action) {
       isLoading: false,
     );
   } else if (action.runtimeType.toString() == (StartLoadMoreHomeState).toString()) {
-    return state.newState(
-      //isLoadingMore: true,
-    );
+    return state.newState();
   } else if (action.runtimeType.toString() == (LoadMoreDataHomeState).toString()) {
     List<HomeModel> searchList = []..addAll(state.searchList)..addAll(action.moreData);
     List<HomeModel> dataList = []..addAll(state.dataList);

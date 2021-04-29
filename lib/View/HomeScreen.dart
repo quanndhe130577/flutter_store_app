@@ -23,6 +23,8 @@ import 'package:toast/toast.dart';
 import 'package:badges/badges.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomeScreen extends StatefulWidget {
   final String currentEmail;
@@ -48,6 +50,12 @@ class _HomeScreen extends State<HomeScreen> {
   bool isInLoadingSearch = false;
   bool isHeadOfContext = true;
   double opacityAppbar = 0;
+  List<String> listImage = [
+    "https://i.imgur.com/NCGELsD.jpg",
+    "https://i.imgur.com/68yHTO9.jpg",
+    "https://i.imgur.com/gWjAMXQ.jpg",
+    "https://i.imgur.com/yfqRp7o.jpg"
+  ];
 
   //
 
@@ -85,48 +93,51 @@ class _HomeScreen extends State<HomeScreen> {
           this.isInLoadingMore = true;
         });
       }
-      await Future.delayed(Duration(seconds: 1));
+      //await Future.delayed(Duration(seconds: 1));
       store.dispatch(LoadMoreDataHomeAction());
     }
 
-    if (_controller.offset <= _controller.position.minScrollExtent && !_controller.position.outOfRange) {
+    /*if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange &&
+        !store.state.homeState.isLoading) {
       store.dispatch(RefreshDataHomeAction());
-    } else if (_controller.offset <= _controller.position.minScrollExtent) {
+    } else */
+    if (_controller.offset <= _controller.position.minScrollExtent + 30) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0;
           this.isHeadOfContext = true;
         });
       }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 20) {
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 50) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0.2;
           this.isHeadOfContext = false;
         });
       }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 40) {
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 70) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0.4;
           this.isHeadOfContext = false;
         });
       }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 60) {
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 90) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0.6;
           this.isHeadOfContext = false;
         });
       }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 80) {
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 110) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0.8;
           this.isHeadOfContext = false;
         });
       }
-    } else {
+    } else if (opacityAppbar != 1) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 1;
@@ -359,18 +370,30 @@ class _HomeScreen extends State<HomeScreen> {
                         )
                       : ListView.builder(
                           padding: EdgeInsets.only(top: paddingTopMedia),
-                          physics: BouncingScrollPhysics(),
+                          //physics: BouncingScrollPhysics(),
                           controller: _controller,
                           itemCount: searchList.length + 1,
                           scrollDirection: Axis.vertical,
                           itemExtent: _getHeightForCart(this.context, dividedBy: numberOfCartInScreen),
                           itemBuilder: (buildContext, index) {
+                            final double height = MediaQuery.of(context).size.height;
                             if (index == 0) {
-                              return Image.network(
-                                "https://i.imgur.com/NCGELsD.jpg",
-                                fit: BoxFit.cover,
-                                // width: 500,
-                                // height: 400,
+                              return CarouselSlider(
+                                options: CarouselOptions(
+                                  aspectRatio: 2,
+                                  //enlargeCenterPage: true,
+                                  scrollDirection: Axis.vertical,
+                                  autoPlay: true,
+                                  height: height,
+                                  viewportFraction: 1,
+                                ),
+                                items: listImage
+                                    .map((item) => Image.network(
+                                          item,
+                                          fit: BoxFit.cover,
+                                          height: height,
+                                        ))
+                                    .toList(),
                               );
                             } else if (index == searchList.length) {
                               if (searchList.length > 4) {

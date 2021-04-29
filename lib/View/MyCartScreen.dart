@@ -222,7 +222,9 @@ class _MyCartState extends State<MyCart> {
                           return slideUI(dataList[index]);
                         },
                         separatorBuilder: (context, index) {
-                          return Divider();
+                          return Divider(
+                            thickness: 5,
+                          );
                         },
                       ),
               ),
