@@ -74,6 +74,7 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   ScrollController _controller;
+  TextEditingController _textFiledController;
 
   void handleControllerHome() async {
     // if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -102,7 +103,14 @@ class _HomeScreen extends State<HomeScreen> {
         !store.state.homeState.isLoading) {
       store.dispatch(RefreshDataHomeAction());
     } else */
-    if (_controller.offset <= _controller.position.minScrollExtent + 30) {
+    if (searchState) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 1;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else if (_controller.offset <= _controller.position.minScrollExtent + 30) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0;
@@ -157,6 +165,8 @@ class _HomeScreen extends State<HomeScreen> {
 
     _controller = ScrollController();
     _controller.addListener(handleControllerHome);
+
+    _textFiledController = TextEditingController();
     super.initState();
   }
 
@@ -170,6 +180,8 @@ class _HomeScreen extends State<HomeScreen> {
     return newHeight / dividedBy;
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     double paddingTopMedia = MediaQuery.of(context).padding.top;
@@ -178,80 +190,77 @@ class _HomeScreen extends State<HomeScreen> {
       child: StoreBuilder<AppState>(
         onInit: (store) => store.dispatch(InitAppAction(store.state.uid)),
         builder: (BuildContext context, Store<AppState> store) => Scaffold(
+          key: _scaffoldKey,
           extendBodyBehindAppBar: true,
           backgroundColor: Color(0xffffffff),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(heightOfAppBar),
             child: AppBar(
-              backgroundColor: isHeadOfContext ? Colors.transparent : Color(0xffff2fc3).withOpacity(opacityAppbar),
-              elevation: 0.0,
-              title: !searchState
-                  ? isHeadOfContext
-                      ? Text("")
-                      : Text("Dashboard")
-                  : TextField(
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.search, color: Colors.white),
-                        hintText: "Search . . . ",
-                        hintStyle: TextStyle(color: Colors.white),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        disabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onSubmitted: (text) {
-                        searchMethod(text.toLowerCase());
-                      },
-                      autofocus: false,
-                    ),
+              leading: IconButton(
+                icon: Icon(Icons.dehaze_rounded, color: isHeadOfContext && !searchState ? Colors.white : Colors.blue),
+                onPressed: () => _scaffoldKey.currentState.openDrawer(),
+              ),
+              backgroundColor:
+                  isHeadOfContext && !searchState ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
+              //backgroundColor: isHeadOfContext ? Colors.transparent : Color(0xffff2fc3).withOpacity(opacityAppbar),
+              elevation: opacityAppbar * 10,
+              title: TextField(
+                controller: _textFiledController,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.search, color: isHeadOfContext && !searchState ? Colors.white : Colors.red),
+                  hintText: "Search . . . ",
+                  hintStyle: TextStyle(color: isHeadOfContext && !searchState ? Colors.white : Colors.black54),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  disabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onSubmitted: (text) {
+                  searchMethod(text.toLowerCase());
+                  setState(() {
+                    searchState = true;
+                  });
+                },
+                autofocus: false,
+              ),
               centerTitle: false,
               actions: [
-                searchState
-                    ? IconButton(
-                        icon: Icon(Icons.cancel),
-                        color: Colors.white,
-                        onPressed: () {
-                          store.dispatch(RemoveSearchHomeState());
-                          setState(() {
-                            searchState = !searchState;
-                          });
-                        },
-                      )
-                    : IconButton(
-                        icon: Icon(Icons.search),
-                        color: Colors.white,
-                        onPressed: () {
-                          if (this.mounted) {
-                            setState(() {
-                              searchState = !searchState;
-                            });
-                          }
-                        },
-                      ),
                 Visibility(
-                  visible: !searchState,
-                  child: TextButton(
+                  visible: searchState,
+                  child: IconButton(
+                    icon: Icon(Icons.cancel),
+                    color: isHeadOfContext && !searchState ? Colors.white : Colors.red,
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
+                      _textFiledController.value =
+                          new TextEditingController.fromValue(new TextEditingValue(text: "")).value;
+                      store.dispatch(RemoveSearchHomeState());
+                      setState(() {
+                        searchState = !searchState;
+                      });
                     },
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 5),
-                      child: StoreConnector<AppState, List<CartModel>>(
-                        converter: (store) => store.state.myCartState.cartList,
-                        builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                          badgeColor: Colors.blue,
-                          position: BadgePosition.bottomStart(bottom: 10, start: 15),
-                          badgeContent: Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                          child: Icon(
-                            Icons.shopping_cart,
-                            color: isHeadOfContext ? Colors.white : Colors.black,
-                            semanticLabel: "MyCart",
-                          ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 5),
+                    child: StoreConnector<AppState, List<CartModel>>(
+                      converter: (store) => store.state.myCartState.cartList,
+                      builder: (BuildContext context, List<CartModel> cartList) => Badge(
+                        badgeColor: Colors.red,
+                        position: BadgePosition.bottomStart(bottom: 10, start: 15),
+                        badgeContent: Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
+                        child: Icon(
+                          Icons.shopping_cart,
+                          color: isHeadOfContext && !searchState ? Colors.white : Colors.blue,
+                          semanticLabel: "MyCart",
                         ),
                       ),
                     ),
@@ -377,7 +386,7 @@ class _HomeScreen extends State<HomeScreen> {
                           itemExtent: _getHeightForCart(this.context, dividedBy: numberOfCartInScreen),
                           itemBuilder: (buildContext, index) {
                             final double height = MediaQuery.of(context).size.height;
-                            if (index == 0) {
+                            if (index == 0 && !searchState) {
                               return CarouselSlider(
                                 options: CarouselOptions(
                                   aspectRatio: 2,
