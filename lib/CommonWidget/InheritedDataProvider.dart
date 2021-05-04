@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 
-class InheritedDataProvider extends InheritedWidget {
-  final double data;
+class InheritedAppBarProvider extends InheritedWidget {
+  final double opacity;
+  final Widget title;
 
-  InheritedDataProvider({
+  InheritedAppBarProvider({
     Widget child,
-    this.data,
+    this.opacity,
+    this.title,
   }) : super(child: child);
 
   @override
-  bool updateShouldNotify(InheritedDataProvider oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(InheritedAppBarProvider oldWidget) => opacity != oldWidget.opacity;
 
-  static InheritedDataProvider of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<InheritedDataProvider>();
+  static InheritedAppBarProvider of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<InheritedAppBarProvider>();
 }

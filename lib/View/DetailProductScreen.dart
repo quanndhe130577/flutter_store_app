@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
 import 'package:flutter_food_app/CommonWidget/InheritedDataProvider.dart';
-import 'package:flutter_food_app/CommonWidget/LeadingAppbar.dart';
-import 'package:flutter_food_app/CommonWidget/StoreActionAppbar.dart';
 import 'package:flutter_food_app/View/StoreScreen.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
@@ -49,31 +48,10 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
           this.isHeadOfContext = true;
         });
       }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 20) {
-      if (this.mounted) {
-        setState(() {
-          opacityAppbar = 0.2;
-          this.isHeadOfContext = false;
-        });
-      }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 40) {
-      if (this.mounted) {
-        setState(() {
-          opacityAppbar = 0.4;
-          this.isHeadOfContext = false;
-        });
-      }
-    } else if (_controller.offset <= _controller.position.minScrollExtent + 60) {
-      if (this.mounted) {
-        setState(() {
-          opacityAppbar = 0.6;
-          this.isHeadOfContext = false;
-        });
-      }
     } else if (_controller.offset <= _controller.position.minScrollExtent + 80) {
       if (this.mounted) {
         setState(() {
-          opacityAppbar = 0.8;
+          opacityAppbar = _controller.offset / 100;
           this.isHeadOfContext = false;
         });
       }
@@ -159,25 +137,12 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
-          child: AppBar(
-            leading: InheritedDataProvider(
-              child: LeadingAppbar(iconData: Icons.arrow_back),
-              data: (1 - opacityAppbar) * 0.2,
-            ),
-
-            //LeadingAppbar(iconData: Icons.arrow_back, opacity: 1 - this.opacityAppbar),
-            backgroundColor: isHeadOfContext ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
-            elevation: 0.0,
+          child: InheritedAppBarProvider(
+            child: CustomAppBar(store: this.store),
+            opacity: (1 - opacityAppbar) * 0.2,
             title: isHeadOfContext
                 ? Text("")
                 : Text(isLoading ? "Loading . . ." : data.name, style: TextStyle(color: Colors.black)),
-            centerTitle: true,
-            actions: [
-              InheritedDataProvider(
-                child: StoreActionAppbar(store: this.store),
-                data: (1 - opacityAppbar) * 0.2,
-              ),
-            ],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
