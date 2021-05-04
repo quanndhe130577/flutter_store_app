@@ -12,32 +12,31 @@ import 'InheritedAppbarProvider.dart';
 
 class CustomAppBar extends StatefulWidget {
   final Store<AppState> store;
-  final Widget title;
-  IconData iconDataLeading;
-  Function handleLeading;
+  final IconData iconDataLeading;
+  final Function handleLeading;
 
-  CustomAppBar({@required this.store, this.title, this.iconDataLeading, this.handleLeading});
+  CustomAppBar({@required this.store, this.iconDataLeading, this.handleLeading});
 
   @override
-  _CustomAppBarState createState() =>
-      _CustomAppBarState(this.store, this.title, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState createState() => _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
   double opacityAppbar = 0;
   Store<AppState> store;
-  Widget title = Text("");
   IconData iconDataLeading;
   Function handleLeading;
 
-  _CustomAppBarState(this.store, this.title, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
 
   @override
   void initState() {
     // TODO: implement initState
-    handleLeading = () => Navigator.of(context).pop();
-    iconDataLeading = Icons.arrow_back;
     super.initState();
+  }
+
+  void _defaultHandleLeading() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -47,8 +46,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
       leading: Padding(
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 7, top: 7),
         child: TextButton(
-          onPressed: handleLeading,
-          child: Icon(this.iconDataLeading, color: this.opacityAppbar <= 0.1 ? Colors.red : Colors.white, size: 20),
+          onPressed: this.handleLeading != null ? this.handleLeading : this._defaultHandleLeading,
+          child: Icon(this.iconDataLeading != null ? this.iconDataLeading : Icons.arrow_back,
+              color: this.opacityAppbar <= 0.1 ? Colors.red : Colors.white, size: 20),
           style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0))),
             backgroundColor: MaterialStateProperty.all<Color>(Colors.black26.withOpacity(this.opacityAppbar)),
@@ -58,7 +58,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       backgroundColor:
           this.opacityAppbar == 0 ? Colors.white.withOpacity(1 - this.opacityAppbar / 0.2) : Colors.transparent,
       elevation: 0.0,
-      title: InheritedAppBarProvider.of(context).title,
+      title: InheritedAppBarProvider.of(context).title != null ? InheritedAppBarProvider.of(context).title : Text(""),
       centerTitle: true,
       actions: [
         Padding(

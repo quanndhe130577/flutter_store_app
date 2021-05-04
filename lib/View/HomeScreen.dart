@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
+import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
 import 'package:flutter_food_app/redux/AppActions.dart';
 import 'package:flutter_food_app/redux/AppReducers.dart';
@@ -195,79 +197,87 @@ class _HomeScreen extends State<HomeScreen> {
           backgroundColor: Color(0xffffffff),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(heightOfAppBar),
-            child: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.dehaze_rounded, color: isHeadOfContext && !searchState ? Colors.white : Colors.blue),
-                onPressed: () => _scaffoldKey.currentState.openDrawer(),
+            child: InheritedAppBarProvider(
+              child: CustomAppBar(
+                store: this.store,
+                handleLeading: () => _scaffoldKey.currentState.openDrawer(),
+                iconDataLeading: Icons.dehaze_rounded,
               ),
-              backgroundColor:
-                  isHeadOfContext && !searchState ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
-              //backgroundColor: isHeadOfContext ? Colors.transparent : Color(0xffff2fc3).withOpacity(opacityAppbar),
-              elevation: opacityAppbar * 10,
-              title: TextField(
-                controller: _textFiledController,
-                decoration: InputDecoration(
-                  icon: Icon(Icons.search, color: isHeadOfContext && !searchState ? Colors.white : Colors.red),
-                  hintText: "Search . . . ",
-                  hintStyle: TextStyle(color: isHeadOfContext && !searchState ? Colors.white : Colors.black54),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  disabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onSubmitted: (text) {
-                  searchMethod(text.toLowerCase());
-                  setState(() {
-                    searchState = true;
-                  });
-                },
-                autofocus: false,
-              ),
-              centerTitle: false,
-              actions: [
-                Visibility(
-                  visible: searchState,
-                  child: IconButton(
-                    icon: Icon(Icons.cancel),
-                    color: isHeadOfContext && !searchState ? Colors.white : Colors.red,
-                    onPressed: () {
-                      _textFiledController.value =
-                          new TextEditingController.fromValue(new TextEditingValue(text: "")).value;
-                      store.dispatch(RemoveSearchHomeState());
-                      setState(() {
-                        searchState = !searchState;
-                      });
-                    },
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 5),
-                    child: StoreConnector<AppState, List<CartModel>>(
-                      converter: (store) => store.state.myCartState.cartList,
-                      builder: (BuildContext context, List<CartModel> cartList) => Badge(
-                        badgeColor: Colors.red,
-                        position: BadgePosition.bottomStart(bottom: 10, start: 15),
-                        badgeContent: Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-                        child: Icon(
-                          Icons.shopping_cart,
-                          color: isHeadOfContext && !searchState ? Colors.white : Colors.blue,
-                          semanticLabel: "MyCart",
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              opacity: (1 - opacityAppbar) * 0.2,
             ),
+            // AppBar(
+            //   leading: IconButton(
+            //     icon: Icon(Icons.dehaze_rounded, color: isHeadOfContext && !searchState ? Colors.white : Colors.blue),
+            //     onPressed: () => _scaffoldKey.currentState.openDrawer(),
+            //   ),
+            //   backgroundColor:
+            //       isHeadOfContext && !searchState ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
+            //   //backgroundColor: isHeadOfContext ? Colors.transparent : Color(0xffff2fc3).withOpacity(opacityAppbar),
+            //   elevation: opacityAppbar * 10,
+            //   title: TextField(
+            //     controller: _textFiledController,
+            //     decoration: InputDecoration(
+            //       icon: Icon(Icons.search, color: isHeadOfContext && !searchState ? Colors.white : Colors.red),
+            //       hintText: "Search . . . ",
+            //       hintStyle: TextStyle(color: isHeadOfContext && !searchState ? Colors.white : Colors.black54),
+            //       focusedBorder: UnderlineInputBorder(
+            //         borderSide: BorderSide.none,
+            //       ),
+            //       disabledBorder: UnderlineInputBorder(
+            //         borderSide: BorderSide.none,
+            //       ),
+            //       enabledBorder: UnderlineInputBorder(
+            //         borderSide: BorderSide.none,
+            //       ),
+            //     ),
+            //     onSubmitted: (text) {
+            //       searchMethod(text.toLowerCase());
+            //       setState(() {
+            //         searchState = true;
+            //       });
+            //     },
+            //     autofocus: false,
+            //   ),
+            //   centerTitle: false,
+            //   actions: [
+            //     Visibility(
+            //       visible: searchState,
+            //       child: IconButton(
+            //         icon: Icon(Icons.cancel),
+            //         color: isHeadOfContext && !searchState ? Colors.white : Colors.red,
+            //         onPressed: () {
+            //           _textFiledController.value =
+            //               new TextEditingController.fromValue(new TextEditingValue(text: "")).value;
+            //           store.dispatch(RemoveSearchHomeState());
+            //           setState(() {
+            //             searchState = !searchState;
+            //           });
+            //         },
+            //       ),
+            //     ),
+            //     TextButton(
+            //       onPressed: () {
+            //         Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
+            //       },
+            //       child: Padding(
+            //         padding: EdgeInsets.only(right: 5),
+            //         child: StoreConnector<AppState, List<CartModel>>(
+            //           converter: (store) => store.state.myCartState.cartList,
+            //           builder: (BuildContext context, List<CartModel> cartList) => Badge(
+            //             badgeColor: Colors.red,
+            //             position: BadgePosition.bottomStart(bottom: 10, start: 15),
+            //             badgeContent: Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
+            //             child: Icon(
+            //               Icons.shopping_cart,
+            //               color: isHeadOfContext && !searchState ? Colors.white : Colors.blue,
+            //               semanticLabel: "MyCart",
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ),
           drawer: Drawer(
             child: Column(

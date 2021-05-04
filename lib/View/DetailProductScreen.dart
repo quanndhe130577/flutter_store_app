@@ -33,7 +33,6 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
 
   DetailProductModel data = new DetailProductModel();
   bool isLoading = false;
-  bool isHeadOfContext = true;
   double opacityAppbar = 0;
 
   ScrollController _controller;
@@ -45,21 +44,18 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 0;
-          this.isHeadOfContext = true;
         });
       }
     } else if (_controller.offset <= _controller.position.minScrollExtent + 80) {
       if (this.mounted) {
         setState(() {
           opacityAppbar = _controller.offset / 100;
-          this.isHeadOfContext = false;
         });
       }
     } else {
       if (this.mounted) {
         setState(() {
           opacityAppbar = 1;
-          this.isHeadOfContext = false;
         });
       }
     }
@@ -140,7 +136,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
           child: InheritedAppBarProvider(
             child: CustomAppBar(store: this.store),
             opacity: (1 - opacityAppbar) * 0.2,
-            title: isHeadOfContext
+            title: opacityAppbar == 0
                 ? Text("")
                 : Text(isLoading ? "Loading . . ." : data.name, style: TextStyle(color: Colors.black)),
           ),
