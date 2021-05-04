@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
-import 'package:flutter_food_app/CommonWidget/InheritedDataProvider.dart';
+import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
 import 'package:flutter_food_app/View/StoreScreen.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';

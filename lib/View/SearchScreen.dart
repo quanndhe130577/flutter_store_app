@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
-import 'package:flutter_food_app/CommonWidget/InheritedDataProvider.dart';
+import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/Home/HomeActions.dart';
 import 'package:redux/redux.dart';

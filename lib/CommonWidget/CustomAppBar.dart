@@ -8,7 +8,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:badges/badges.dart';
 
-import 'InheritedDataProvider.dart';
+import 'InheritedAppbarProvider.dart';
 
 class CustomAppBar extends StatefulWidget {
   final Store<AppState> store;
