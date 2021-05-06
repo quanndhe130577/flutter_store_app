@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
@@ -29,8 +28,6 @@ class _MyCartState extends State<MyCart> {
   Store<AppState> store;
 
   _MyCartState(this.store);
-
-  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -175,9 +172,8 @@ class _MyCartState extends State<MyCart> {
                     },
                     child: Align(
                       alignment: Alignment.center,
-                      child: Text("Buy",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30)),
+                      child:
+                          Text("Buy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30)),
                     ),
                   ),
                 ),
@@ -348,8 +344,7 @@ class _MyCartState extends State<MyCart> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              DetailProductScreen(item.uploadId, this.store)));
+                          builder: (BuildContext context) => DetailProductScreen(item.uploadId, this.store)));
                 },
                 child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
               ),
@@ -373,8 +368,7 @@ class _MyCartState extends State<MyCart> {
                       children: [
                         Text(
                           '${new String.fromCharCodes(new Runes('\u0024'))} ${item.price} ',
-                          style: TextStyle(
-                              color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         Expanded(child: Container()),

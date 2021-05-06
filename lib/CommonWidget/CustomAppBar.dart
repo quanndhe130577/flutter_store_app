@@ -18,10 +18,7 @@ class CustomAppBar extends StatefulWidget {
   CustomAppBar({@required this.store, this.iconDataLeading, this.handleLeading});
 
   @override
-  _CustomAppBarState createState() => _CustomAppBarState(
-      //this.store,
-      this.iconDataLeading,
-      this.handleLeading);
+  _CustomAppBarState createState() => _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -30,10 +27,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   IconData iconDataLeading;
   Function handleLeading;
 
-  _CustomAppBarState(
-      //this.store,
-      this.iconDataLeading,
-      this.handleLeading);
+  _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
 
   @override
   void initState() {

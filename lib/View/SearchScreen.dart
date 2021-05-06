@@ -9,6 +9,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:flutter_food_app/Common.dart';
 
+import 'MyCartScreen.dart';
+
 class SearchScreen extends StatefulWidget {
   final Store<AppState> store;
 

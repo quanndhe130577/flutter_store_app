@@ -203,7 +203,6 @@ class _HomeScreen extends State<HomeScreen> {
                     color: this.opacityAppbar <= 0.5 ? Colors.white : Colors.black12.withOpacity(0.1),
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
-                  //color: this.opacityAppbar <= 0.5 ? Colors.white : Colors.black12.withOpacity(0.2),
                   child: Row(
                     children: [
                       Icon(Icons.search, color: Colors.black.withOpacity(0.5)),
@@ -225,79 +224,6 @@ class _HomeScreen extends State<HomeScreen> {
                 iconDataLeading: Icons.dehaze_rounded,
               ),
             ),
-            // AppBar(
-            //   leading: IconButton(
-            //     icon: Icon(Icons.dehaze_rounded, color: isHeadOfContext && !searchState ? Colors.white : Colors.blue),
-            //     onPressed: () => _scaffoldKey.currentState.openDrawer(),
-            //   ),
-            //   backgroundColor:
-            //       isHeadOfContext && !searchState ? Colors.transparent : Colors.white.withOpacity(opacityAppbar),
-            //   //backgroundColor: isHeadOfContext ? Colors.transparent : Color(0xffff2fc3).withOpacity(opacityAppbar),
-            //   elevation: opacityAppbar * 10,
-            //   title: TextField(
-            //     controller: _textFiledController,
-            //     decoration: InputDecoration(
-            //       icon: Icon(Icons.search, color: isHeadOfContext && !searchState ? Colors.white : Colors.red),
-            //       hintText: "Search . . . ",
-            //       hintStyle: TextStyle(color: isHeadOfContext && !searchState ? Colors.white : Colors.black54),
-            //       focusedBorder: UnderlineInputBorder(
-            //         borderSide: BorderSide.none,
-            //       ),
-            //       disabledBorder: UnderlineInputBorder(
-            //         borderSide: BorderSide.none,
-            //       ),
-            //       enabledBorder: UnderlineInputBorder(
-            //         borderSide: BorderSide.none,
-            //       ),
-            //     ),
-            //     onSubmitted: (text) {
-            //       searchMethod(text.toLowerCase());
-            //       setState(() {
-            //         searchState = true;
-            //       });
-            //     },
-            //     autofocus: false,
-            //   ),
-            //   centerTitle: false,
-            //   actions: [
-            //     Visibility(
-            //       visible: searchState,
-            //       child: IconButton(
-            //         icon: Icon(Icons.cancel),
-            //         color: isHeadOfContext && !searchState ? Colors.white : Colors.red,
-            //         onPressed: () {
-            //           _textFiledController.value =
-            //               new TextEditingController.fromValue(new TextEditingValue(text: "")).value;
-            //           store.dispatch(RemoveSearchHomeState());
-            //           setState(() {
-            //             searchState = !searchState;
-            //           });
-            //         },
-            //       ),
-            //     ),
-            //     TextButton(
-            //       onPressed: () {
-            //         Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store)));
-            //       },
-            //       child: Padding(
-            //         padding: EdgeInsets.only(right: 5),
-            //         child: StoreConnector<AppState, List<CartModel>>(
-            //           converter: (store) => store.state.myCartState.cartList,
-            //           builder: (BuildContext context, List<CartModel> cartList) => Badge(
-            //             badgeColor: Colors.red,
-            //             position: BadgePosition.bottomStart(bottom: 10, start: 15),
-            //             badgeContent: Text(cartList.length.toString(), style: TextStyle(color: Colors.white)),
-            //             child: Icon(
-            //               Icons.shopping_cart,
-            //               color: isHeadOfContext && !searchState ? Colors.white : Colors.blue,
-            //               semanticLabel: "MyCart",
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ),
           drawer: Drawer(
             child: Column(
@@ -322,7 +248,6 @@ class _HomeScreen extends State<HomeScreen> {
                   onTap: () async {
                     await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UploadData()))
                         .then((value) => {});
-                    //loadFirstData();
                   },
                 ),
                 ListTile(
@@ -455,8 +380,6 @@ class _HomeScreen extends State<HomeScreen> {
   Widget cardUI(HomeModel item) {
     return Card(
       elevation: 7,
-      //margin: EdgeInsets.all(3),
-      //color: Color(0xffff2fc3),
       child: Container(
         color: Colors.white,
         margin: EdgeInsets.all(1.5),
