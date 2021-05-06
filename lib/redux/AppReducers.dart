@@ -5,6 +5,7 @@ import 'package:flutter_food_app/redux/Home/HomeState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartReducer.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteReducer.dart';
+import 'package:flutter_food_app/redux/Search/SearchReducer.dart';
 
 AppState appReducers(AppState state, dynamic action) {
   if (action.runtimeType.toString() == (InitAppState).toString()) {
@@ -26,14 +27,25 @@ AppState appReducers(AppState state, dynamic action) {
       homeState: state.homeState.newState(
         isLoading: true,
       ),
+      myCartState: state.myCartState.newState(),
+      myFavState: state.myFavState.newState(),
     );
   } else if (action.runtimeType.toString() == (ClearStateAppState).toString()) {
     return state.newState(
       homeState: new HomeState(),
       myCartState: new MyCartState(),
     );
+  } else if (action.runtimeType.toString().endsWith("HomeState")) {
+    homeReducers(state.homeState, action);
+  } else if (action.runtimeType.toString().endsWith("MyCartState")) {
+    myCartReducers(state.myCartState, action);
+  } else if (action.runtimeType.toString().endsWith("SearchState")) {
+    searchReducers(state.searchState, action);
+  } else if (action.runtimeType.toString().endsWith("MyFavState")) {
+    myFavReducers(state.myFavState, action);
   }
-  return state.newState(
+  return state;
+  /*return state.newState(
     homeState: homeReducers(
       state.homeState,
       action,
@@ -46,5 +58,9 @@ AppState appReducers(AppState state, dynamic action) {
       state.myFavState,
       action,
     ),
-  );
+    searchState: searchReducers(
+      state.searchState,
+      action,
+    ),
+  );*/
 }

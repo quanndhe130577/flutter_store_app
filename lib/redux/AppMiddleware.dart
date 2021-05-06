@@ -12,6 +12,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_food_app/Common.dart';
 import 'AppActions.dart';
 import 'MyFavorite/MyFavoriteMiddleware.dart';
+import 'Search/SearchMiddleware.dart';
 
 Future<List<HomeModel>> _loadFirstHomeModelData() async {
   List<HomeModel> dataList = [];
@@ -76,8 +77,7 @@ Future<List<FavModel>> _loadFavModelData(String uid) async {
     var values = dataSnapShot.value;
 
     for (var key in keys) {
-      DatabaseReference favRef =
-          FirebaseDatabase.instance.reference().child("Data").child(key).child("Fav").child(uid);
+      DatabaseReference favRef = FirebaseDatabase.instance.reference().child("Data").child(key).child("Fav").child(uid);
       await favRef.once().then((value) {
         if (value.value != null && value.value["state"] == true) {
           FavModel data = new FavModel(
@@ -101,14 +101,13 @@ Future<List<FavModel>> _loadFavModelData(String uid) async {
 }
 
 void appStateMiddleware(Store<AppState> store, action, NextDispatcher next) async {
-  if (action.runtimeType.toString().endsWith("HomeState") ||
-      action.runtimeType.toString().endsWith("HomeAction")) {
+  if (action.runtimeType.toString().endsWith("HomeAction")) {
     homeStateMiddleware(store, action, next);
-  } else if (action.runtimeType.toString().endsWith("MyCartState") ||
-      action.runtimeType.toString().endsWith("MyCartAction")) {
+  } else if (action.runtimeType.toString().endsWith("MyCartAction")) {
     myCartStateMiddleware(store, action, next);
-  } else if (action.runtimeType.toString().endsWith("MyFavState") ||
-      action.runtimeType.toString().endsWith("MyFavAction")) {
+  } else if (action.runtimeType.toString().endsWith("SearchAction")) {
+    searchStateMiddleware(store, action, next);
+  } else if (action.runtimeType.toString().endsWith("MyFavAction")) {
     myFavStateMiddleware(store, action, next);
   } else if (action.runtimeType.toString().endsWith("AppAction") ||
       action.runtimeType.toString().endsWith("AppState")) {

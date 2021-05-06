@@ -68,7 +68,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
           ? actions
           : [
               Padding(
-                padding: EdgeInsets.only(bottom: 7, top: 7),
+                padding: EdgeInsets.only(bottom: 7, top: 7, left: 7),
                 child: TextButton(
                   onPressed: () =>
                       Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCart(this.store))),
