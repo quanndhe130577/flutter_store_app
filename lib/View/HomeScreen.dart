@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_food_app/Common.dart';
 import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
 import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
-import 'package:flutter_food_app/Model/MyCartEntity.dart';
+import 'package:flutter_food_app/View/SearchScreen.dart';
 import 'package:flutter_food_app/redux/AppActions.dart';
 import 'package:flutter_food_app/redux/AppReducers.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
@@ -20,9 +19,7 @@ import 'package:flutter_food_app/View/LogInScreen.dart';
 import 'UploadDataScreen.dart';
 import 'package:flutter_food_app/View/MyFavoriteScreen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_food_app/View//MyCartScreen.dart';
 import 'package:toast/toast.dart';
-import 'package:badges/badges.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:carousel_slider/carousel_options.dart';
@@ -76,7 +73,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   ScrollController _controller;
-  TextEditingController _textFiledController;
 
   void handleControllerHome() async {
     // if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -168,7 +164,6 @@ class _HomeScreen extends State<HomeScreen> {
     _controller = ScrollController();
     _controller.addListener(handleControllerHome);
 
-    _textFiledController = TextEditingController();
     super.initState();
   }
 
@@ -198,13 +193,37 @@ class _HomeScreen extends State<HomeScreen> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(heightOfAppBar),
             child: InheritedAppBarProvider(
-              reduxStore: this.store,
+              opacity: this.opacityAppbar * 0.2,
+              title: GestureDetector(
+                onTap: () => Navigator.push(
+                    context, MaterialPageRoute(builder: (BuildContext context) => SearchScreen(this.store))),
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: this.opacityAppbar <= 0.5 ? Colors.white : Colors.black12.withOpacity(0.1),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  //color: this.opacityAppbar <= 0.5 ? Colors.white : Colors.black12.withOpacity(0.2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, color: Colors.black.withOpacity(0.5)),
+                      SizedBox(width: 5),
+                      StoreConnector<AppState, String>(
+                        converter: (store) => store.state.homeState.searchText,
+                        builder: (BuildContext context, String searchText) =>
+                            Expanded(child: Text(searchText, style: TextStyle(color: Colors.red, fontSize: 15))),
+                      ),
+                      SizedBox(width: 5),
+                      Icon(Icons.camera_alt_outlined, color: Colors.black.withOpacity(0.5)),
+                    ],
+                  ),
+                ),
+              ),
               child: CustomAppBar(
                 store: this.store,
                 handleLeading: () => _scaffoldKey.currentState.openDrawer(),
                 iconDataLeading: Icons.dehaze_rounded,
               ),
-              opacity: (1 - opacityAppbar) * 0.2,
             ),
             // AppBar(
             //   leading: IconButton(

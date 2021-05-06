@@ -51,29 +51,71 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: InheritedAppBarProvider(
-            reduxStore: this.store,
-            child: CustomAppBar(),
-            opacity: (1 - opacityAppbar) * 0.2,
-            title: TextField(
-              controller: _textFiledController,
-              decoration: InputDecoration(
-                icon: Icon(Icons.search, color: Colors.red),
-                hintText: "Search . . . ",
-                hintStyle: TextStyle(color: Colors.black54),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                disabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide.none,
+            child: CustomAppBar(store: this.store),
+            opacity: this.opacityAppbar * 0.2,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 7, top: 7, left: 7),
+                child: TextButton(
+                  onPressed: () => {},
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.black26.withOpacity(0.2 - this.opacityAppbar * 0.2)),
+                  ),
+                  child: Icon(
+                    Icons.filter_alt_outlined,
+                    color: this.opacityAppbar >= 0.1 ? Colors.red : Colors.white,
+                    semanticLabel: "MyCart",
+                    size: 25,
+                  ),
                 ),
               ),
-              onSubmitted: (text) {
-                searchMethod(text.toLowerCase());
-              },
-              autofocus: false,
+            ],
+            title: Container(
+              padding: EdgeInsets.only(left: 5, right: 5),
+              decoration: BoxDecoration(
+                color: Colors.black12.withOpacity(0.1),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              //color: this.opacityAppbar <= 0.5 ? Colors.white : Colors.black12.withOpacity(0.2),
+              child: Row(
+                children: [
+                  Icon(Icons.search, color: Colors.black.withOpacity(0.5)),
+                  SizedBox(width: 5),
+                  StoreConnector<AppState, String>(
+                    converter: (store) => store.state.homeState.searchText,
+                    builder: (BuildContext context, String searchText) => Expanded(
+                      child: Container(
+                        height: 40,
+                        child: TextField(
+                          controller: _textFiledController,
+                          decoration: InputDecoration(
+                            //icon: Icon(Icons.search, color: Colors.red),
+                            hintText: searchText,
+                            hintStyle: TextStyle(color: Colors.black54),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            disabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onSubmitted: (text) {
+                            //searchMethod(text.toLowerCase());
+                          },
+                          autofocus: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Icon(Icons.camera_alt_outlined, color: Colors.black.withOpacity(0.5)),
+                ],
+              ),
             ),
           ),
         ),

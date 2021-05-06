@@ -2,17 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:redux/redux.dart';
 
-
 class InheritedAppBarProvider extends InheritedWidget {
   final double opacity;
   final Widget title;
-  final Store<AppState> reduxStore;
+  final List<Widget> actions;
 
   InheritedAppBarProvider({
     Widget child,
     @required this.opacity,
     this.title,
-    @required this.reduxStore,
+    this.actions
   }) : super(child: child);
 
   @override
