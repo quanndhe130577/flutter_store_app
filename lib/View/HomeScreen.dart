@@ -198,6 +198,7 @@ class _HomeScreen extends State<HomeScreen> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(heightOfAppBar),
             child: InheritedAppBarProvider(
+              reduxStore: this.store,
               child: CustomAppBar(
                 store: this.store,
                 handleLeading: () => _scaffoldKey.currentState.openDrawer(),

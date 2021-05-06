@@ -51,7 +51,8 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: InheritedAppBarProvider(
-            child: CustomAppBar(store: this.store),
+            reduxStore: this.store,
+            child: CustomAppBar(),
             opacity: (1 - opacityAppbar) * 0.2,
             title: TextField(
               controller: _textFiledController,
