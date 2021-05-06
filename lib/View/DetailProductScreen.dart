@@ -135,7 +135,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: InheritedAppBarProvider(
             reduxStore: this.store,
-            child: CustomAppBar(),
+            child: CustomAppBar(store: this.store),
             opacity: (1 - opacityAppbar) * 0.2,
             title: opacityAppbar == 0
                 ? Text("")

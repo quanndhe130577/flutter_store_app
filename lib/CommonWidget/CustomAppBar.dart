@@ -18,7 +18,10 @@ class CustomAppBar extends StatefulWidget {
   CustomAppBar({this.store, this.iconDataLeading, this.handleLeading});
 
   @override
-  _CustomAppBarState createState() => _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState createState() => _CustomAppBarState(
+      //this.store,
+      this.iconDataLeading,
+      this.handleLeading);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -27,7 +30,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
   IconData iconDataLeading;
   Function handleLeading;
 
-  _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState(
+      //this.store,
+      this.iconDataLeading,
+      this.handleLeading);
 
   @override
   void initState() {
@@ -42,7 +48,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     this.opacityAppbar = InheritedAppBarProvider.of(context).opacity;
-    //this.store = InheritedAppBarProvider.of(context).reduxStore;
+    this.store = InheritedAppBarProvider.of(context).reduxStore;
+    print(this.store.state.myCartState.cartList.length.toString());
     return AppBar(
       leading: Padding(
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 7, top: 7),
@@ -74,7 +81,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
             child: Badge(
               badgeColor: Colors.red,
               position: BadgePosition.bottomStart(bottom: 10, start: 10),
-              badgeContent: Text(this.store.state.myCartState.cartList.length.toString(), style: TextStyle(color: Colors.white, fontSize: 10)),
+              badgeContent: Text(this.store.state.myCartState.cartList.length.toString(),
+                  style: TextStyle(color: Colors.white, fontSize: 10)),
               child: Icon(
                 Icons.shopping_cart_outlined,
                 color: this.opacityAppbar <= 0.1 ? Colors.red : Colors.white,
