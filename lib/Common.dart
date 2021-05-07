@@ -64,3 +64,23 @@ void showDialogConfirm({
     },
   );
 }
+
+double getHeightForWidget(
+    BuildContext context, {
+      double dividedBy = 1,
+      double sub = 0,
+      bool ignoreAppbar = true,
+      bool ignorePaddingTop = true,
+      bool ignorePaddingBottom = true,
+    }) {
+  double height = MediaQuery.of(context).size.height - sub;
+  if (ignoreAppbar) {
+    height -= heightOfAppBar;
+  }
+  // Height (without SafeArea)
+  var padding = MediaQuery.of(context).padding;
+  if (ignorePaddingTop) height -= padding.top;
+  if (ignorePaddingBottom) height -= padding.bottom;
+
+  return height / dividedBy;
+}

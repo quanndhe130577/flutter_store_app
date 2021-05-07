@@ -83,11 +83,13 @@ Future<List<SearchModel>> _loadFirstData(String keyword) async {
 void searchStateMiddleware(Store<AppState> store, action, NextDispatcher next) async {
   next(action);
   if (action.runtimeType.toString() == (LoadMoreDataSearchAction).toString()) {
-    store.dispatch(StartLoadingSearchState());
-    await _loadMoreData(store.state.searchState.dataList.length, store.state.searchState.searchText)
+    store.dispatch(StartLoadingSearchState(store.state.searchState.searchText));
+    await _loadMoreData(store.state.searchState.searchList.length, store.state.searchState.searchText)
         .then((moreData) => store.dispatch(LoadMoreDataSearchState(moreData)));
   } else if (action.runtimeType.toString() == (FirstLoadSearchAction).toString()) {
-    store.dispatch(StartLoadingSearchState());
+    store.dispatch(StartLoadingSearchState(action.keyword));
     await _loadFirstData(action.keyword).then((dataList) => store.dispatch(LoadDataSearchState(dataList)));
+  } else if (action.runtimeType.toString() == (ClearDataSearchAction).toString()) {
+    store.dispatch(ClearDataSearchState());
   }
 }

@@ -5,14 +5,15 @@ import 'package:flutter_food_app/redux/Home/HomeState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartReducer.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartState.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteReducer.dart';
+import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteState.dart';
 import 'package:flutter_food_app/redux/Search/SearchReducer.dart';
+import 'package:flutter_food_app/redux/Search/SearchState.dart';
 
 AppState appReducers(AppState state, dynamic action) {
   if (action.runtimeType.toString() == (InitAppState).toString()) {
     return state.newState(
       homeState: state.homeState.newState(
         dataList: action.dataList,
-        searchList: action.dataList,
         isLoading: false,
       ),
       myCartState: state.myCartState.newState(
@@ -24,11 +25,10 @@ AppState appReducers(AppState state, dynamic action) {
     );
   } else if (action.runtimeType.toString() == (StartInitAppState).toString()) {
     return state.newState(
-      homeState: state.homeState.newState(
-        isLoading: true,
-      ),
-      myCartState: state.myCartState.newState(),
-      myFavState: state.myFavState.newState(),
+      homeState: new HomeState(isLoading: true),
+      myCartState: new MyCartState(),
+      myFavState: new MyFavState(),
+      searchState: new SearchState(),
     );
   } else if (action.runtimeType.toString() == (ClearStateAppState).toString()) {
     return state.newState(
@@ -36,31 +36,31 @@ AppState appReducers(AppState state, dynamic action) {
       myCartState: new MyCartState(),
     );
   } else if (action.runtimeType.toString().endsWith("HomeState")) {
-    homeReducers(state.homeState, action);
+    return state.newState(homeState: homeReducers(state.homeState, action));
   } else if (action.runtimeType.toString().endsWith("MyCartState")) {
-    myCartReducers(state.myCartState, action);
+    return state.newState(myCartState: myCartReducers(state.myCartState, action));
   } else if (action.runtimeType.toString().endsWith("SearchState")) {
-    searchReducers(state.searchState, action);
+    return state.newState(searchState: searchReducers(state.searchState, action));
   } else if (action.runtimeType.toString().endsWith("MyFavState")) {
-    myFavReducers(state.myFavState, action);
+    return state.newState(myFavState: myFavReducers(state.myFavState, action));
   }
   return state;
-  /*return state.newState(
-    homeState: homeReducers(
-      state.homeState,
-      action,
-    ),
-    myCartState: myCartReducers(
-      state.myCartState,
-      action,
-    ),
-    myFavState: myFavReducers(
-      state.myFavState,
-      action,
-    ),
-    searchState: searchReducers(
-      state.searchState,
-      action,
-    ),
-  );*/
+  // return state.newState(
+  //   homeState: homeReducers(
+  //     state.homeState,
+  //     action,
+  //   ),
+  //   myCartState: myCartReducers(
+  //     state.myCartState,
+  //     action,
+  //   ),
+  //   myFavState: myFavReducers(
+  //     state.myFavState,
+  //     action,
+  //   ),
+  //   searchState: searchReducers(
+  //     state.searchState,
+  //     action,
+  //   ),
+  // );
 }

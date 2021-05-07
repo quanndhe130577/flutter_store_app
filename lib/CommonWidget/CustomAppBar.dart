@@ -48,11 +48,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
       leading: Padding(
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 7, top: 7),
         child: TextButton(
-          onPressed: this.handleLeading != null ? this.handleLeading : this._defaultHandleLeading,
+          onPressed: this.handleLeading != null ? () => handleLeading : this._defaultHandleLeading,
           child: Icon(this.iconDataLeading != null ? this.iconDataLeading : Icons.arrow_back,
-              //color: this.opacityAppbar <= 0.1 ? Colors.red : Colors.white, size: 20),
-              color: this.opacityAppbar >= 0.1 ? Colors.red : Colors.white,
-              size: 20),
+              color: this.opacityAppbar >= 0.1 ? Colors.red : Colors.white, size: 20),
           style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0))),
             backgroundColor: MaterialStateProperty.all<Color>(Colors.black26.withOpacity(0.2 - this.opacityAppbar)),

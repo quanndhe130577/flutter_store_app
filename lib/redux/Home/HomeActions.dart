@@ -10,23 +10,23 @@ class LoadMoreDataHomeState {
   LoadMoreDataHomeState(this.moreData);
 }
 
-class SearchHomeAction {
-  String keyword;
-
-  SearchHomeAction(this.keyword);
-}
+// class SearchHomeAction {
+//   String keyword;
+//
+//   SearchHomeAction(this.keyword);
+// }
 
 class StartLoadingSearchHomeState {}
 
-class LoadingSearchHomeState {
-  String keyword;
+// class LoadingSearchHomeState {
+//   String keyword;
+//
+//   List<HomeModel> searchList;
+//
+//   LoadingSearchHomeState(this.keyword, this.searchList);
+// }
 
-  List<HomeModel> searchList;
-
-  LoadingSearchHomeState(this.keyword, this.searchList);
-}
-
-class RemoveSearchHomeState {}
+// class RemoveSearchHomeState {}
 
 class StartRefreshDataHomeState {}
 

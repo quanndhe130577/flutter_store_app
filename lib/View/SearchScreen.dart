@@ -48,14 +48,9 @@ class _SearchScreenState extends State<SearchScreen> {
     store.dispatch(FirstLoadSearchAction(text));
   }
 
-  double _getHeightForCart(BuildContext context, {double dividedBy = 1}) {
-    double height = MediaQuery.of(context).size.height - heightOfAppBar;
-
-    // Height (without SafeArea)
-    var padding = MediaQuery.of(context).padding;
-    double newHeight = height - padding.top - padding.bottom;
-
-    return newHeight / dividedBy;
+  void handleLeading(BuildContext context) {
+    store.dispatch(ClearDataSearchAction());
+    Navigator.of(context).pop();
   }
 
   @override
@@ -64,13 +59,15 @@ class _SearchScreenState extends State<SearchScreen> {
     return StoreProvider(
       store: this.store,
       child: Scaffold(
-        extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: InheritedAppBarProvider(
-            child: CustomAppBar(store: this.store),
-            opacity: this.opacityAppbar * 0.2,
+            child: CustomAppBar(
+              store: this.store,
+              handleLeading: handleLeading,
+            ),
+            opacity: 0.2,
             actions: [
               Visibility(
                 visible: this.isSearching,
@@ -106,7 +103,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Icon(Icons.search, color: Colors.black.withOpacity(0.5)),
                   SizedBox(width: 5),
                   StoreConnector<AppState, String>(
-                    converter: (store) => store.state.homeState.searchText,
+                    converter: (store) => store.state.searchState.searchText,
                     builder: (BuildContext context, String searchText) => Expanded(
                       child: Container(
                         height: 40,
@@ -114,7 +111,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           controller: _textFiledController,
                           decoration: InputDecoration(
                             //icon: Icon(Icons.search, color: Colors.red),
-                            hintText: searchText,
+                            //hintText: searchText,
+                            labelText: searchText,
                             hintStyle: TextStyle(color: Colors.black54),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide.none,
@@ -159,7 +157,14 @@ class _SearchScreenState extends State<SearchScreen> {
               ),*/
             Expanded(
               child: StoreConnector<AppState, List<SearchModel>>(
-                converter: (store) => store.state.searchState.dataList,
+                converter: (store) => store.state.searchState.searchList,
+                distinct: true,
+                onWillChange: (prev, cur) {
+                  Navigator.of(this.context).pop();
+                },
+                onDidChange: (prev, cur) {
+                  print("haha");
+                },
                 builder: (context, List<SearchModel> dataList) => dataList.length == 0
                     ? Center(
                         child: Text("No data available", style: TextStyle(fontSize: 30)),
@@ -169,7 +174,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         //physics: BouncingScrollPhysics(),
                         itemCount: dataList.length + 1,
                         scrollDirection: Axis.vertical,
-                        itemExtent: _getHeightForCart(this.context, dividedBy: 5.6),
+                        //itemExtent: _getHeightForCart(this.context, dividedBy: 5.6),
                         itemBuilder: (buildContext, index) {
                           if (index == dataList.length) {
                             if (dataList.length > 4) {
@@ -257,6 +262,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ],
             ),
+            SizedBox(height: 10),
           ],
         ),
       ),

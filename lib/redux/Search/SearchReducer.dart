@@ -7,25 +7,22 @@ SearchState searchReducers(SearchState state, dynamic action) {
   if (action.runtimeType.toString() == (StartLoadingSearchState).toString()) {
     return state.newState(
       isLoading: true,
+      searchText: action.keyword,
     );
   } else if (action.runtimeType.toString() == (LoadMoreDataSearchState).toString()) {
-    List<SearchModel> dataList = []..addAll(state.dataList)..addAll(action.moreData);
-    if (state.searchText.isEmpty) {
-      return state.newState();
-    }
+    List<SearchModel> dataList = []..addAll(state.searchList)..addAll(action.moreData);
     return state.newState(
-      dataList: dataList,
+      searchList: dataList,
       isLoading: false,
     );
   } else if (action.runtimeType.toString() == (LoadDataSearchState).toString()) {
     List<SearchModel> dataList = []..addAll(action.dataList);
-    if (state.searchText.isEmpty) {
-      return state.newState();
-    }
     return state.newState(
-      dataList: dataList,
+      searchList: dataList,
       isLoading: false,
     );
+  } else if (action.runtimeType.toString() == (ClearDataSearchState).toString()) {
+    return SearchState();
   }
   return state;
 }

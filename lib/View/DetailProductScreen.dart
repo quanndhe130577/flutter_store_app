@@ -126,6 +126,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double heightStoreWidget = getHeightForWidget(context, dividedBy: 3.5);
     return StoreProvider(
       store: this.store,
       child: Scaffold(
@@ -245,8 +246,8 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
                           Image.network(
                             data.imgUrl,
                             fit: BoxFit.cover,
-                            width: 500,
-                            height: 400,
+                            width: double.infinity,
+                            height: getHeightForWidget(context, dividedBy: 1.7, ignoreAppbar: false),
                           ),
                           SizedBox(height: 10),
                           Container(
@@ -292,7 +293,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
                       thickness: 10,
                       height: 50,
                     ),
-                    StoreProduct(data.store),
+                    StoreProduct(data.store, heightStoreWidget),
                     Divider(
                       thickness: 10,
                       height: 50,
@@ -347,18 +348,20 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
 }
 
 class StoreProduct extends StatefulWidget {
-  final ShortenStoreModel store;
+  final ShortenStoreModel storeData;
+  final double lengthOfWidget;
 
-  StoreProduct(this.store);
+  StoreProduct(this.storeData, this.lengthOfWidget);
 
   @override
-  _StoreProductState createState() => _StoreProductState(this.store);
+  _StoreProductState createState() => _StoreProductState(this.storeData, this.lengthOfWidget);
 }
 
 class _StoreProductState extends State<StoreProduct> {
   ShortenStoreModel storeProduct;
+  double lengthOfWidget;
 
-  _StoreProductState(this.storeProduct);
+  _StoreProductState(this.storeProduct, this.lengthOfWidget);
 
   @override
   Widget build(BuildContext context) {
@@ -372,8 +375,8 @@ class _StoreProductState extends State<StoreProduct> {
                 ClipOval(
                   child: Image.network(
                     storeProduct.imgUrl,
-                    height: 75,
-                    width: 75,
+                    height: (lengthOfWidget - 20) / 2.3,
+                    width: (lengthOfWidget - 20) / 2.3,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -459,84 +462,3 @@ class _StoreProductState extends State<StoreProduct> {
     );
   }
 }
-
-// class DetailProduct extends StatefulWidget {
-//   final DetailProductModel data;
-//
-//   DetailProduct(this.data);
-//
-//   @override
-//   _DetailProductState createState() => _DetailProductState(this.data);
-// }
-//
-// class _DetailProductState extends State<DetailProduct> {
-//   DetailProductModel data;
-//
-//   _DetailProductState(this.data);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: Column(
-//         children: [
-//           Image.network(
-//             data.imgUrl,
-//             fit: BoxFit.cover,
-//             width: 500,
-//             height: 400,
-//           ),
-//           SizedBox(height: 10),
-//           Container(
-//             padding: EdgeInsets.only(left: 10, right: 10),
-//             width: double.infinity,
-//             child: Text(
-//               data.name,
-//               style: TextStyle(
-//                 color: Colors.black,
-//                 fontSize: 25,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//               textAlign: TextAlign.left,
-//             ),
-//           ),
-//           SizedBox(height: 5),
-//           Container(
-//             padding: EdgeInsets.only(left: 10, right: 10),
-//             width: double.infinity,
-//             child: Text(
-//               '${new String.fromCharCodes(new Runes('\u0024'))} ${data.price} ',
-//               style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
-//               textAlign: TextAlign.left,
-//             ),
-//           ),
-//           SizedBox(height: 5),
-//           Container(
-//             padding: EdgeInsets.only(left: 10, right: 10),
-//             width: double.infinity,
-//             child: Text(
-//               "Material : ${data.material}",
-//               style: TextStyle(
-//                 color: Colors.black,
-//                 fontSize: 15,
-//               ),
-//               textAlign: TextAlign.left,
-//             ),
-//           ),
-//           SizedBox(height: 5),
-//           Container(
-//             padding: EdgeInsets.only(left: 10, right: 10),
-//             width: double.infinity,
-//             child: Text(
-//               "Description : ${data.description != null ? data.description : ""}",
-//               style: TextStyle(
-//                 color: Colors.black,
-//                 fontSize: 15,
-//               ),
-//               textAlign: TextAlign.left,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

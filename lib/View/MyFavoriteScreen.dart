@@ -23,6 +23,8 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
 
   _MyFavoriteState(this.store);
 
+  double numberOfProductInScreen = 3;
+
   @override
   void initState() {
     super.initState();
@@ -30,14 +32,14 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    double heightOfCard = getHeightForWidget(context, dividedBy: numberOfProductInScreen, sub: 100);
     return StoreProvider(
       store: this.store,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(heightOfAppBar),
           child: AppBar(
-            title: Text("My Favorite",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            title: Text("My Favorite", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             backgroundColor: Color(0xffff2f3c),
           ),
         ),
@@ -51,7 +53,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                   itemCount: favList.length,
                   scrollDirection: Axis.vertical,
                   itemBuilder: (buildContext, index) {
-                    return cardUI(favList[index]);
+                    return cardUI(favList[index], heightOfCard);
                   },
                 ),
         ),
@@ -59,7 +61,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
     );
   }
 
-  Widget cardUI(FavModel item) {
+  Widget cardUI(FavModel item, double length) {
     return Card(
       elevation: 7,
       margin: EdgeInsets.all(15),
@@ -67,36 +69,20 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
       child: Container(
         color: Colors.white,
         margin: EdgeInsets.all(1.5),
-        padding: EdgeInsets.only(right: 10, left: 10, bottom: 10),
+        padding: EdgeInsets.all(10),
         child: Column(
           children: [
-            SizedBox(
-              width: double.infinity,
-              // height: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  removeFav(item.uploadId);
-                },
-                child: Icon(Icons.remove, color: Colors.red),
-                style: TextButton.styleFrom(
-                  //minimumSize: Size(double.infinity, double.infinity),
-                  backgroundColor: Colors.black12,
-                ),
-              ),
-            ),
-            SizedBox(height: 3),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            DetailProductScreen(item.uploadId, this.store)));
+                        builder: (BuildContext context) => DetailProductScreen(item.uploadId, this.store)));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.network(item.imgUrl, fit: BoxFit.cover, height: 100, width: 100),
+                  Image.network(item.imgUrl, fit: BoxFit.cover, height: length - 65, width: length - 65),
                   SizedBox(width: 5),
                   Expanded(
                     child: Column(
@@ -104,8 +90,7 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                       children: [
                         Text(
                           shortenString(item.name, 15),
-                          style: TextStyle(
-                              color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                         Container(
                           width: double.infinity,
@@ -149,17 +134,37 @@ class _MyFavoriteState extends State<MyFavorite> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            SizedBox(height: 3),
+            SizedBox(height: 5),
             Container(
-              child: TextButton.icon(
-                onPressed: () {
-                  addToCartHandle(item.uploadId);
-                },
-                icon: Icon(Icons.add_shopping_cart, color: Colors.black),
-                label: Text("Add to cart", style: TextStyle(color: Colors.black)),
+              height: 40,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        removeFav(item.uploadId);
+                      },
+                      child: Icon(Icons.remove, color: Colors.red),
+                      style: TextButton.styleFrom(
+                        //minimumSize: Size(double.infinity, double.infinity),
+                        backgroundColor: Colors.black12,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        addToCartHandle(item.uploadId);
+                      },
+                      child: Icon(Icons.add_shopping_cart, color: Colors.black),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              width: double.infinity,
-              color: Colors.red,
             ),
           ],
         ),

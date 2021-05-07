@@ -27,6 +27,8 @@ class _MyCartState extends State<MyCart> {
   bool isLoading = false;
   Store<AppState> store;
 
+  final double numberOfCartInScreen = 5;
+
   _MyCartState(this.store);
 
   @override
@@ -84,6 +86,9 @@ class _MyCartState extends State<MyCart> {
         });
       }
     }
+
+    final double lengthForACart = getHeightForWidget(this.context,
+        dividedBy: this.numberOfCartInScreen, sub: 50 + (this.numberOfCartInScreen - 1) * 5);
 
     return Scaffold(
       backgroundColor: Color(0xffffffff),
@@ -215,7 +220,7 @@ class _MyCartState extends State<MyCart> {
                         itemCount: dataList.length,
                         scrollDirection: Axis.vertical,
                         itemBuilder: (buildContext, index) {
-                          return slideUI(dataList[index]);
+                          return slideUI(dataList[index], lengthForACart);
                         },
                         separatorBuilder: (context, index) {
                           return Divider(
@@ -231,7 +236,7 @@ class _MyCartState extends State<MyCart> {
     );
   }
 
-  Widget slideUI(CartModel item) {
+  Widget slideUI(CartModel item, double length) {
     bool isSelected = dataChoose.contains(item);
 
     void removeFromCart() {
@@ -346,7 +351,7 @@ class _MyCartState extends State<MyCart> {
                       MaterialPageRoute(
                           builder: (BuildContext context) => DetailProductScreen(item.uploadId, this.store)));
                 },
-                child: Image.network(item.imgUrl, fit: BoxFit.cover, width: 100, height: 100),
+                child: Image.network(item.imgUrl, fit: BoxFit.cover, width: length - 20, height: length - 20),
               ),
               SizedBox(width: 10),
               Expanded(
@@ -364,6 +369,7 @@ class _MyCartState extends State<MyCart> {
                         textAlign: TextAlign.left,
                       ),
                     ),
+                    SizedBox(height: 20),
                     Row(
                       children: [
                         Text(
@@ -375,24 +381,45 @@ class _MyCartState extends State<MyCart> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Container(
+                            width: 120,
+                            height: 30,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.blue),
+                              border: Border.all(color: Colors.black38.withOpacity(0.2)),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
                               children: [
-                                TextButton(
-                                  onPressed: () {
-                                    handleQuantity(1, isSelected); // minus
-                                  },
-                                  child: Icon(Icons.remove),
+                                Expanded(
+                                  child: Container(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        handleQuantity(1, isSelected); // minus
+                                      },
+                                      child: Icon(Icons.remove, size: 15),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border(right: BorderSide(color: Colors.black38.withOpacity(0.2))),
+                                    ),
+                                  ),
                                 ),
-                                Text(item.quantity.toString()),
-                                TextButton(
-                                  onPressed: () {
-                                    handleQuantity(0, isSelected); // plus
-                                  },
-                                  child: Icon(Icons.add),
+                                //VerticalDivider(thickness: 1, indent: 5, endIndent: 5),
+                                Container(
+                                  width: 40,
+                                  child: Text(item.quantity.toString(), textAlign: TextAlign.center),
+                                ),
+                                //VerticalDivider(thickness: 1, indent: 5, endIndent: 5),
+                                Expanded(
+                                  child: Container(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        handleQuantity(0, isSelected); // plus
+                                      },
+                                      child: Icon(Icons.add, size: 15),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border(left: BorderSide(color: Colors.black38.withOpacity(0.2))),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

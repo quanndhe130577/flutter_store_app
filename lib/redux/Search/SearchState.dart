@@ -7,10 +7,10 @@ class SearchState {
 
   String searchText;
 
-  List<SearchModel> dataList;
+  List<SearchModel> searchList;
 
   SearchState({
-    this.dataList = const [],
+    this.searchList = const [],
     this.isLoading = false,
     //this.isLoadingMore = false,
     this.searchText = "",
@@ -20,10 +20,10 @@ class SearchState {
     bool isLoading,
     //bool isLoadingMore,
     String searchText,
-    List<SearchModel> dataList,
+    List<SearchModel> searchList,
   }) {
     return SearchState(
-      dataList: dataList != null ? dataList : this.dataList,
+      searchList: searchList != null ? searchList : this.searchList,
       isLoading: isLoading != null ? isLoading : this.isLoading,
       //isLoadingMore: isLoadingMore != null ? isLoadingMore : this.isLoadingMore,
       searchText: searchText != null ? searchText : this.searchText,

@@ -21,10 +21,10 @@ class AppState {
   AppState newState({HomeState homeState, MyCartState myCartState, MyFavState myFavState, SearchState searchState}) {
     return AppState(
       this.uid,
-      homeState: homeState != null ? homeState : HomeState(),
-      myCartState: myCartState != null ? myCartState : MyCartState(),
-      myFavState: myFavState != null ? myFavState : MyFavState(),
-      searchState: searchState != null ? searchState : SearchState(),
+      homeState: homeState != null ? homeState : this.homeState,
+      myCartState: myCartState != null ? myCartState : this.myCartState,
+      myFavState: myFavState != null ? myFavState : this.myFavState,
+      searchState: searchState != null ? searchState : this.searchState,
     );
   }
 

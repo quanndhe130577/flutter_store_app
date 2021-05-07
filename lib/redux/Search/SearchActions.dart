@@ -1,6 +1,10 @@
 import 'package:flutter_food_app/Model/SearchEntity.dart';
 
-class StartLoadingSearchState {}
+class StartLoadingSearchState {
+  String keyword;
+
+  StartLoadingSearchState(this.keyword);
+}
 
 class FirstLoadSearchAction {
   String keyword;
@@ -21,3 +25,6 @@ class LoadDataSearchState {
 
   LoadDataSearchState(this.dataList);
 }
+
+class ClearDataSearchAction{}
+class ClearDataSearchState{}

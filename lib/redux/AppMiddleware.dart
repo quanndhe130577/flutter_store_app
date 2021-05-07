@@ -121,5 +121,7 @@ void appStateMiddleware(Store<AppState> store, action, NextDispatcher next) asyn
     } else if (action.runtimeType.toString() == (ClearStateAppAction).toString()) {
       store.dispatch(ClearStateAppState());
     }
+  } else if (action.runtimeType.toString().endsWith("State")) {
+    next(action);
   }
 }
