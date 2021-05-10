@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_food_app/Common.dart';
+import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
+import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/Model/MyCartEntity.dart';
@@ -94,6 +96,33 @@ class _MyCartState extends State<MyCart> {
       backgroundColor: Color(0xffffffff),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(heightOfAppBar),
+        child: InheritedAppBarProvider(
+          child: CustomAppBar(store: this.store),
+          opacity: 0.2,
+          title: Text("My Cart", style: TextStyle(color: Colors.black)),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.delete),
+              color: Colors.red,
+              onPressed: () {
+                if (dataChoose.length > 0) {
+                  showDialogConfirm(
+                    title: Text("Remove"),
+                    content: Text("Do you want to remove ? "),
+                    context: context,
+                    yesCallback: () {
+                      _removeAllChoseItems();
+                    },
+                    noCallback: () {},
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      /*PreferredSize(
+        preferredSize: Size.fromHeight(heightOfAppBar),
         child: AppBar(
           backgroundColor: Color(0xffff2fc3),
           title: Text("My Cart"),
@@ -118,15 +147,7 @@ class _MyCartState extends State<MyCart> {
             ),
           ],
         ),
-      ),
-
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: Text("Buy"),
-      //   elevation: 2,
-      //   backgroundColor: Colors.red,
-      // ),
+      ),*/
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         color: Colors.white,

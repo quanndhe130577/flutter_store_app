@@ -12,14 +12,20 @@ final numberOfFirstLoad = 5;
 void showSimpleLoadingModalDialog(context) {
   showDialog(
     barrierDismissible: false,
-    barrierColor: Colors.white10,
+    barrierColor: Colors.white54,
     context: context,
     builder: (BuildContext context) {
       return Dialog(
         backgroundColor: Colors.black54,
+        insetPadding: EdgeInsets.only(
+          left: getWeightForWidget(context, dividedBy: 2, sub: 100),
+          right: getWeightForWidget(context, dividedBy: 2, sub: 100),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         child: Container(
-          constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
+          //constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
+          height: 75, width: 75,
+          //padding: EdgeInsets.only(left: 10, right: 50),
           child: SpinKitFadingCircle(
             itemBuilder: (BuildContext context, int index) {
               return Icon(Icons.circle, color: Colors.white, size: 10);
@@ -66,14 +72,15 @@ void showDialogConfirm({
 }
 
 double getHeightForWidget(
-    BuildContext context, {
-      double dividedBy = 1,
-      double sub = 0,
-      bool ignoreAppbar = true,
-      bool ignorePaddingTop = true,
-      bool ignorePaddingBottom = true,
-    }) {
-  double height = MediaQuery.of(context).size.height - sub;
+  BuildContext context, {
+  double dividedBy = 1,
+  double sub = 0,
+  double bonus = 0,
+  bool ignoreAppbar = true,
+  bool ignorePaddingTop = true,
+  bool ignorePaddingBottom = true,
+}) {
+  double height = MediaQuery.of(context).size.height - sub + bonus;
   if (ignoreAppbar) {
     height -= heightOfAppBar;
   }
@@ -83,4 +90,15 @@ double getHeightForWidget(
   if (ignorePaddingBottom) height -= padding.bottom;
 
   return height / dividedBy;
+}
+
+double getWeightForWidget(
+  BuildContext context, {
+  double dividedBy = 1,
+  double sub = 0,
+  double bonus = 0,
+}) {
+  double width = MediaQuery.of(context).size.width - sub + bonus;
+
+  return width / dividedBy;
 }
