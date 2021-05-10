@@ -14,11 +14,13 @@ class CustomAppBar extends StatefulWidget {
   final Store<AppState> store;
   final IconData iconDataLeading;
   final Function handleLeading;
+  final Function handleAfterPopLeading;
 
-  CustomAppBar({@required this.store, this.iconDataLeading, this.handleLeading});
+  CustomAppBar({@required this.store, this.iconDataLeading, this.handleLeading, this.handleAfterPopLeading});
 
   @override
-  _CustomAppBarState createState() => _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState createState() =>
+      _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading, this.handleAfterPopLeading);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -26,8 +28,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Store<AppState> store;
   IconData iconDataLeading;
   Function handleLeading;
+  Function handleAfterPopLeading;
 
-  _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading);
+  _CustomAppBarState(this.store, this.iconDataLeading, this.handleLeading, this.handleAfterPopLeading);
 
   @override
   void initState() {
@@ -35,20 +38,28 @@ class _CustomAppBarState extends State<CustomAppBar> {
     super.initState();
   }
 
-  void _defaultHandleLeading() {
-    Navigator.of(context).pop();
-  }
-
   @override
   Widget build(BuildContext context) {
     this.opacityAppbar = InheritedAppBarProvider.of(context).opacity;
     Widget titleWG = InheritedAppBarProvider.of(context).title;
     List<Widget> actions = InheritedAppBarProvider.of(context).actions;
+
+    void _defaultHandleLeading() {
+      Navigator.of(context).pop();
+    }
+
     return AppBar(
       leading: Padding(
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 7, top: 7),
         child: TextButton(
-          onPressed: this.handleLeading != null ? () => handleLeading : this._defaultHandleLeading,
+          onPressed: this.handleLeading != null
+              ? handleLeading
+              : this.handleAfterPopLeading != null
+                  ? () {
+                      this.handleAfterPopLeading();
+                      _defaultHandleLeading();
+                    }
+                  : _defaultHandleLeading,
           child: Icon(this.iconDataLeading != null ? this.iconDataLeading : Icons.arrow_back,
               color: this.opacityAppbar >= 0.1 ? Colors.red : Colors.white, size: 20),
           style: ButtonStyle(

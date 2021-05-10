@@ -34,6 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
   double opacityAppbar = 0;
 
   bool isSearching = false;
+  bool isBackHome = false;
 
   @override
   void initState() {
@@ -48,9 +49,11 @@ class _SearchScreenState extends State<SearchScreen> {
     store.dispatch(FirstLoadSearchAction(text));
   }
 
-  void handleLeading(BuildContext context) {
+  void handleAfterPopLeading() {
     store.dispatch(ClearDataSearchAction());
-    Navigator.of(context).pop();
+    if (this.mounted) {
+      this.isBackHome = true;
+    }
   }
 
   @override
@@ -65,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
           child: InheritedAppBarProvider(
             child: CustomAppBar(
               store: this.store,
-              handleLeading: handleLeading,
+              handleAfterPopLeading: handleAfterPopLeading,
             ),
             opacity: 0.2,
             actions: [
@@ -107,12 +110,13 @@ class _SearchScreenState extends State<SearchScreen> {
                     builder: (BuildContext context, String searchText) => Expanded(
                       child: Container(
                         height: 40,
+                        padding: EdgeInsets.only(bottom: 5),
                         child: TextField(
                           controller: _textFiledController,
                           decoration: InputDecoration(
                             //icon: Icon(Icons.search, color: Colors.red),
                             //hintText: searchText,
-                            labelText: searchText,
+                            //labelText: searchText,
                             hintStyle: TextStyle(color: Colors.black54),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide.none,
@@ -160,7 +164,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 converter: (store) => store.state.searchState.searchList,
                 distinct: true,
                 onWillChange: (prev, cur) {
-                  Navigator.of(this.context).pop();
+                  if (!this.isBackHome) {
+                    Navigator.of(this.context).pop();
+                  }
                 },
                 onDidChange: (prev, cur) {
                   print("haha");
@@ -170,14 +176,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Text("No data available", style: TextStyle(fontSize: 30)),
                       )
                     : ListView.builder(
-                        padding: EdgeInsets.only(top: paddingTopMedia),
+                        padding: EdgeInsets.only(top: 0),
                         //physics: BouncingScrollPhysics(),
                         itemCount: dataList.length + 1,
                         scrollDirection: Axis.vertical,
                         //itemExtent: _getHeightForCart(this.context, dividedBy: 5.6),
                         itemBuilder: (buildContext, index) {
                           if (index == dataList.length) {
-                            if (dataList.length > 4) {
+                            if (dataList.length > 5) {
                               return SpinKitWave(color: Colors.red, size: 35.0);
                             }
                             return null;

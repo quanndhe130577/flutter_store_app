@@ -49,6 +49,9 @@ Future<List<SearchModel>> _loadMoreData(int currentNumber, String keyword) async
 
 Future<List<SearchModel>> _loadFirstData(String keyword) async {
   List<SearchModel> dataList = [];
+  if (keyword.isEmpty) {
+    return dataList;
+  }
 
   DatabaseReference reference = FirebaseDatabase.instance.reference().child("Data");
   await reference.once().then((DataSnapshot dataSnapShot) {
@@ -61,7 +64,7 @@ Future<List<SearchModel>> _loadFirstData(String keyword) async {
         break;
       }
       if (keyword.isNotEmpty) {
-        if (!values[key]["name"].toString().contains(keyword)) {
+        if (!values[key]["name"].toString().toLowerCase().contains(keyword.toLowerCase())) {
           continue;
         }
       }
