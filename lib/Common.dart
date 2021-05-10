@@ -18,14 +18,13 @@ void showSimpleLoadingModalDialog(context) {
       return Dialog(
         backgroundColor: Colors.black54,
         insetPadding: EdgeInsets.only(
-          left: getWeightForWidget(context, dividedBy: 2, sub: 100),
-          right: getWeightForWidget(context, dividedBy: 2, sub: 100),
+          left: getWeightForWidget(context, dividedBy: 2, sub: 75),
+          right: getWeightForWidget(context, dividedBy: 2, sub: 75),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         child: Container(
-          //constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
-          height: 75, width: 75,
-          //padding: EdgeInsets.only(left: 10, right: 50),
+          constraints: BoxConstraints(maxHeight: 75, maxWidth: 75),
+          //height: 75, width: 75,
           child: SpinKitFadingCircle(
             itemBuilder: (BuildContext context, int index) {
               return Icon(Icons.circle, color: Colors.white, size: 10);

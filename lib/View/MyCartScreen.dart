@@ -121,33 +121,6 @@ class _MyCartState extends State<MyCart> {
           ],
         ),
       ),
-      /*PreferredSize(
-        preferredSize: Size.fromHeight(heightOfAppBar),
-        child: AppBar(
-          backgroundColor: Color(0xffff2fc3),
-          title: Text("My Cart"),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.delete),
-              color: Colors.white,
-              onPressed: () {
-                if (dataChoose.length > 0) {
-                  showDialogConfirm(
-                    title: Text("Remove"),
-                    content: Text("Do you want to remove ? "),
-                    context: context,
-                    yesCallback: () {
-                      _removeAllChoseItems();
-                    },
-                    noCallback: () {},
-                  );
-                }
-              },
-            ),
-          ],
-        ),
-      ),*/
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         color: Colors.white,
