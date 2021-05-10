@@ -12,9 +12,9 @@ import 'package:flutter_food_app/redux/Search/SearchState.dart';
 AppState appReducers(AppState state, dynamic action) {
   if (action.runtimeType.toString() == (InitAppState).toString()) {
     return state.newState(
+      isInitLoad: false,
       homeState: state.homeState.newState(
         dataList: action.dataList,
-        isLoading: false,
       ),
       myCartState: state.myCartState.newState(
         cartList: action.cartList,
@@ -25,15 +25,18 @@ AppState appReducers(AppState state, dynamic action) {
     );
   } else if (action.runtimeType.toString() == (StartInitAppState).toString()) {
     return state.newState(
-      homeState: new HomeState(isLoading: true),
+      isInitLoad: true,
+      homeState: new HomeState(),
       myCartState: new MyCartState(),
       myFavState: new MyFavState(),
       searchState: new SearchState(),
     );
   } else if (action.runtimeType.toString() == (ClearStateAppState).toString()) {
     return state.newState(
+      isInitLoad: false,
       homeState: new HomeState(),
       myCartState: new MyCartState(),
+      myFavState: new MyFavState(),
     );
   } else if (action.runtimeType.toString().endsWith("HomeState")) {
     return state.newState(homeState: homeReducers(state.homeState, action));

@@ -243,85 +243,82 @@ class _HomeScreen extends State<HomeScreen> {
           ),
           body: Column(
             children: [
-              /*StoreConnector<AppState, bool>(
-                converter: (store) => store.state.homeState.isLoading,
-                builder: (BuildContext context, bool isLoading) =>
-                    Visibility(
-                  visible: isLoading && !this.isInLoadingSearch,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: paddingTopMedia + heightOfAppBar),
-                    child: SpinKitWave(
-                      color: Colors.red,
-                      size: 35.0,
-                    ),
-                  ),
-                ),
-              ),*/
-              Expanded(
-                child: StoreConnector<AppState, List<HomeModel>>(
-                  distinct: true,
-                  converter: (store) => store.state.homeState.dataList,
-                  onWillChange: (prev, cur) {},
-                  onDidChange: (prev, cur) {
-                    if (store.state.homeState.dataList.length > this.numberOfCartInScreen &&
-                        _controller.offset == _controller.position.maxScrollExtent) {
-                      Toast.show("You reached the end", context, duration: 1);
-                      _controller.animateTo(
-                        _controller.position.maxScrollExtent - 50,
-                        curve: Curves.linear,
-                        duration: Duration(microseconds: 1),
-                      );
-                    }
-                    if (this.mounted) {
-                      setState(() {
-                        this.isInLoadingMore = false;
-                      });
-                    }
-                  },
-                  builder: (context, List<HomeModel> dataList) => dataList.length == 0
-                      ? Center(
-                          child: Text("No data available", style: TextStyle(fontSize: 30)),
-                        )
-                      : ListView.builder(
-                          padding: EdgeInsets.only(top: paddingTopMedia),
-                          //physics: BouncingScrollPhysics(),
-                          controller: _controller,
-                          itemCount: dataList.length + 2,
-                          scrollDirection: Axis.vertical,
-                          //itemExtent: _getHeightForCart(this.context, dividedBy: numberOfCartInScreen),
-                          itemBuilder: (buildContext, index) {
-                            //final double height = MediaQuery.of(context).size.height;
-                            if (index == 0) {
-                              return CarouselSlider(
-                                options: CarouselOptions(
-                                  aspectRatio: 2,
-                                  //enlargeCenterPage: true,
-                                  scrollDirection: Axis.vertical,
-                                  autoPlay: true,
-                                  height: this.heightOfSlide,
-                                  viewportFraction: 1,
-                                ),
-                                items: listImage
-                                    .map((item) => Image.network(
-                                          item,
-                                          fit: BoxFit.cover,
-                                          height: 150,
-                                        ))
-                                    .toList(),
-                              );
-                            } else if (index == dataList.length + 1) {
-                              if (dataList.length > 4) {
-                                return Container(
-                                  height: 50,
-                                  child: SpinKitWave(color: Colors.red, size: 35.0),
-                                );
-                              }
-                              return null;
-                            }
-                            return cardUI(dataList[index - 1], lengthForACart);
-                          },
+              StoreConnector<AppState, bool>(
+                converter: (store) => store.state.isInitLoad,
+                builder: (BuildContext context, bool isInitLoad) => isInitLoad
+                    ? Container(
+                        padding: EdgeInsets.only(top: paddingTopMedia + heightOfAppBar),
+                        child: SpinKitDualRing(
+                          color: Colors.red,
+                          size: 35.0,
                         ),
-                ),
+                      )
+                    : Expanded(
+                        child: StoreConnector<AppState, List<HomeModel>>(
+                          distinct: true,
+                          converter: (store) => store.state.homeState.dataList,
+                          onWillChange: (prev, cur) {},
+                          onDidChange: (prev, cur) {
+                            if (store.state.homeState.dataList.length > this.numberOfCartInScreen &&
+                                _controller.offset == _controller.position.maxScrollExtent) {
+                              Toast.show("You reached the end", context, duration: 1);
+                              _controller.animateTo(
+                                _controller.position.maxScrollExtent - 50,
+                                curve: Curves.linear,
+                                duration: Duration(microseconds: 1),
+                              );
+                            }
+                            if (this.mounted) {
+                              setState(() {
+                                this.isInLoadingMore = false;
+                              });
+                            }
+                          },
+                          builder: (context, List<HomeModel> dataList) => dataList.length == 0
+                              ? Center(
+                                  child: Text("No data available", style: TextStyle(fontSize: 30)),
+                                )
+                              : ListView.builder(
+                                  padding: EdgeInsets.only(top: paddingTopMedia),
+                                  //physics: BouncingScrollPhysics(),
+                                  controller: _controller,
+                                  itemCount: dataList.length + 2,
+                                  scrollDirection: Axis.vertical,
+                                  //itemExtent: _getHeightForCart(this.context, dividedBy: numberOfCartInScreen),
+                                  itemBuilder: (buildContext, index) {
+                                    //final double height = MediaQuery.of(context).size.height;
+                                    if (index == 0) {
+                                      return CarouselSlider(
+                                        options: CarouselOptions(
+                                          aspectRatio: 2,
+                                          //enlargeCenterPage: true,
+                                          scrollDirection: Axis.vertical,
+                                          autoPlay: true,
+                                          height: this.heightOfSlide,
+                                          viewportFraction: 1,
+                                        ),
+                                        items: listImage
+                                            .map((item) => Image.network(
+                                                  item,
+                                                  fit: BoxFit.cover,
+                                                  height: 150,
+                                                ))
+                                            .toList(),
+                                      );
+                                    } else if (index == dataList.length + 1) {
+                                      if (dataList.length > 4) {
+                                        return Container(
+                                          height: 50,
+                                          child: SpinKitWave(color: Colors.red, size: 35.0),
+                                        );
+                                      }
+                                      return null;
+                                    }
+                                    return cardUI(dataList[index - 1], lengthForACart);
+                                  },
+                                ),
+                        ),
+                      ),
               ),
             ],
           ),

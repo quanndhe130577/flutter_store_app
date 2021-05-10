@@ -10,7 +10,6 @@ HomeState homeReducers(HomeState state, dynamic action) {
   } else if (action.runtimeType.toString() == (RefreshDataHomeState).toString()) {
     return state.newState(
       dataList: state.dataList,
-      //searchList: action.dataList,
       isLoading: false,
     );
   } else if (action.runtimeType.toString() == (StartLoadMoreHomeState).toString()) {
@@ -23,20 +22,5 @@ HomeState homeReducers(HomeState state, dynamic action) {
       isLoading: false,      //isLoadingMore: false,
     );
   }
-  /* else if (action.runtimeType.toString() == (StartLoadingSearchHomeState).toString()) {
-    return state.newState(
-      isLoading: true,
-      //searchList: [],
-    );
-  }
-   else if (action.runtimeType.toString() == (LoadingSearchHomeState).toString()) {
-    return state.newState(
-      searchText: action.keyword,
-      searchList: action.searchList,
-      isLoading: false,
-    );
-  } else if (action.runtimeType.toString() == (RemoveSearchHomeState).toString()) {
-    return state.newState(searchText: "", searchList: state.dataList);
-  }*/
   return state;
 }
