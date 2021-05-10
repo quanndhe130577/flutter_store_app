@@ -4,6 +4,7 @@ import 'package:flutter_food_app/CommonWidget/CustomAppBar.dart';
 import 'package:flutter_food_app/CommonWidget/InheritedAppbarProvider.dart';
 import 'package:flutter_food_app/Model/SearchEntity.dart';
 import 'package:flutter_food_app/redux/AppState.dart';
+import 'package:flutter_food_app/redux/Home/HomeMiddleware.dart';
 import 'package:flutter_food_app/redux/MyCart/MyCartActions.dart';
 import 'package:flutter_food_app/redux/MyFavorite/MyFavoriteActions.dart';
 import 'package:flutter_food_app/redux/Search/SearchActions.dart';
@@ -35,11 +36,54 @@ class _SearchScreenState extends State<SearchScreen> {
 
   bool isSearching = false;
   bool isBackHome = false;
+  bool isInLoadingMore = false;
+
+  double numberOfCartInScreen = 5;
+
+  ScrollController _controller;
+
+  void handleControllerHome() async {
+    // if (_controller.offset >= _controller.position.maxScrollExtent &&
+    //     !_controller.position.outOfRange) {
+    //   //await Future.delayed(Duration(seconds: 1));
+    //   //store.dispatch(LoadMoreDataHomeAction());
+    // }
+
+    if (_controller.offset >=
+            _controller.position.maxScrollExtent -
+                stepLoadMore * getHeightForWidget(this.context, dividedBy: this.numberOfCartInScreen) &&
+        !isInLoadingMore) {
+      if (this.mounted) {
+        setState(() {
+          this.isInLoadingMore = true;
+        });
+      }
+      store.dispatch(LoadMoreDataSearchAction());
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent + 100) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = _controller.offset / 100;
+          this.isHeadOfContext = false;
+        });
+      }
+    } else if (opacityAppbar != 1) {
+      if (this.mounted) {
+        setState(() {
+          opacityAppbar = 1;
+          this.isHeadOfContext = false;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     _textFiledController = TextEditingController();
+    _controller = ScrollController();
+    _controller.addListener(handleControllerHome);
+
     super.initState();
   }
 
@@ -47,6 +91,11 @@ class _SearchScreenState extends State<SearchScreen> {
     showSimpleLoadingModalDialog(this.context);
     await Future.delayed(Duration(seconds: 1));
     store.dispatch(FirstLoadSearchAction(text));
+    if (this.mounted) {
+      setState(() {
+        this.isSearching = true;
+      });
+    }
   }
 
   void handleAfterPopLeading() {
@@ -78,17 +127,24 @@ class _SearchScreenState extends State<SearchScreen> {
                   padding: EdgeInsets.only(bottom: 7, top: 7, left: 7),
                   child: TextButton(
                     onPressed: () => {},
-                    style: ButtonStyle(
+                    /*style: ButtonStyle(
                       shape:
                           MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0))),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.black26.withOpacity(0.2 - this.opacityAppbar * 0.2)),
-                    ),
-                    child: Icon(
-                      Icons.filter_alt_outlined,
-                      color: this.opacityAppbar >= 0.1 ? Colors.red : Colors.white,
-                      semanticLabel: "MyCart",
-                      size: 25,
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.black26.withOpacity(0.15)),
+                    ),*/
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.filter_alt_outlined,
+                          color: Colors.red,
+                          semanticLabel: "Filter",
+                          size: 30,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Text("Filter", style: TextStyle(color: Colors.red, fontSize: 10)),
+                        ),
+                      ],
                     ),
                   ),
                 ),
