@@ -54,6 +54,7 @@ class _HomeScreen extends State<HomeScreen> {
     "https://i.imgur.com/gWjAMXQ.jpg",
     "https://i.imgur.com/yfqRp7o.jpg"
   ];
+  bool reachTheEnd = false;
 
   //
 
@@ -82,24 +83,16 @@ class _HomeScreen extends State<HomeScreen> {
 
     if (_controller.offset >=
             _controller.position.maxScrollExtent -
-                double.parse(stepLoadMore.toString()) *
-                    (getHeightForWidget(this.context, dividedBy: numberOfCartInScreen) / 2) &&
-        //!store.state.homeState.isLoadingMore &&
+                stepLoadMore *
+                    getHeightForWidget(this.context, dividedBy: this.numberOfCartInScreen, sub: this.heightOfSlide) &&
         !isInLoadingMore) {
       if (this.mounted) {
         setState(() {
           this.isInLoadingMore = true;
         });
       }
-      //await Future.delayed(Duration(seconds: 1));
       store.dispatch(LoadMoreDataHomeAction());
     }
-
-    /*if (_controller.offset <= _controller.position.minScrollExtent &&
-        !_controller.position.outOfRange &&
-        !store.state.homeState.isLoading) {
-      store.dispatch(RefreshDataHomeAction());
-    } else */
     if (_controller.offset <= _controller.position.minScrollExtent + this.heightOfSlide) {
       if (this.mounted) {
         setState(() {
@@ -257,11 +250,18 @@ class _HomeScreen extends State<HomeScreen> {
                         child: StoreConnector<AppState, List<HomeModel>>(
                           distinct: true,
                           converter: (store) => store.state.homeState.dataList,
-                          onWillChange: (prev, cur) {},
-                          onDidChange: (prev, cur) {
-                            if (store.state.homeState.dataList.length > this.numberOfCartInScreen &&
-                                _controller.offset == _controller.position.maxScrollExtent) {
+                          onWillChange: (prev, cur) {
+                            if (prev.length == cur.length && !this.reachTheEnd) {
                               Toast.show("You reached the end", context, duration: 1);
+                              if (this.mounted) {
+                                setState(() {
+                                  this.reachTheEnd = true;
+                                });
+                              }
+                            }
+                          },
+                          onDidChange: (prev, cur) {
+                            if (_controller.offset == _controller.position.maxScrollExtent && !this.reachTheEnd) {
                               _controller.animateTo(
                                 _controller.position.maxScrollExtent - 50,
                                 curve: Curves.linear,
@@ -306,7 +306,7 @@ class _HomeScreen extends State<HomeScreen> {
                                             .toList(),
                                       );
                                     } else if (index == dataList.length + 1) {
-                                      if (dataList.length > 4) {
+                                      if (dataList.length > 4 && !this.reachTheEnd) {
                                         return Container(
                                           height: 50,
                                           child: SpinKitWave(color: Colors.red, size: 35.0),
